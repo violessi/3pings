@@ -1,27 +1,40 @@
-// TripCard.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-// Define the type for props so that it can receive data from the parent screen
 type TripCardProps = {
   title: string;
-  duration: string;
-  distance: string;
-  difficulty: string;
+  bikeID: string;
+  tripStart: string;
+  tripEnd: string;
+  remarks: string;
 };
 
 export default function TripCard({
   title,
-  duration,
-  distance,
-  difficulty,
+  bikeID,
+  tripStart,
+  tripEnd,
+  remarks,
 }: TripCardProps) {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.detail}>Duration: {duration}</Text>
-      <Text style={styles.detail}>Distance: {distance}</Text>
-      <Text style={styles.detail}>Difficulty: {difficulty}</Text>
+      <Text style={styles.detail}>
+        <Text style={styles.label}>Bike ID: </Text>
+        {bikeID}
+      </Text>
+      <Text style={styles.detail}>
+        <Text style={styles.label}>Trip Start: </Text>
+        {tripStart}
+      </Text>
+      <Text style={styles.detail}>
+        <Text style={styles.label}>Trip End: </Text>
+        {tripEnd}
+      </Text>
+      <Text style={styles.detail}>
+        <Text style={styles.label}>Remarks: </Text>
+        {remarks}
+      </Text>
     </View>
   );
 }
@@ -46,6 +59,10 @@ const styles = StyleSheet.create({
   },
   detail: {
     fontSize: 16,
+    color: '#555',
+  },
+  label: {
+    fontWeight: 'bold',
     color: '#555',
   },
 });

@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet } from 'react-native';
-import globalStyles from '../../assets/styles'; // Relative path to the styles.ts file
+import globalStyles from '../../assets/styles';
 
 export default function ProfileScreen() {
   return (
