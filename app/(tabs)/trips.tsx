@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, ScrollView } from 'react-native';
-import TripCard from '../../components/TripCard'; // Import your TripCard component
-import globalStyles from '../../assets/styles'; // Relative path to the styles.ts file
+import TripCard from '../../components/TripCard';
+import globalStyles from '../../assets/styles';
 
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebaseConfig'; // adjust the path based on your folder structure
-
-// NEW TYPE for completedTrips
-type CompletedTrip = {
-  bikeID: string;
-  startRack: string;
-  endRack: string;
-  startTime: string;
-  endTime: string;
-};
-
-// TEMPORARY mocked current trip
-const currentTrip = [
-  { title: 'Downtown Tour 1', duration: '2 hours', distance: '10km', difficulty: 'Easy' },
-];
+import { db } from '../../firebaseConfig';
+import { Trip } from '../../components/types';
 
 export default function TripScreen() {
+  const [completedTrips, setCompletedTrips] = useState<Trip[]>([]);
+  const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
+
   // Fetch data
-  const [completedTrips, setCompletedTrips] = useState<CompletedTrip[]>([]);
+
+  useEffect(() => {
+    const fetchActiveTrips = async () => {
+      try {
+        const activeCollection = collection(db, 'activeTrips');
+        const activeSnapshot = await getDocs(activeCollection);
+        const trips: Trip[] = activeSnapshot.docs.map((doc) => doc.data() as Trip);
+        setActiveTrips(trips);
+        console.log('Fetched active trips:', trips);
+      } catch (error) {
+        console.error('Error fetching active trips:', error);
+      }
+    };
+
+    fetchActiveTrips();
+  }, []);
 
   useEffect(() => {
     const fetchCompletedTrips = async () => {
@@ -30,7 +35,7 @@ export default function TripScreen() {
         const tripsCollection = collection(db, 'completedTrips');
         const tripSnapshot = await getDocs(tripsCollection);
 
-        const trips: CompletedTrip[] = tripSnapshot.docs.map((doc) => doc.data() as CompletedTrip);
+        const trips: Trip[] = tripSnapshot.docs.map((doc) => doc.data() as Trip);
 
         console.log('Fetched completed trips:', trips);
         setCompletedTrips(trips);
@@ -46,25 +51,26 @@ export default function TripScreen() {
   return (
     <View style={globalStyles.wrapper}>
     <ScrollView contentContainerStyle={globalStyles.container} showsVerticalScrollIndicator={false}>
-        {/* Dynamically render bike trip cards */}
-        <Text style={globalStyles.title}> Active</Text>
-        {currentTrip.map((trip, index) => (
+        <Text style={globalStyles.title}> Active </Text>
+        {activeTrips.map((trip, index) => (
           <TripCard
             key={index}
-            title={trip.title}
-            duration={trip.duration}
-            distance={trip.distance}
-            difficulty={trip.difficulty}
+            title={`${trip.startRack}`}
+            bikeID={`Bike ${trip.bikeID}`}
+            tripStart={`${trip.startTime.toDate().toLocaleString()}`}
+            tripEnd=""
+            remarks="N/A" // change to bike status once db for bikes ready (reserved | in use | overtime)
           />
         ))}
-        <Text style={globalStyles.title}> Completed</Text>
+        <Text style={globalStyles.title}> Completed </Text>
         {completedTrips.map((trip, index) => (
           <TripCard
             key={index}
-            title={`Bike ${trip.bikeID}`}
-            duration={`${trip.startTime.toDate().toLocaleString()} to ${trip.endTime.toDate().toLocaleString()}`}
-            distance={`${trip.startRack} → ${trip.endRack}`}
-            difficulty="N/A" // You can customize this or create a new component
+            title={`${trip.startRack} to ${trip.endRack}`}
+            bikeID={`Bike ${trip.bikeID}`}
+            tripStart={`${trip.startTime.toDate().toLocaleString()}`}
+            tripEnd={`${trip.endTime.toDate().toLocaleString()}`}
+            remarks="N/A" // change to bike status once db for bikes ready (paid | unpaid)
           />
         ))}
     </ScrollView>
