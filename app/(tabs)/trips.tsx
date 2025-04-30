@@ -59,7 +59,7 @@ export default function TripScreen() {
             bikeID={`Bike ${trip.bikeID}`}
             tripStart={`${trip.startTime.toDate().toLocaleString()}`}
             tripEnd=""
-            remarks="N/A" // change to bike status once db for bikes ready (reserved | in use | overtime)
+            remarks={`${trip.status}`} // change to bike status once db for bikes ready (reserved | in use | overtime)
           />
         ))}
         <Text style={globalStyles.title}> Completed </Text>
@@ -70,7 +70,7 @@ export default function TripScreen() {
             bikeID={`Bike ${trip.bikeID}`}
             tripStart={`${trip.startTime.toDate().toLocaleString()}`}
             tripEnd={`${trip.endTime.toDate().toLocaleString()}`}
-            remarks="N/A" // change to bike status once db for bikes ready (paid | unpaid)
+            remarks={`${trip.status}`} // change to bike status once db for bikes ready (paid | unpaid)
           />
         ))}
     </ScrollView>
