@@ -7,16 +7,16 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#ffd33d',
         headerStyle: {
-          backgroundColor: '#30013C',
+          backgroundColor: '#362C5F',
         },
         headerShadowVisible: false,
         headerTintColor: '#fff',
         tabBarStyle: {
-        backgroundColor: '#30013C',
+        backgroundColor: '#362C5F',
         },
       }}
     >
-      <Tabs.Screen name="index" 
+      <Tabs.Screen name="action" 
         options={{ 
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
@@ -27,6 +27,14 @@ export default function TabLayout() {
       <Tabs.Screen name="rewards" 
         options={{ 
           title: 'Rewards',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
+          ),
+        }} 
+      />
+      <Tabs.Screen name="index" 
+        options={{ 
+          title: 'Maps',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
           ),

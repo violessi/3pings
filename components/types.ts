@@ -6,4 +6,5 @@ export type Trip = {
     endRack: string;
     startTime: Timestamp;
     endTime: Timestamp;
+    status: string;
   };
