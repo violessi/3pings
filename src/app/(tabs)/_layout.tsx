@@ -1,60 +1,91 @@
-import { Tabs } from 'expo-router';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Tabs } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#ffd33d',
-        headerStyle: {
-          backgroundColor: '#362C5F',
-        },
-        headerShadowVisible: false,
-        headerTintColor: '#fff',
+        tabBarActiveTintColor: "#362C5F",
+        headerShown: false,
         tabBarStyle: {
-        backgroundColor: '#362C5F',
+          backgroundColor: "#ffffff",
+          paddingTop: 4,
+          paddingBottom: 10,
         },
       }}
     >
-      <Tabs.Screen name="action" 
-        options={{ 
-          title: 'Home',
+      <Tabs.Screen
+        name="action"
+        options={{
+          title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={color} size={24} />
+            <Ionicons
+              name={focused ? "home-sharp" : "home-outline"}
+              color={color}
+              size={24}
+            />
           ),
-        }} 
+        }}
       />
-      <Tabs.Screen name="rewards" 
-        options={{ 
-          title: 'Rewards',
+      <Tabs.Screen
+        name="rewards"
+        options={{
+          title: "Rewards",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
+            <Ionicons
+              name={
+                focused ? "information-circle" : "information-circle-outline"
+              }
+              color={color}
+              size={24}
+            />
           ),
-        }} 
+        }}
       />
-      <Tabs.Screen name="index" 
-        options={{ 
-          title: 'Maps',
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Maps",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
+            <Ionicons
+              name={
+                focused ? "information-circle" : "information-circle-outline"
+              }
+              color={color}
+              size={24}
+            />
           ),
-        }} 
+        }}
       />
-      <Tabs.Screen name="trips" 
-        options={{ 
-          title: 'Trips',
+      <Tabs.Screen
+        name="trips"
+        options={{
+          title: "Trips",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
+            <Ionicons
+              name={
+                focused ? "information-circle" : "information-circle-outline"
+              }
+              color={color}
+              size={24}
+            />
           ),
-        }} 
+        }}
       />
-      <Tabs.Screen name="profile" 
-        options={{ 
-          title: 'Profile',
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
+            <Ionicons
+              name={
+                focused ? "information-circle" : "information-circle-outline"
+              }
+              color={color}
+              size={24}
+            />
           ),
-        }} 
+        }}
       />
     </Tabs>
   );
