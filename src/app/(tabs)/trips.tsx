@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, ScrollView } from 'react-native';
-import TripCard from '../../components/TripCard';
-import globalStyles from '../../assets/styles';
+import React, { useState, useEffect } from "react";
+import { Text, View, ScrollView } from "react-native";
+import TripCard from "../../../components/TripCard";
+import globalStyles from "../../../assets/styles";
 
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
-import { Trip } from '../../components/types';
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebaseConfig";
+import { Trip } from "../../../components/types";
 
 export default function TripScreen() {
   const [completedTrips, setCompletedTrips] = useState<Trip[]>([]);
@@ -16,13 +16,15 @@ export default function TripScreen() {
   useEffect(() => {
     const fetchActiveTrips = async () => {
       try {
-        const activeCollection = collection(db, 'activeTrips');
+        const activeCollection = collection(db, "activeTrips");
         const activeSnapshot = await getDocs(activeCollection);
-        const trips: Trip[] = activeSnapshot.docs.map((doc) => doc.data() as Trip);
+        const trips: Trip[] = activeSnapshot.docs.map(
+          (doc) => doc.data() as Trip
+        );
         setActiveTrips(trips);
-        console.log('Fetched active trips:', trips);
+        console.log("Fetched active trips:", trips);
       } catch (error) {
-        console.error('Error fetching active trips:', error);
+        console.error("Error fetching active trips:", error);
       }
     };
 
@@ -32,12 +34,14 @@ export default function TripScreen() {
   useEffect(() => {
     const fetchCompletedTrips = async () => {
       try {
-        const tripsCollection = collection(db, 'completedTrips');
+        const tripsCollection = collection(db, "completedTrips");
         const tripSnapshot = await getDocs(tripsCollection);
 
-        const trips: Trip[] = tripSnapshot.docs.map((doc) => doc.data() as Trip);
+        const trips: Trip[] = tripSnapshot.docs.map(
+          (doc) => doc.data() as Trip
+        );
 
-        console.log('Fetched completed trips:', trips);
+        console.log("Fetched completed trips:", trips);
         setCompletedTrips(trips);
       } catch (error) {
         console.error("Error fetching completed trips:", error);
@@ -50,7 +54,10 @@ export default function TripScreen() {
   // Return
   return (
     <View style={globalStyles.wrapper}>
-    <ScrollView contentContainerStyle={globalStyles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={globalStyles.container}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={globalStyles.title}> Active </Text>
         {activeTrips.map((trip, index) => (
           <TripCard
@@ -73,7 +80,7 @@ export default function TripScreen() {
             remarks={`${trip.status}`} // change to bike status once db for bikes ready (paid | unpaid)
           />
         ))}
-    </ScrollView>
+      </ScrollView>
     </View>
   );
 }
