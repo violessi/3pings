@@ -7,7 +7,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
+import { db } from "@/firebaseConfig";
 
 import globalStyles from "@/src/assets/styles";
 
@@ -63,7 +63,7 @@ export default function ActionPage() {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 justify-center items-center gap-5 p-5">
       <Button title="Avail Bike" onPress={handleAvail} color="#362C5F" />
       <Button title="Return Bike" onPress={handleReturn} color="#362C5F" />
       <Button

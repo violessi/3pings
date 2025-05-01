@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, ScrollView } from "react-native";
-import TripCard from "../../../components/TripCard";
-import globalStyles from "../../../assets/styles";
+import TripCard from "@/src/components/TripCard";
+import globalStyles from "@/src/assets/styles";
 
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
-import { Trip } from "../../../components/types";
+import { db } from "@/firebaseConfig";
+import { Trip } from "@/src/components/types";
 
 export default function TripScreen() {
   const [completedTrips, setCompletedTrips] = useState<Trip[]>([]);
