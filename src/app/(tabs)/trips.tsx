@@ -6,6 +6,7 @@ import globalStyles from "@/src/assets/styles";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { Trip } from "@/src/components/types";
+import Header from "@/src/components/Header";
 
 export default function TripScreen() {
   const [completedTrips, setCompletedTrips] = useState<Trip[]>([]);
@@ -54,6 +55,7 @@ export default function TripScreen() {
   // Return
   return (
     <SafeAreaView className="flex-1 bg-background">
+      <Header title="Trips" subtitle="Check your trips!" />
       <ScrollView
         contentContainerStyle={globalStyles.container}
         showsVerticalScrollIndicator={false}

@@ -9,6 +9,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 
+import Header from "@/src/components/Header";
 
 export default function ActionPage() {
   const router = useRouter();
@@ -63,6 +64,11 @@ export default function ActionPage() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
+      <Header
+        title="Welcome, user!"
+        subtitle="What do you want to do today?"
+        hasBack={false}
+        isHomepage={true}
       />
     </SafeAreaView>
   );
