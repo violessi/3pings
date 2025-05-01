@@ -1,4 +1,4 @@
-import { Text, View, Button, StyleSheet, Alert } from "react-native";
+import { View, Alert, SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
 import {
   collection,
@@ -9,7 +9,6 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 
-import globalStyles from "@/src/assets/styles";
 
 export default function ActionPage() {
   const router = useRouter();
@@ -63,24 +62,8 @@ export default function ActionPage() {
   };
 
   return (
-    <View className="flex-1 justify-center items-center gap-5 p-5">
-      <Button title="Avail Bike" onPress={handleAvail} color="#362C5F" />
-      <Button title="Return Bike" onPress={handleReturn} color="#362C5F" />
-      <Button
-        title="Reserve"
-        onPress={() => router.replace("/(tabs)")}
-        color="#362C5F"
+    <SafeAreaView className="flex-1 bg-background">
       />
-    </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    gap: 20,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-  },
-});

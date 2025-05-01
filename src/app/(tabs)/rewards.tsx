@@ -1,10 +1,9 @@
-import { Text, View, StyleSheet } from "react-native";
-import globalStyles from "@/src/assets/styles";
+import { Text, View, StyleSheet, SafeAreaView } from "react-native";
 
 export default function RewardsScreen() {
   return (
-    <View style={globalStyles.container}>
-      <Text style={globalStyles.text}>Rewards screen</Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-background">
+      <Text className="text-secondary">Rewards screen</Text>
+    </SafeAreaView>
   );
 }

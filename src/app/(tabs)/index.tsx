@@ -12,8 +12,7 @@ import globalStyles from "@/src/assets/styles";
 
 export default function Index() {
   return (
-    <View style={globalStyles.container}>
-      <Text style={globalStyles.text}>Map and racks screen</Text>
-    </View>
+    <SafeAreaView className="flex-1">
+    </SafeAreaView>
   );
 }

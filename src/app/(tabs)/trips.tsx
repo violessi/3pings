@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, ScrollView } from "react-native";
+import { Text, View, ScrollView, SafeAreaView } from "react-native";
 import TripCard from "@/src/components/TripCard";
 import globalStyles from "@/src/assets/styles";
 
@@ -53,7 +53,7 @@ export default function TripScreen() {
 
   // Return
   return (
-    <View style={globalStyles.wrapper}>
+    <SafeAreaView className="flex-1 bg-background">
       <ScrollView
         contentContainerStyle={globalStyles.container}
         showsVerticalScrollIndicator={false}
@@ -81,6 +81,6 @@ export default function TripScreen() {
           />
         ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
