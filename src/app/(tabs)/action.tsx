@@ -10,6 +10,7 @@ import {
 import { db } from "@/firebaseConfig";
 
 import Header from "@/src/components/Header";
+import Option from "@/src/components/HomeOptions";
 
 export default function ActionPage() {
   const router = useRouter();
@@ -70,6 +71,26 @@ export default function ActionPage() {
         hasBack={false}
         isHomepage={true}
       />
+      <View className="flex-1 justify-start gap-1 p-5">
+        <Option
+          title="Rent"
+          description="Rent a bike"
+          icon="bike"
+          onPress={handleAvail}
+        />
+        <Option
+          title="Return"
+          description="Return a bike"
+          icon="arrow-left"
+          onPress={handleReturn}
+        />
+        <Option
+          title="Reserve"
+          description="Reserve a bike"
+          icon="calendar"
+          onPress={() => router.replace("/(tabs)")}
+        />
+      </View>
     </SafeAreaView>
   );
 }
