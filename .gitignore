@@ -35,4 +35,14 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# firebase
+firebase-debug.log
+
+# builds
+ios/
+android/
+
+# misc
+.vscode/
+
 app-example
