@@ -1,5 +1,5 @@
-import { Text, View, StyleSheet } from 'react-native';
-import globalStyles from '../../assets/styles';
+import { Text, View, StyleSheet } from "react-native";
+import globalStyles from "../../../assets/styles";
 
 export default function RewardsScreen() {
   return (
