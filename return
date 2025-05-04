@@ -1,0 +1,64 @@
+ReturnABike(rackId, userId)
+1. checkRackId(rackId) -> boolean
+2. hasAvailableSlots(rackId, rackThreshold) -> boolean
+3. pingHardware() -> boolean
+4. unlockSlot(rackId, bikeId) -> void (use rfid to search for slot with null)
+5. waitUntilReturned(bikeId) -> boolean
+6. updateTrip(userId, endTime, finalFee, status) -> void
+    computeFee(startTime, baseRate, addtlCharges) -> number
+    {endTime, finalFee, status:"completed"}
+7. updateBike(bikeId, status) -> void
+8. updateUser(balance, currentTrip) -> void
+
+----
+
+CLIENT TO DB
+1. checkRackId(rackId) -> boolean
+    - GET
+        - table: racks
+        - filter: rackId
+    - return if rack id exist in db
+2. hasAvailableSlots(rackId, rackThreshold) -> boolean
+    - GET
+        - table: bikes
+        - filter: status==available, rackId
+    - return true if list of available bikes on a rack is less than threshold 
+3. updateTrip(userId, endTime, finalFee, status) -> void
+    - computeFee(startTime, baseRate, addtlCharges) -> number
+        - GET
+            - table: trips
+            - filter: userId, status==active
+        - return finalFee
+    - UPDATE
+        - table: trips
+        - payload: { endTime: currentTime, finalFee, status: "completed" }
+4. updateBike(bikeId, status) -> void
+    - UPDATE
+        - table: bikes 
+        - payload: { status: "available" }
+5. updateUser(balance, currentTrip) -> void
+    - UPDATE
+        - table: users
+        - payload: { balance: balance + finalFee, currentTrip: null }
+
+----
+
+CLIENT TO HARDWARE
+1. pingHardware() -> boolean
+    - GET
+    - return true
+2. unlockSlot(rackId, bikeId) -> void
+    - POST
+        - payload: { rackId, bikeId }
+3. waitUntilReturned(bikeId) -> boolean
+    - onChangeListener
+        - table: bike
+        - filter: bikeId
+        - attribute: status
+    - wait until status is Returned
+
+----
+
+HARDWARE TASKS
+1. Create Endpoint unlockSlot to unlock bike slot, payload rackId and bikeId, return ack
+2. When bike is successfully mounted, send firebase post request to update bike with { status: returned, rackId }, return ack 

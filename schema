@@ -1,0 +1,43 @@
+TABLES:
+ 
+1. racks:
+    rack_id,
+    rack_name,
+    location,
+    coordinates,
+    created_at,
+    updated_at
+
+2. bikes:
+    bike_id,
+    rack_id,
+    status: reserved | available | returning | returned | rented | getting | missing | maintenance,
+    created_at,
+    updated_at
+
+3. trips:
+    trip_id, 
+    user_id,
+    start_time,
+    end_time,
+    bike_id,
+    status: reserved | active | completed | cancelled,
+    base_rate,
+    addtl_charge,
+    final_fee,
+    created_at,
+    updated_at
+
+4. users:
+    id,
+    name,
+    balance,
+    current_trip,
+    created_at,
+    updated_at
+
+NOTES:
+- available (bike is returned) vs returning (bike slot opened, waiting for bike)
+- rented (bike is availed) vs getting (bike slot opened, waiting for user to get bike)
+- need to put pa ung sa incentives
+- base_rate is the fee of rental every x mins, final_fee is computed by (base_rate * diff of start and end times) + addtl_charge
