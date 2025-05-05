@@ -30,7 +30,8 @@ TABLES:
 
 4. users:
     id,
-    name,
+    email,
+    username,
     balance,
     current_trip,
     created_at,
@@ -41,3 +42,5 @@ NOTES:
 - rented (bike is availed) vs getting (bike slot opened, waiting for user to get bike)
 - need to put pa ung sa incentives
 - base_rate is the fee of rental every x mins, final_fee is computed by (base_rate * diff of start and end times) + addtl_charge
+- rack threshold is 5 bikes
+- base rate is 10 pesos

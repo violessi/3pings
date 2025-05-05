@@ -3,14 +3,14 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCXVatql4xb0sgh7HKUGwva1qVvEanUdfg",
-    authDomain: "stickersmash-648fc.firebaseapp.com",
-    projectId: "stickersmash-648fc",
-    storageBucket: "stickersmash-648fc.firebasestorage.app",
-    messagingSenderId: "970412997500",
-    appId: "1:970412997500:web:94fb59f56fc7d2be4c82f9",
-    measurementId: "G-PH4BFG6KT2"
-  };
+  apiKey: "AIzaSyDU0Elccke6IY1dlMGdbSAxgPnRNm4Gdxo",
+  authDomain: "cs145-iotcup.firebaseapp.com",
+  projectId: "cs145-iotcup",
+  storageBucket: "cs145-iotcup.firebasestorage.app",
+  messagingSenderId: "695263987135",
+  appId: "1:695263987135:web:0c57e5a675ae4e6c070d0a",
+  measurementId: "G-YCQ1Z7HVZ4"
+};
   
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

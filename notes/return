@@ -2,11 +2,10 @@ ReturnABike(rackId, userId)
 1. checkRackId(rackId) -> boolean
 2. hasAvailableSlots(rackId, rackThreshold) -> boolean
 3. pingHardware() -> boolean
-4. unlockSlot(rackId, bikeId) -> void (use rfid to search for slot with null)
+4. unlockSlot(bikeId) -> void
 5. waitUntilReturned(bikeId) -> boolean
 6. updateTrip(userId, endTime, finalFee, status) -> void
     computeFee(startTime, baseRate, addtlCharges) -> number
-    {endTime, finalFee, status:"completed"}
 7. updateBike(bikeId, status) -> void
 8. updateUser(balance, currentTrip) -> void
 
