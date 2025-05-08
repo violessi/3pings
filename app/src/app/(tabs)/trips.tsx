@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, ScrollView, SafeAreaView } from "react-native";
+import { Text, ScrollView, SafeAreaView } from "react-native";
 import TripCard from "@/src/components/TripCard";
 import globalStyles from "@/src/assets/styles";
 
@@ -12,42 +12,35 @@ export default function TripScreen() {
   const [completedTrips, setCompletedTrips] = useState<Trip[]>([]);
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
 
-  // Fetch data
-
   useEffect(() => {
-    const fetchActiveTrips = async () => {
+    const fetchTrips = async () => {
       try {
-        const activeCollection = collection(db, "activeTrips");
-        const activeSnapshot = await getDocs(activeCollection);
-        const trips: Trip[] = activeSnapshot.docs.map((doc) => doc.data() as Trip);
-        setActiveTrips(trips);
-        console.log("Fetched active trips:", trips);
-      } catch (error) {
-        console.error("Error fetching active trips:", error);
-      }
-    };
-
-    fetchActiveTrips();
-  }, []);
-
-  useEffect(() => {
-    const fetchCompletedTrips = async () => {
-      try {
-        const tripsCollection = collection(db, "completedTrips");
+        const tripsCollection = collection(db, "trips");
         const tripSnapshot = await getDocs(tripsCollection);
-        const trips: Trip[] = tripSnapshot.docs.map((doc) => doc.data() as Trip);
-        setCompletedTrips(trips);
-        console.log("Fetched completed trips:", trips);
+
+        const allTrips: Trip[] = tripSnapshot.docs.map((doc) => doc.data() as Trip);
+
+        const active = allTrips.filter(trip =>
+          trip.status === "reserved" || trip.status === "active"
+        );
+
+        const completed = allTrips.filter(trip =>
+          trip.status === "completed" || trip.status === "cancelled"
+        );
+
+        setActiveTrips(active);
+        setCompletedTrips(completed);
+
+        console.log("Active Trips:", active);
+        console.log("Completed Trips:", completed);
       } catch (error) {
-        console.error("Error fetching completed trips:", error);
+        console.error("Error fetching trips:", error);
       }
     };
 
-    fetchCompletedTrips();
+    fetchTrips();
   }, []);
 
-  // Return
-  
   return (
     <SafeAreaView className="flex-1 bg-background">
       <Header title="Trips" subtitle="Check your trips!" />
@@ -59,22 +52,22 @@ export default function TripScreen() {
         {activeTrips.map((trip, index) => (
           <TripCard
             key={index}
-            title={`Bike ${trip.bike_id}`}  
-            bikeID={trip.bike_id}  
-            tripStart={trip.start_time.toDate().toLocaleString()}  
-            tripEnd={trip.end_time.toDate().toLocaleString() || "Not returned yet"}  
-            remarks={trip.status}  
+            title={`Trip using ${trip.bike_id}`}
+            bikeID={`${trip.bike_id}`}
+            tripStart={`${trip.start_time.toDate().toLocaleString()}`}
+            tripEnd=""
+            remarks={`${trip.status}`}
           />
         ))}
         <Text style={globalStyles.title}> Completed </Text>
         {completedTrips.map((trip, index) => (
           <TripCard
             key={index}
-            title={`Bike ${trip.bike_id}`}  
-            bikeID={trip.bike_id} 
-            tripStart={trip.start_time.toDate().toLocaleString()}  
-            tripEnd={trip.end_time.toDate().toLocaleString()} 
-            remarks={trip.status}  
+            title={`Trip using ${trip.bike_id}`}
+            bikeID={`${trip.bike_id}`}
+            tripStart={`${trip.start_time.toDate().toLocaleString()}`}
+            tripEnd={`${trip.end_time.toDate().toLocaleString()}`}
+            remarks={`${trip.status}`}
           />
         ))}
       </ScrollView>
