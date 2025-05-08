@@ -17,7 +17,7 @@ app.get('/api/hello', (req, res) => {
 */
 
 // Load routes
-app.use('/api/action', require('./routes/bikeActions'));
+app.use('/api/bikeActions', require('./routes/bikeActions'));
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
