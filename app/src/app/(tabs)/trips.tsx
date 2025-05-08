@@ -19,9 +19,7 @@ export default function TripScreen() {
       try {
         const activeCollection = collection(db, "activeTrips");
         const activeSnapshot = await getDocs(activeCollection);
-        const trips: Trip[] = activeSnapshot.docs.map(
-          (doc) => doc.data() as Trip
-        );
+        const trips: Trip[] = activeSnapshot.docs.map((doc) => doc.data() as Trip);
         setActiveTrips(trips);
         console.log("Fetched active trips:", trips);
       } catch (error) {
@@ -37,13 +35,9 @@ export default function TripScreen() {
       try {
         const tripsCollection = collection(db, "completedTrips");
         const tripSnapshot = await getDocs(tripsCollection);
-
-        const trips: Trip[] = tripSnapshot.docs.map(
-          (doc) => doc.data() as Trip
-        );
-
-        console.log("Fetched completed trips:", trips);
+        const trips: Trip[] = tripSnapshot.docs.map((doc) => doc.data() as Trip);
         setCompletedTrips(trips);
+        console.log("Fetched completed trips:", trips);
       } catch (error) {
         console.error("Error fetching completed trips:", error);
       }
@@ -53,6 +47,7 @@ export default function TripScreen() {
   }, []);
 
   // Return
+  
   return (
     <SafeAreaView className="flex-1 bg-background">
       <Header title="Trips" subtitle="Check your trips!" />
@@ -64,22 +59,22 @@ export default function TripScreen() {
         {activeTrips.map((trip, index) => (
           <TripCard
             key={index}
-            title={`${trip.startRack}`}
-            bikeID={`Bike ${trip.bikeID}`}
-            tripStart={`${trip.startTime.toDate().toLocaleString()}`}
-            tripEnd=""
-            remarks={`${trip.status}`} // change to bike status once db for bikes ready (reserved | in use | overtime)
+            title={`Bike ${trip.bike_id}`}  
+            bikeID={trip.bike_id}  
+            tripStart={trip.start_time.toDate().toLocaleString()}  
+            tripEnd={trip.end_time.toDate().toLocaleString() || "Not returned yet"}  
+            remarks={trip.status}  
           />
         ))}
         <Text style={globalStyles.title}> Completed </Text>
         {completedTrips.map((trip, index) => (
           <TripCard
             key={index}
-            title={`${trip.startRack} to ${trip.endRack}`}
-            bikeID={`Bike ${trip.bikeID}`}
-            tripStart={`${trip.startTime.toDate().toLocaleString()}`}
-            tripEnd={`${trip.endTime.toDate().toLocaleString()}`}
-            remarks={`${trip.status}`} // change to bike status once db for bikes ready (paid | unpaid)
+            title={`Bike ${trip.bike_id}`}  
+            bikeID={trip.bike_id} 
+            tripStart={trip.start_time.toDate().toLocaleString()}  
+            tripEnd={trip.end_time.toDate().toLocaleString()} 
+            remarks={trip.status}  
           />
         ))}
       </ScrollView>
