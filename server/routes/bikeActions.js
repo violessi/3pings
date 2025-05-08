@@ -3,16 +3,16 @@ const router = express.Router();
 const { db } = require("../firebaseAdmin");
 
 // POST /api/action/avail
+// make a new trip with intial fields first
 router.post("/avail", async (req, res) => {
   try {
     const newTrip = {
-      bikeID: Math.floor(Math.random() * 100),
-      startRack: "Station A",
-      startTime: new Date(),
-      status: "In Use",
+      bike_id: Math.floor(Math.random() * 100),
+      start_time: new Date(),
+      status: "active",
     };
 
-    await db.collection("activeTrips").add(newTrip);
+    await db.collection("trips").add(newTrip);
     res.status(200).json({ message: "Bike availed!" });
   } catch (err) {
     console.error(err);
@@ -21,26 +21,26 @@ router.post("/avail", async (req, res) => {
 });
 
 // POST /api/action/return
+// update trip
 router.post("/return", async (req, res) => {
   try {
-    const snapshot = await db.collection("activeTrips").get();
+    const snapshot = await db
+      .collection("trips")
+      .where("status", "in", ["reserved", "active"])
+      .limit(1)
+      .get();
 
     if (snapshot.empty) {
-      return res.status(404).json({ error: "No active trips" });
+      return res.status(404).json({ error: "No active/reserved trips found" });
     }
 
-    const firstTrip = snapshot.docs[0];
-    const tripData = firstTrip.data();
+    const tripDoc = snapshot.docs[0];
+    const tripRef = db.collection("trips").doc(tripDoc.id);
 
-    const completedTrip = {
-      ...tripData,
-      endRack: "Station B",
-      endTime: new Date(),
-      status: "Paid",
-    };
-
-    await db.collection("completedTrips").add(completedTrip);
-    await db.collection("activeTrips").doc(firstTrip.id).delete();
+    await tripRef.update({
+      end_time: new Date(),
+      status: "completed", // or "cancelled" depending on user action
+    });
 
     res.status(200).json({ message: "Bike returned!" });
   } catch (err) {
