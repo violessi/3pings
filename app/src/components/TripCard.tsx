@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import globalStyles from "@/src/assets/styles";
 
 type TripCardProps = {
   title: string;
@@ -18,7 +19,7 @@ export default function TripCard({
 }: TripCardProps) {
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={globalStyles.subtitle}>{title}</Text>
       <Text style={styles.detail}>
         <Text style={styles.label}>Bike ID: </Text>
         {bikeID}
@@ -52,13 +53,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   detail: {
-    fontSize: 16,
+    marginLeft: 5,
+    fontSize: 14,
     color: '#555',
   },
   label: {

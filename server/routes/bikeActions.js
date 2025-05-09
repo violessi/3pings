@@ -49,6 +49,30 @@ router.post("/return", async (req, res) => {
   }
 });
 
+// POST /api/bikeActions/reserve
+router.post("/reserve", async (req, res) => {
+  try {
+    const { bike_id, user_id, date, time } = req.body;
+
+    // Combine date and time into a proper timestamp if provided
+    const reservationStart = date && time ? new Date(`${date}T${time}:00`) : new Date();
+
+    const newTrip = {
+      bike_id: bike_id || Math.floor(Math.random() * 100), // fallback to mock ID
+      user_id: user_id || "anonymous", // fallback if no user provided
+      start_time: reservationStart,
+      status: "reserved",
+      created_at: new Date(),
+    };
+
+    await db.collection("trips").add(newTrip);
+    res.status(200).json({ message: "Bike reserved!" });
+  } catch (err) {
+    console.error("Reserve Error:", err);
+    res.status(500).json({ error: "Failed to reserve bike" });
+  }
+});
+
 module.exports = router;
 
 /*

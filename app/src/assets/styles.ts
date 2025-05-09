@@ -23,6 +23,37 @@ const globalStyles = StyleSheet.create({
     width: '100%', // Ensure it stretches across the container
     fontWeight: 'bold'
   },   
+  subtitle: {
+    fontSize: 20,
+    marginBottom: 10,
+    color: '#29243F',
+    textAlign: 'left', // This aligns the text to the left
+    width: '100%', // Ensure it stretches across the container
+    fontWeight: 'bold'
+  },
+  detail: {
+    fontSize: 14,
+    fontWeight: 'normal',
+    color: '#555',
+    marginBottom: 5,
+    marginTop: 5,
+  },
+  note: {
+    fontSize: 12,
+    fontWeight: 'normal',
+    color: '#757575',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  column: {
+    width: '49%',
+    marginBottom: 5,
+  },
     
       // Images
       imageContainer: {

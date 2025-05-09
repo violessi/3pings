@@ -1,12 +1,6 @@
 import { View, Alert, SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 
 import Header from "@/src/components/Header";
@@ -74,7 +68,7 @@ export default function ActionPage() {
           title="Reserve"
           description="Reserve a bike"
           icon="calendar"
-          onPress={() => router.replace("/(tabs)")}
+          onPress={() => router.push('/reserve')} 
         />
       </View>
     </SafeAreaView>

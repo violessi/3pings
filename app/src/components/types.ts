@@ -8,3 +8,10 @@ export type Trip = {
     end_time: Timestamp;
     status: string;
   };
+
+export type Rack = {
+    location: string;
+    available: number;
+    reserved: number;
+    empty: number;
+  };
