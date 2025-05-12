@@ -2,14 +2,14 @@ import { StyleSheet } from 'react-native';
 
 const globalStyles = StyleSheet.create({
   wrapper: {
-    flex: 1, // Ensure the wrapper takes up the full screen
+    flex: 1,
     backgroundColor: '#ffffff',
   },
   container: {
-    flexGrow: 1, // Allow content to stretch and fill the available space
+    flexGrow: 1, 
     backgroundColor: '#ffffff',
-    justifyContent: 'flex-start', // Align content to the top
-    alignItems: 'center', // Center horizontally
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     padding: 20,
   },
   text: {
@@ -19,16 +19,16 @@ const globalStyles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
     color: '#000',
-    textAlign: 'left', // This aligns the text to the left
-    width: '100%', // Ensure it stretches across the container
+    textAlign: 'left', 
+    width: '100%', 
     fontWeight: 'bold'
   },   
   subtitle: {
     fontSize: 20,
     marginBottom: 10,
     color: '#29243F',
-    textAlign: 'left', // This aligns the text to the left
-    width: '100%', // Ensure it stretches across the container
+    textAlign: 'left', 
+    width: '100%', 
     fontWeight: 'bold'
   },
   detail: {
@@ -65,7 +65,7 @@ const globalStyles = StyleSheet.create({
         borderRadius: 18,
       },
     
-      // Footer OF PAGE with a button?
+      // Footer OF PAGE
       footerContainer: {
         flex: 1 / 3,
         alignItems: 'center',

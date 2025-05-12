@@ -2,6 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import globalStyles from "@/src/assets/styles";
 
+// fields and style of trip card 
+// displayed in trips page
+
 type TripCardProps = {
   title: string;
   bikeID: string;

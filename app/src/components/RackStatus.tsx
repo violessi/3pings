@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import globalStyles from "@/src/assets/styles";
 
+// fields and style of rack status card 
+// displayed in rack details page
 
 type RackStatProps = {
   location: string;

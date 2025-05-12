@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { db } = require("../firebaseAdmin");
+const { admin, db } = require("../firebaseAdmin");
 
 // POST /api/action/avail
 // make a new trip with intial fields first
