@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
+import { useRouter } from "expo-router";
 
 // fields and style of trip card 
 // displayed in trips page
@@ -11,6 +12,7 @@ type TripCardProps = {
   tripStart: string;
   tripEnd: string;
   remarks: string;
+  addtl_charge?: number;
 };
 
 export default function TripCard({
@@ -19,41 +21,93 @@ export default function TripCard({
   tripStart,
   tripEnd,
   remarks,
+  addtl_charge,
 }: TripCardProps) {
+  const statusStyles = getStatusStyles(remarks, addtl_charge); // remarks = status string
+  const router = useRouter();  
+
   return (
-    <View style={styles.card}>
+    <View style={tripStyles.card}>
       <Text style={globalStyles.subtitle}>{title}</Text>
-      <Text style={styles.detail}>
-        <Text style={styles.label}>Bike ID: </Text>
-        {bikeID}
-      </Text>
-      <Text style={styles.detail}>
-        <Text style={styles.label}>Trip Start: </Text>
-        {tripStart}
-      </Text>
-      <Text style={styles.detail}>
-        <Text style={styles.label}>Trip End: </Text>
-        {tripEnd}
-      </Text>
-      <Text style={styles.detail}>
-        <Text style={styles.label}>Remarks: </Text>
-        {remarks}
-      </Text>
+
+      <View style={globalStyles.row}>
+        {/*Left*/}
+        <View style={globalStyles.column}>
+          <Text style={tripStyles.label}>Trip Start: </Text>
+          <Text style={tripStyles.detail}>{formatDate(tripStart)}</Text>
+          <Text style={tripStyles.label}>Trip End: </Text>
+          <Text style={tripStyles.detail}>{formatDate(tripEnd)}</Text>
+        </View>
+
+        {/*Right*/}
+        <View style={globalStyles.column}>
+          <Text style={tripStyles.label}> From: </Text>
+          <Text style={tripStyles.detail}> Start Rack</Text>
+          <Text style={tripStyles.label}> To: </Text>
+          <Text style={tripStyles.detail}> End Rack</Text>
+        </View>
+      </View>
+      
+      <View style={globalStyles.row}>
+        {/*Left*/}
+        <View style={globalStyles.column}>
+          { remarks != 'reserved' && (
+            <View style={[tripStyles.status, statusStyles.container]}>
+              <Text style={[{ fontWeight: '600' }, {textTransform: 'capitalize'}, statusStyles.text]}>
+                {addtl_charge && addtl_charge > 0 ? 'Overdue: Php ' + addtl_charge : remarks}
+              </Text>
+            </View>
+          )}
+        </View>
+        {/*Right - try: make it right aligned*/}
+        <View style={[globalStyles.column, { alignItems: 'flex-end' }]}> 
+          { addtl_charge && addtl_charge > 0 && ( // Penalty information 
+            <TouchableOpacity
+              style={[tripStyles.status, {backgroundColor: '#e2e3e5'}]}
+              onPress={() => router.replace('/profile')} // go to profile
+              activeOpacity={0.8}
+              >
+              <Text>Penalty information</Text>
+            </TouchableOpacity>
+          )}
+          { remarks === 'active' && ( // nearest rack to me 
+            <TouchableOpacity
+              style={[tripStyles.status, {backgroundColor: '#e2e3e5'}]}
+              onPress={() => router.replace('/')} // go to maps?
+              activeOpacity={0.8}
+              >
+              <Text> Nearest rack to me</Text>
+            </TouchableOpacity>
+          )}
+          { remarks === 'reserved' && ( // cancel reservation 
+            <TouchableOpacity
+              style={[tripStyles.status, {backgroundColor: '#e2e3e5'}]}
+              //onPress={} // handle delete
+              activeOpacity={0.8}
+              >
+              <Text>Cancel reservation</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+      
+      { remarks != 'reserved' && ( // nearest rack to me 
+        <Text style={[tripStyles.detail, {color: '#721c24'}]}>
+          <Text style={[tripStyles.label, {color: '#721c24'}]}>Remarks: </Text>
+          [time left or overdue balance]
+        </Text>
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const tripStyles = StyleSheet.create({
   card: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
     width: '100%',
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.3,
-    // shadowRadius: 4,
     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
     elevation: 5,
   },
@@ -66,4 +120,82 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#555',
   },
+  status: {
+    alignSelf: 'flex-start',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
 });
+
+// diff colored status boxes
+const getStatusStyles = (status: string, addtlCharge?: number) => {
+ if (addtlCharge && addtlCharge > 0) {
+    return { //case: overdue
+      container: {
+        backgroundColor: '#f8d7da',
+        borderColor: '#721c24',
+      },
+      text: {
+        color: '#721c24',
+      },
+    };
+  }
+  
+  switch (status.toLowerCase()) {
+    case 'active': // yellow
+      return {
+        container: {
+          backgroundColor: '#fff3cd',
+          borderColor: '#856404',
+        },
+        text: {
+          color: '#856404',
+        },
+      };
+    case 'completed': // green
+      return {
+        container: {
+          backgroundColor: '#d4edda',
+          borderColor: '#155724',
+        },
+        text: {
+          color: '#155724',
+        },
+      };
+    default: // 
+      return {
+        container: {
+          backgroundColor: '#e2e3e5',
+          borderColor: '#6c757d',
+        },
+        text: {
+          color: '#6c757d',
+        },
+      };
+  }
+};
+
+// date time display format
+const formatDate = (dateString: string): string => {
+
+  if (dateString) {
+    const date = new Date(dateString);
+
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'short',  
+      day: 'numeric', 
+    };
+
+    const datePart = date.toLocaleDateString('en-US', options);
+    const timePart = date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
+
+    return `${datePart} (${timePart})`;
+    }
+};

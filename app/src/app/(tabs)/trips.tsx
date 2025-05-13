@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Text, ScrollView, SafeAreaView } from "react-native";
-import TripCard from "@/src/components/TripCard";
 import globalStyles from "@/src/assets/styles";
 
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
-import { Trip } from "@/src/components/types";
 import Header from "@/src/components/Header";
+
+// trips
+import { Trip } from "@/src/components/types";
+import TripCard from "@/src/components/TripCard";
+
 
 export default function TripScreen() {
   const [completedTrips, setCompletedTrips] = useState<Trip[]>([]);
@@ -21,7 +24,7 @@ export default function TripScreen() {
         const allTrips: Trip[] = tripSnapshot.docs.map((doc) => doc.data() as Trip);
 
         const active = allTrips.filter(trip =>
-          trip.status === "reserved" || trip.status === "active"
+          trip.status === "active"
         );
 
         const completed = allTrips.filter(trip =>
@@ -57,6 +60,7 @@ export default function TripScreen() {
             tripStart={`${trip.start_time.toDate().toLocaleString()}`}
             tripEnd=""
             remarks={`${trip.status}`}
+            addtl_charge={trip.addtl_charge}
           />
         ))}
         <Text style={globalStyles.title}> Completed </Text>
@@ -68,6 +72,7 @@ export default function TripScreen() {
             tripStart={`${trip.start_time.toDate().toLocaleString()}`}
             tripEnd={`${trip.end_time.toDate().toLocaleString()}`}
             remarks={`${trip.status}`}
+            addtl_charge={trip.addtl_charge}
           />
         ))}
       </ScrollView>

@@ -7,6 +7,7 @@ export type Trip = {
     start_time: Timestamp;
     end_time: Timestamp;
     status: string;
+    addtl_charge: number;
   };
 
 export type Rack = {

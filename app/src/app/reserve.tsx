@@ -97,7 +97,7 @@ export default function ReserveScreen() {
   
       if (res.ok) {
         console.log("Bike reserved!");
-        router.replace("/trips");
+        router.replace("/");
       } else {
         const { error } = await res.json();
         console.log(error || "Error reserving bike");
