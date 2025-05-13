@@ -3,31 +3,38 @@ import { Text, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, But
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { useRouter, Stack } from "expo-router";
 import { db } from "@/firebaseConfig";
-import { Rack } from "@/src/components/types";
-
-// import { DatePickerModal } from 'react-native-paper-dates';
 
 import globalStyles from "@/src/assets/styles";
 import Header from "@/src/components/Header";
+
+
+// datetimepicker
+// import { DatePickerModal } from 'react-native-paper-dates';
 // import DateTime from '@/src/components/DateTimePicker';
+
+// handling multiple racks
+import { Rack } from "@/src/components/types";
 import RackStatus from "@/src/components/RackStatus";
+import { useLocalSearchParams } from "expo-router";
 
 export default function ReserveScreen() {
-
+  const { rackID } = useLocalSearchParams(); //
   const [rackData, setRackData] = useState<Rack | null>(null);
   const router = useRouter();  
   
   useEffect(() => {
     const fetchRackInfo = async () => {
+      if (!rackID || typeof rackID !== "string") return;
+
       try {
-        const rackID = "rack123"; // for a specific bike rack; hardcode first; get from docname
+        // const rackID = "rack123"; // for a specific bike rack; hardcode first; get from docname
         const totalSlots = 5;
 
         // fetch bike rack info
         // details/address from db = racks, fields = rack_name, location
         const rackDoc = await getDoc(doc(db, "racks", rackID));
         if (!rackDoc.exists()) {
-          console.error("Rack not found");
+          console.error("Rack not found"); // modal/go back
           return;
         }
 
@@ -64,12 +71,12 @@ export default function ReserveScreen() {
         console.log("Reserved:", reservedCount);
         console.log("Empty slots:", emptySlots);
       } catch (error) {
-          console.error("Error fetching racks:", error);
+        console.error("Error fetching racks:", error);
       }
     };
   
     fetchRackInfo();
-  }, []);
+  }, [rackID]);
 
   
   // handle reserve function
@@ -82,6 +89,7 @@ export default function ReserveScreen() {
           'Content-Type': 'application/json', // Important to send JSON data
         },
         body: JSON.stringify({
+          rack: rackID,
           date: "2025-05-13", 
           time: "11:30",
         }),

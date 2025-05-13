@@ -68,7 +68,7 @@ export default function ActionPage() {
           title="Reserve"
           description="Reserve a bike"
           icon="calendar"
-          onPress={() => router.push('/reserve')} 
+          onPress={() => router.replace('/')} 
         />
       </View>
     </SafeAreaView>
