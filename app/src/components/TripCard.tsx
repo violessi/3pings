@@ -1,0 +1,69 @@
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import globalStyles from "@/src/assets/styles";
+
+// fields and style of trip card 
+// displayed in trips page
+
+type TripCardProps = {
+  title: string;
+  bikeID: string;
+  tripStart: string;
+  tripEnd: string;
+  remarks: string;
+};
+
+export default function TripCard({
+  title,
+  bikeID,
+  tripStart,
+  tripEnd,
+  remarks,
+}: TripCardProps) {
+  return (
+    <View style={styles.card}>
+      <Text style={globalStyles.subtitle}>{title}</Text>
+      <Text style={styles.detail}>
+        <Text style={styles.label}>Bike ID: </Text>
+        {bikeID}
+      </Text>
+      <Text style={styles.detail}>
+        <Text style={styles.label}>Trip Start: </Text>
+        {tripStart}
+      </Text>
+      <Text style={styles.detail}>
+        <Text style={styles.label}>Trip End: </Text>
+        {tripEnd}
+      </Text>
+      <Text style={styles.detail}>
+        <Text style={styles.label}>Remarks: </Text>
+        {remarks}
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 20,
+    width: '100%',
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.3,
+    // shadowRadius: 4,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
+    elevation: 5,
+  },
+  detail: {
+    marginLeft: 5,
+    fontSize: 14,
+    color: '#555',
+  },
+  label: {
+    fontWeight: 'bold',
+    color: '#555',
+  },
+});
