@@ -1,58 +1,65 @@
 RentABike(rackId, userId)
 1. checkRackId(rackId) -> boolean
-2. getAvailableBikes(rackId) -> array of bikeIds
+2. getAvailableBikes(rackId) -> array of bikeIds with rackSlots
 3. createTrip(TripData) -> void
 4. updateBike(bikeId, status) -> void
 5. updateUser(tripId) -> void
+6. pingHardware()
+7. unlockBike(bikeId)
+8. waitUntilRented()
 
-----
+---
 
-CLIENT TO DB API
-1. checkRackId(rackId) -> boolean
-    - GET
-        - table: racks
-        - filter: rackId
-    - return if rack id exist in db
-2. getAvailableBikes(rackId) -> array of bikeIds
-    - GET
-        - table: bikes
-        - filter: status==available, rackId
-    - list of available bikes on a rack
-3. createTrip(tripData) -> tripId
-    - POST
-        - payload: tripData
-    - return created tripId
-4. updateBike(bikeId, status) -> void
-    - UPDATE
-        - table: bikes
-        - payload: { status: getting }
-5. updateUser(tripId) -> void
-    - UPDATE
-        - table: users
-        - payload: {currentTrip: tripId}
+SERVER TO DB API
 
+checkRackId(rackId) -> boolean
+   - GET
+     - table: racks
+     - filter: rackId
+   - return if rack id exist in db
 
-----
+getAvailableBikes(rackId) -> array of bikeIds with rackSlots
+   - GET
+     - table: bikes
+     - filter: status==available, rackId
+   - list of available bikes on a rack
 
-CLIENT TO HARDWARE
-1. pingHardware() -> boolean
-    - GET
-    - return true
-2. unlockBike(bikeId)
-    - POST
-    - payload: {bikeId}
-3. waitUntilRented() -> boolean
-    - onChangeListener
-        - table: bike
-        - filter: bikeId
-        - attribute: status
-    - wait until status is Rented
+createTrip(tripData) -> tripId
+   - POST
+     - payload: tripData
+   - return created tripId
 
+updateBike(bikeId, status) -> void
+   - UPDATE
+     - table: bikes
+     - payload: { status: getting }
 
-----
+updateUser(tripId) -> void
+   - UPDATE
+     - table: users
+     - payload: {currentTrip: tripId}
+
+---
+
+SERVER TO HARDWARE
+
+pingHardware() -> boolean
+   - GET
+   - return true
+
+unlockBike(bikeId)
+   - POST
+   - payload: {bikeId}
+
+waitUntilRented() -> boolean
+   - onChangeListener
+     - table: bike
+     - filter: bikeId
+     - attribute: status
+   - wait until status is Rented
+
+---
 
 HARDWARE TASKS
 1. Create Endpoint unlockBike to unlock slot with bike, payload contain bikeId, return ack
-2. When a bike is succesfully unmounted, send firebase post request to update bike status to rented and rackId to null, return ack 
-
-
+2. When a bike is succesfully unmounted, send firebase post request to update bike status to rented and rackId to null, return ack
