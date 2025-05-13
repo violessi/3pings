@@ -10,6 +10,7 @@ export type Trip = {
   };
 
 export type Rack = {
+    name: string;
     location: string;
     available: number;
     reserved: number;

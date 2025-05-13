@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Alert } from "react-native";
+import { Text, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Button } from "react-native";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
-import { useRouter } from "expo-router";
+import { useRouter, Stack } from "expo-router";
 import { db } from "@/firebaseConfig";
 import { Rack } from "@/src/components/types";
 
+// import { DatePickerModal } from 'react-native-paper-dates';
+
 import globalStyles from "@/src/assets/styles";
 import Header from "@/src/components/Header";
+// import DateTime from '@/src/components/DateTimePicker';
 import RackStatus from "@/src/components/RackStatus";
-
 
 export default function ReserveScreen() {
 
@@ -18,7 +20,7 @@ export default function ReserveScreen() {
   useEffect(() => {
     const fetchRackInfo = async () => {
       try {
-        const rackID = "rack123"; // for a specific bike rack; hardcode first
+        const rackID = "rack123"; // for a specific bike rack; hardcode first; get from docname
         const totalSlots = 5;
 
         // fetch bike rack info
@@ -50,6 +52,7 @@ export default function ReserveScreen() {
         const emptySlots = totalSlots - occupiedSlots - reservedCount;
 
         setRackData ({
+          name: rackData.rack_name,
           location: rackData.location,
           available: availableCount,
           reserved: reservedCount,
@@ -70,41 +73,67 @@ export default function ReserveScreen() {
 
   
   // handle reserve function
+  // post: bike_id, 
   const handleReserve = async () => {
     try {
       const res = await fetch("http://localhost:3000/api/bikeActions/reserve", {
         method: "POST", // post to server to handle reservation request
+        headers: {
+          'Content-Type': 'application/json', // Important to send JSON data
+        },
+        body: JSON.stringify({
+          date: "2025-05-13", 
+          time: "11:30",
+        }),
       });
   
       if (res.ok) {
-        Alert.alert("Bike reserved!");
+        console.log("Bike reserved!");
         router.replace("/trips");
       } else {
         const { error } = await res.json();
-        Alert.alert(error || "Error reserving bike");
+        console.log(error || "Error reserving bike");
       }
     } catch (err) {
       console.error("Error:", err);
     }
   };
   
+  const handleGoBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/'); // or router.push('/'), depending on your UX
+    }
+  };
+
+  // const handleDateConfirm = (date: Date) => {
+  //   console.log('User picked date:', date);
+  //   // send this date to your backend or store it in state
+  // };
 
   // return 3 segments: rack photo, rack status, reserve a bike container
   // reserving a bike has dropdown fields date, start time of reservation, and then reserve button
   // reserve button goes to backend handleReserve fucntion that adds a new trip doc but with status as reserved, which will be timed
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Header title="Reserve"/>
+      <Stack.Screen options={{ headerShown: false }} />
+      <Header 
+        title="Reserve"
+        subtitle="Reserve a bike from this rack!"
+        hasBack={true}
+        prevCallback={handleGoBack}
+      />
       <ScrollView
         contentContainerStyle={reserveStyles.container}
         showsVerticalScrollIndicator={false}
       >
-      <Text style={globalStyles.title}> Rack Name </Text>
+      <Text style={globalStyles.title}> {rackData && rackData.name} </Text>
       <View style={reserveStyles.reserveCard}>
         <Text style={globalStyles.detail}> Map Photo </Text>
       </View>
       
-      <Text style={globalStyles.subtitle}> Rack status </Text>
+      <Text style={globalStyles.subtitle}> Rack Status </Text>
       {rackData && (
         <RackStatus
           location={rackData.location}
@@ -126,6 +155,7 @@ export default function ReserveScreen() {
               >
               <Text style={reserveStyles.buttonText}>Select a Date</Text>
             </TouchableOpacity>
+            {/* <DateTime onConfirm={handleDateConfirm} /> */}
           </View>
 
           <View style={globalStyles.column}> 
@@ -142,7 +172,7 @@ export default function ReserveScreen() {
 
         <TouchableOpacity
           style={reserveStyles.reserveButton}
-          onPress={() => {handleReserve}}
+          onPress={handleReserve}
           activeOpacity={0.8}
         >
         <Text style={reserveStyles.buttonText}>Reserve</Text>
@@ -172,10 +202,11 @@ const reserveStyles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.3,
+    // shadowRadius: 4,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
     elevation: 5,
   },
   reserveButton: {
@@ -195,5 +226,10 @@ const reserveStyles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 10,
     alignItems: 'center',
+  },
+  backButton: {
+    marginBottom: 20,
+    alignSelf: 'flex-start',
+    padding: 8,
   },
 });

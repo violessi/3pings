@@ -19,17 +19,24 @@ export default function Header({
 }: HeaderProps) {
   return (
     <View
-      className={`h-24 px-5 py-5 flex-col justify-end ${
+      className={`h-${ hasBack ? "12" : "24"} px-5 py-5 flex-col justify-end ${
         isHomepage ? "bg-background" : "bg-primary"
       }`}
     >
       {hasBack ? (
-        <View className="flex-row items-center justify-between">
+        <View className="flex-row">
           <IconButton icon="arrow-left" size={24} onPress={prevCallback} />
-          <Text className="text-xl font-semibold text-white absolute left-1/2 -translate-x-1/2">
-            {title}
-          </Text>
-          <View style={{ width: 48 }} />{" "}
+          <View style={{ flex:1}}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'white' }}>
+              {title}
+            </Text>
+            {subtitle && (
+              <Text style={{fontSize: 14, color: 'white'}}>
+                {subtitle}
+              </Text>
+            )}
+          </View>
+          <View style={{ width: 48 }} />
         </View>
       ) : (
         <View className="items-start">
