@@ -10,8 +10,10 @@ module.exports = {
     extend: {
       colors: {
         background: "#f2f2f2",
-        primary: "#362C5F",
-        secondary: "#29243F",
+        primary: "#362C5F", // header and buttons
+        "primary-light": "#A8A4B8",
+        secondary: "#29243F", // text
+        outline: "#7E7E7E", // outline
       },
     },
   },
