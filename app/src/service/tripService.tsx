@@ -68,7 +68,6 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
 
     return parsed.data;
   } catch (err: any) {
-    console.error(`getAvailableBikes failed: ${err.message}`);
     return []; // temporary solution
   }
 };

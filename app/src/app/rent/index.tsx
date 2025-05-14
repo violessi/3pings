@@ -6,18 +6,36 @@ import Header from "@/components/Header";
 import Button from "@/components/Button";
 import RackInput from "@/components/RackInput";
 import { useBike } from "@/context/BikeContext";
+import LoadingModal from "@/components/LoadingModal";
+import SuccessModal from "@/components/SuccessModal";
+import ErrorModal from "@/components/ErrorModal";
 
 export default function Rent() {
   const router = useRouter();
-  const { rackId, updateRackId, rentABike } = useBike();
+  const {
+    rackId,
+    showSuccessModal,
+    showErrorModal,
+    setShowErrorModal,
+    setShowSuccessModal,
+    showLoadingModal,
+    updateRackId,
+    rentABike,
+  } = useBike();
+  const [assignedBike, setAssignedBike] = useState<Bike | null>(null);
 
   const handleButtonPress = async () => {
     try {
-      // move to context
       const res = await rentABike();
+      setAssignedBike(res);
     } catch (err: any) {
-      Alert.alert("Error: ", err.message);
+      Alert.alert("Error!", err.message); // temporary; replace with modal
     }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    router.replace("/(tabs)/action");
   };
 
   const handleBack = () => {
@@ -45,6 +63,19 @@ export default function Rent() {
           disabled={rackId ? false : true}
         />
       </View>
+      <LoadingModal showLoadingModal={showLoadingModal} />
+      <SuccessModal
+        title="Bike rented successfully!"
+        description={`Your bike is ready for use. Please get your bike in slot ${assignedBike?.rackSlot}. Take care!`}
+        onClose={handleCloseSuccessModal}
+        showSuccessModal={showSuccessModal}
+      />
+      <ErrorModal
+        title="Error"
+        description="An error occurred while processing your request. Please try again."
+        showErrorModal={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+      />
     </SafeAreaView>
   );
 }

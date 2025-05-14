@@ -1,10 +1,16 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { createATrip, getRack, getAvailableBikes } from "@/service/tripService";
+import { set } from "zod";
 
 type BikeContextType = {
   rackId: string;
+  showSuccessModal: boolean;
+  showErrorModal: boolean;
+  setShowErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateRackId: (newRackId: string) => void;
-  rentABike: () => Promise<void>;
+  rentABike: () => Promise<Bike | null>;
+  showLoadingModal: boolean;
 };
 
 export const BikeContext = createContext<BikeContextType | null>(null);
@@ -12,7 +18,9 @@ export const BikeContext = createContext<BikeContextType | null>(null);
 // Provider component
 export const BikeProvider = ({ children }: { children: ReactNode }) => {
   const [rackId, setRackId] = useState("");
-  const [assignedBike, setAssignedBike] = useState<Bike | null>(null);
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   function updateRackId(newRackId: string) {
     setRackId(newRackId);
@@ -47,6 +55,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
   // ============ FULL RENT A BIKE FUNCTION ============
   async function rentABike() {
+    setShowLoadingModal(true);
     try {
       // Check if rackId is valid
       const validRackId = await checkRackId();
@@ -63,7 +72,6 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // Randomly assign a bike to user
       const randomIndex = Math.floor(Math.random() * availableBikes.length);
       const bike = availableBikes[randomIndex];
-      setAssignedBike(bike);
 
       const payload: CreateTrip = {
         bikeId: bike.id,
@@ -72,16 +80,32 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         baseRate: 10,
       };
 
-      const res = await initializeTrip(payload);
-      return res;
+      await initializeTrip(payload);
+
+      setShowLoadingModal(false);
+      setShowSuccessModal(true);
+      updateRackId("");
+
+      return bike;
     } catch (err: any) {
-      console.error("Error in rentABike:", err.message || err);
-      return null;
+      setShowLoadingModal(false);
+      throw new Error(`Error in rentABike: ${err.message}`);
     }
   }
 
   return (
-    <BikeContext.Provider value={{ rackId, updateRackId, rentABike }}>
+    <BikeContext.Provider
+      value={{
+        rackId,
+        showSuccessModal,
+        showErrorModal,
+        setShowErrorModal,
+        setShowSuccessModal,
+        updateRackId,
+        rentABike,
+        showLoadingModal,
+      }}
+    >
       {children}
     </BikeContext.Provider>
   );
