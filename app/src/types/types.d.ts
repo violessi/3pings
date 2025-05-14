@@ -24,7 +24,13 @@ declare global {
   export type Trip = z.infer<typeof TripSchema>;
   export type CreateTrip = Omit<
     Trip,
-    "id" | "createdAt" | "updatedAt" | "endTime" | "addtlCharge" | "finalFee"
+    | "id"
+    | "startTime"
+    | "createdAt"
+    | "updatedAt"
+    | "endTime"
+    | "addtlCharge"
+    | "finalFee"
   >;
 
   export type Bike = z.infer<typeof BikeSchema>;
