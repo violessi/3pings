@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { createATrip, getRack, getAvailableBikes } from "@/service/tripService";
-import { set } from "zod";
+import { listenToBikeStatus } from "@/service/listeners";
 
 type BikeContextType = {
   rackId: string;
@@ -86,10 +86,20 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       setShowSuccessModal(true);
       updateRackId("");
 
+      // listen for changes in bike status.
+      // while bike status is not "rented", keep showing the success modal
+      // if bike status is "rented", close the modal and navigate to the action page
+      const unsub = listenToBikeStatus(bike.id, (status) => {
+        if (status.toLowerCase() === "rented") {
+          unsub(); // stop listening when status is "rented"
+          setShowSuccessModal(false);
+        }
+      });
+
       return bike;
     } catch (err: any) {
       setShowLoadingModal(false);
-      throw new Error(`Error in rentABike: ${err.message}`);
+      throw new Error(`Error: ${err.message}`);
     }
   }
 

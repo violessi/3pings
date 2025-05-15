@@ -39,6 +39,7 @@ export default function Rent() {
   };
 
   const handleBack = () => {
+    updateRackId("");
     router.replace("/(tabs)/action");
   };
 
@@ -66,8 +67,8 @@ export default function Rent() {
       <LoadingModal showLoadingModal={showLoadingModal} />
       <SuccessModal
         title="Bike rented successfully!"
-        description={`Your bike is ready for use. Please get your bike in slot ${assignedBike?.rackSlot}. Take care!`}
-        onClose={handleCloseSuccessModal}
+        description1={`Your bike is ready for use. Please get your bike in slot ${assignedBike?.rackSlot}.`}
+        description2="This modal will close automatically once you have removed your bike."
         showSuccessModal={showSuccessModal}
       />
       <ErrorModal

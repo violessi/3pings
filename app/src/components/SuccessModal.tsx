@@ -3,14 +3,16 @@ import Button from "@/components/Button";
 
 type SuccessModalProps = {
   title: string;
-  description?: string;
+  description1?: string;
+  description2?: string;
   showSuccessModal: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 };
 
 export default function SuccessModal({
   title,
-  description,
+  description1,
+  description2,
   showSuccessModal,
   onClose,
 }: SuccessModalProps) {
@@ -20,10 +22,15 @@ export default function SuccessModal({
       <View className="flex-1 justify-center items-center gap-7">
         <View className="bg-white rounded-lg shadow-lg p-5 m-5 gap-3">
           <Text className="text-primary text-2xl font-semibold">{title}</Text>
-          {description && (
-            <Text className="text-secondary text-base">{description}</Text>
+          {description1 && (
+            <Text className="text-secondary text-base">{description1}</Text>
           )}
-          <Button label="Close" onPress={onClose} />
+          {description2 && (
+            <Text className="text-secondary text-base italic">
+              {description2}
+            </Text>
+          )}
+          {onClose && <Button label="Close" onPress={onClose} />}
         </View>
       </View>
     </Modal>
