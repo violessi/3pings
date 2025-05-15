@@ -4,16 +4,6 @@ const { admin, db } = require("../firebaseAdmin");
 const router = express.Router();
 router.use(express.json());
 
-router.get("/", async (req, res) => {
-  console.log("GET /api/rent/ hit");
-  try {
-    res.status(200).json({ message: "Rent API is working!" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to process request" });
-  }
-});
-
 // ========================= SERVER TO DB =========================
 
 router.get("/getRack/:rackId", async (req, res) => {
@@ -24,9 +14,9 @@ router.get("/getRack/:rackId", async (req, res) => {
 
     if (!rackDoc.exists) {
       res.status(200).json({ message: false });
+    } else {
+      res.status(200).json({ message: true });
     }
-
-    res.status(200).json({ message: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to check rack" });
@@ -56,9 +46,9 @@ router.get("/getAvailableBikes/:rackId", async (req, res) => {
 
     if (availableBikes.length === 0) {
       return res.status(200).json({ message: false });
+    } else {
+      res.status(200).json({ message: true, availableBikes });
     }
-
-    res.status(200).json({ message: true, availableBikes });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to get available bikes" });
@@ -114,5 +104,8 @@ router.post("/createTrip", async (req, res) => {
 });
 
 // ========================= SERVER TO HARDWARE =========================
+
+router.get("/pingHardware", async (req, res) => {});
+router.post("/unlockBike", async (req, res) => {});
 
 module.exports = router;
