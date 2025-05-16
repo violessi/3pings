@@ -74,24 +74,22 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
 
 // ======================RESERVE=============================
 
-export const getUserReservedTrip = async (userId: string) => {
-  try {
-    const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/getReservedTrip/${userId}`, {
-      method: "GET",
-    });
+export const getUserReservedTrip = async (payload: { userId: string; rackId: string }) => {
+  const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/getReservedTrip`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
-    if (!res.ok) {
-      const { error } = await res.json();
-      throw new Error(error || "Error fetching reserved trip");
-    }
-
-    const data = await res.json();
-    return data; // expected reserved trip object or null
-  } catch (err) {
-    console.error("getUserReservedTrip error:", err);
-    return null;
+  if (!res.ok) {
+    throw new Error("Failed to fetch reserved trip");
   }
+
+  return res.json();
 };
+
 
 export const deleteTrip = async (payload: { bikeId: string; userId: string; tripId: string }) => {
   try {

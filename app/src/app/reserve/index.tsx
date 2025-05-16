@@ -35,7 +35,7 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
   const [assignedBike, setAssignedBike] = useState<Bike | null>(null);
 
   // for getting current rack info; rack is input parameter to reserve function
-  const { rackID } = useLocalSearchParams();
+  const { rackID } = useLocalSearchParams(); // get rackID from parameters of calling reserve
   const [rackData, setRackData] = useState<Rack | null>(null);
   
   // for date and time; date and time is posted to server 
@@ -57,7 +57,7 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
   };
 
   const handleBack = () => {
-    updateRackId("");
+    updateRackId(""); 
     if (router.canGoBack()) {
       router.back();
     } else {

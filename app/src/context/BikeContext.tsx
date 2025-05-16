@@ -58,9 +58,13 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  async function checkReserved(userId: string) {
+  async function checkReserved(userId: string, rackId: string) {
     try {
-      const reservedTrip = await getUserReservedTrip(userId);
+      const payload = {
+        userId,
+        rackId,
+      }
+      const reservedTrip = await getUserReservedTrip(payload);
       return reservedTrip;
     } catch (err) {
       console.error("Error in checkReserved:", err);
@@ -94,21 +98,20 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // Check if user has a reservation at this rack
-      const reservedTripDoc = await checkReserved(userId);
+      const reservedTripDoc = await checkReserved(userId, rackId);
       let bikeId: string;
       let reservedTripId: string | undefined;
 
       console.log(reservedTripDoc);
       
       // IF user has a reserved trip at that rack, take bikeId of already assigned bike
+        // ADD check if reservation is at that rack
       // Include reservedTripId in payload for CreateTrip
       if (reservedTripDoc && reservedTripDoc.status === "reserved") {
         bikeId = reservedTripDoc.bikeId;
         reservedTripId = reservedTripDoc.id;
 
         console.log("[APP] User has reserved: " + reservedTripId);
-        // ADD check if reservation is at that rack
-
         console.log("[RENT] Using reserved bike:", bikeId);
       } else {
         // ELSE, check if there are available bikes

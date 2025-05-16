@@ -6,31 +6,33 @@ router.use(express.json());
 
 // ========================= CHECK RESERVED =========================
 
-router.get("/getReservedTrip/:userId", async (req, res) => {
+router.post("/getReservedTrip", async (req, res) => {
   try {
-    const { userId } = req.params;
-
+    const { userId, rackId } = req.body;
     const reservedTripsSnapshot = await db
       .collection("trips")
       .where("userId", "==", userId)
       .where("status", "==", "reserved")
-      .limit(1)
       .get();
 
     if (reservedTripsSnapshot.empty) {
       return res.status(200).json(null); // No active reservation
     }
 
-    const doc = reservedTripsSnapshot.docs[0];
-    const data = doc.data();
+    for (const tripDoc of reservedTripsSnapshot.docs) {
+      const tripData = tripDoc.data();
+      const bikeSnap = await db.collection("bikes").doc(tripData.bikeId).get();
 
-    return res.status(200).json({
-      id: doc.id,
-      ...data,
-      startTime: data.startTime?.toDate?.() ?? null,
-      createdAt: data.createdAt?.toDate?.() ?? null,
-      updatedAt: data.updatedAt?.toDate?.() ?? null,
-    });
+      if (!bikeSnap.exists) continue;
+
+      const bikeData = bikeSnap.data();
+      if (bikeData.rackId === rackId) {
+        return res.status(200).json({ id: tripDoc.id, ...tripData });
+      }
+    }
+    // If none of the reserved trips are at the given rack
+    return res.status(403).json({ message: "No reserved trip at this rack" });
+
   } catch (err) {
     console.error("Error fetching reserved trip:", err);
     return res.status(500).json({ error: "Failed to fetch reserved trip" });

@@ -42,23 +42,30 @@ export default function TripCard({
     cancelReservation
   } = useBike();
 
-  const handleButtonPress = async () => {
-      try {
-        if (!tripID){
-          console.error("No tripId passed to TripCard!");
-          return;
-        }
-        const res = await cancelReservation(tripID); // hwo to get tripId?
-        // function to cancel reservation post to backend, pass tripID?
-        // or make a cancelReservation function where rent/reserve a bike is, then inside do the ff:
-        // can use getUserReservedTrip to check if theres a reserved trip
-        // then delete that trip, update bike and user dbs
-        // basically same as rent logic but reverse
-        console.log("Cancelled.");
-      } catch (err: any) {
-        console.log("Error!", err.message); // temporary; replace with modal
+  const handleCancel = async () => {
+    try {
+      if (!tripID){
+        console.error("No tripId passed to TripCard!");
+        return;
       }
-    };
+      const res = await cancelReservation(tripID);
+      updateRackId("");
+      console.log("Cancelled.");
+    } catch (err: any) {
+      console.log("Error!", err.message); // PLACEHOLDER; replace with modal
+    }
+  };
+
+  // optional: release button in reserved card
+  // const handleRelease = async () => {
+  //   try {
+  //     updateRackId(rackId);
+  //     console.log("Release from rack:", rackId);
+  //     const res = await rentABike();
+  //   } catch (err: any) {
+  //     console.log("Error!", err.message); // temporary; replace with modal
+  //   }    
+  // };
 
   return (
     <View style={globalStyles.card}>
@@ -84,18 +91,28 @@ export default function TripCard({
       
       <View style={globalStyles.row}>
         {/*Left*/}
-        <View style={globalStyles.column}>
-          { remarks != 'reserved' && (
+        <View style={[globalStyles.column, { alignItems: 'flex-start' }]}>
+          { remarks != 'reserved' && ( // display status if not reserved
             <View style={[globalStyles.statusBox, statusStyles.container]}>
               <Text style={[{ fontWeight: '600' }, {textTransform: 'capitalize'}, statusStyles.text]}>
                 {addtl_charge && addtl_charge > 0 ? 'Overdue: Php ' + addtl_charge : remarks}
               </Text>
             </View>
           )}
+          {/* { remarks === 'reserved' && ( // optional: entrypoint to rent from here 
+            <TouchableOpacity
+              style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
+              onPress={() => {handleRelease();}} // handle cancel reservation
+              activeOpacity={0.8}
+              >
+              <Text>Release bike</Text>
+            </TouchableOpacity>
+          )} */}
         </View>
-        {/*Right - try: make it right aligned*/}
+
+        {/*Right*/}
         <View style={[globalStyles.column, { alignItems: 'flex-end' }]}> 
-          { addtl_charge && addtl_charge > 0 && ( // Penalty information 
+          { addtl_charge && addtl_charge > 0 && ( // penalty information 
             <TouchableOpacity
               style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
               onPress={() => router.replace('/profile')} // go to profile
@@ -116,7 +133,7 @@ export default function TripCard({
           { remarks === 'reserved' && ( // cancel reservation 
             <TouchableOpacity
               style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
-              onPress={() => {handleButtonPress();}} // handle cancel reservation
+              onPress={() => {handleCancel();}} // handle cancel reservation
               activeOpacity={0.8}
               >
               <Text>Cancel reservation</Text>

@@ -42,7 +42,6 @@ export default function RewardsCard({
     }
   };
   
-
   return (
     <View style={globalStyles.card}>
       <Text style={globalStyles.subtitle}>{title}</Text>

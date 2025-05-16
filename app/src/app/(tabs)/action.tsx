@@ -72,7 +72,6 @@ export default function ActionPage() {
             icon="arrow-left"
             onPress={() => router.replace("/return")}
           />
-          <Text style = {globalStyles.detail}> Reserve a bike: </Text>
           <Option
             title="Reserve"
             description="Reserve a bike"
