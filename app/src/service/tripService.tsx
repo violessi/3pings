@@ -1,6 +1,6 @@
 import { BikeSchema } from "@/types/schema";
 
-const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.150.244.52"; // change to your laptop's/server's IP
 
 // ========================RENT=============================
 

@@ -12,6 +12,7 @@ app.get('/', (req, res) => {
 // Load routes
 // app.use('/api/bikeActions', require('./routes/bikeActions'));
 app.use('/api/rent', require('./routes/rent'));
+app.use('/api/rewards', require('./routes/rewards'));
 
 const PORT = 3000;
 app.listen(PORT, () => {

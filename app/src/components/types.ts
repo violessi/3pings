@@ -17,3 +17,12 @@ export type Rack = {
     reserved: number;
     empty: number;
   };
+
+export type Reward = {
+  id: string;
+  desc: string;
+  end_rack: string;
+  status: string;
+  reqs: string[];
+  prize: number;
+};

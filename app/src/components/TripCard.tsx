@@ -27,7 +27,7 @@ export default function TripCard({
   const router = useRouter();  
 
   return (
-    <View style={tripStyles.card}>
+    <View style={globalStyles.card}>
       <Text style={globalStyles.subtitle}>{title}</Text>
 
       <View style={globalStyles.row}>
@@ -52,7 +52,7 @@ export default function TripCard({
         {/*Left*/}
         <View style={globalStyles.column}>
           { remarks != 'reserved' && (
-            <View style={[tripStyles.status, statusStyles.container]}>
+            <View style={[globalStyles.statusBox, statusStyles.container]}>
               <Text style={[{ fontWeight: '600' }, {textTransform: 'capitalize'}, statusStyles.text]}>
                 {addtl_charge && addtl_charge > 0 ? 'Overdue: Php ' + addtl_charge : remarks}
               </Text>
@@ -63,7 +63,7 @@ export default function TripCard({
         <View style={[globalStyles.column, { alignItems: 'flex-end' }]}> 
           { addtl_charge && addtl_charge > 0 && ( // Penalty information 
             <TouchableOpacity
-              style={[tripStyles.status, {backgroundColor: '#e2e3e5'}]}
+              style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
               onPress={() => router.replace('/profile')} // go to profile
               activeOpacity={0.8}
               >
@@ -72,7 +72,7 @@ export default function TripCard({
           )}
           { remarks === 'active' && ( // nearest rack to me 
             <TouchableOpacity
-              style={[tripStyles.status, {backgroundColor: '#e2e3e5'}]}
+              style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
               onPress={() => router.replace('/')} // go to maps?
               activeOpacity={0.8}
               >
@@ -81,7 +81,7 @@ export default function TripCard({
           )}
           { remarks === 'reserved' && ( // cancel reservation 
             <TouchableOpacity
-              style={[tripStyles.status, {backgroundColor: '#e2e3e5'}]}
+              style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
               //onPress={} // handle delete
               activeOpacity={0.8}
               >
@@ -102,15 +102,6 @@ export default function TripCard({
 }
 
 const tripStyles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 20,
-    width: '100%',
-    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
-    elevation: 5,
-  },
   detail: {
     marginLeft: 5,
     fontSize: 14,
