@@ -1,40 +1,85 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Button } from "react-native";
+import { Text, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
-import { useRouter, Stack } from "expo-router";
+import { useRouter, useLocalSearchParams   } from "expo-router";
 import { db } from "@/firebaseConfig";
 
 import globalStyles from "@/src/assets/styles";
 import Header from "@/src/components/Header";
 
-
-// datetimepicker
-// import { DatePickerModal } from 'react-native-paper-dates';
-// import DateTime from '@/src/components/DateTimePicker';
-
 // handling multiple racks
 import { Rack } from "@/src/components/types";
 import RackStatus from "@/src/components/RackStatus";
-import { useLocalSearchParams } from "expo-router";
+import RackInput from "@/components/RackInput";
 
-export default function ReserveScreen() {
-  const { rackID } = useLocalSearchParams(); //
+// assign bike
+import { useBike } from "@/context/BikeContext";
+
+export default function Reserve({ params }: { params: { rackID: string } }) {
+  const router = useRouter();    
+
+  // for bike
+  const {
+    rackId,
+    showSuccessModal,
+    showErrorModal,
+    setShowErrorModal,
+    setShowSuccessModal,
+    showLoadingModal,
+    updateRackId,
+    rentABike,
+    reserveABike
+  } = useBike();
+  const [assignedBike, setAssignedBike] = useState<Bike | null>(null);
+
+  // for rack info
+  const { rackID } = useLocalSearchParams();
+
   const [rackData, setRackData] = useState<Rack | null>(null);
-  const router = useRouter();  
   
+  // for date and time
+  // const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const selectedDate = new Date("2025-05-16T10:30:00"); // placeholder
+  
+  // handlers
+  const handleButtonPress = async () => {
+    try {
+      const res = await reserveABike(selectedDate);
+      setAssignedBike(res);
+    } catch (err: any) {
+      console.log("[CHECK] Error!", err.message); // temporary; replace with modal
+    }
+  }; 
+  
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    router.replace("/(tabs)/action");
+  };
+
+  const handleBack = () => {
+    updateRackId("");
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/');
+    }
+  };
+
+  // fetch rack info to display in card
   useEffect(() => {
+    updateRackId(rackID);
+
     const fetchRackInfo = async () => {
       if (!rackID || typeof rackID !== "string") return;
 
       try {
-        // const rackID = "rack123"; // for a specific bike rack; hardcode first; get from docname
         const totalSlots = 5;
 
         // fetch bike rack info
         // details/address from db = racks, fields = rack_name, location
         const rackDoc = await getDoc(doc(db, "racks", rackID));
         if (!rackDoc.exists()) {
-          console.error("Rack not found"); // modal/go back
+          console.error("[APP] Rack not found"); // modal/go back
           return;
         }
 
@@ -45,7 +90,7 @@ export default function ReserveScreen() {
         // taken from bike info (db = bikes) where the rack_id and bike status is stored
         const bikesQuery = query(
           collection(db, "bikes"),
-          where("rack_id", "==", rackID)
+          where("rackId", "==", rackID)
         );
         const bikesSnapshot = await getDocs(bikesQuery); // get all bikes in that rack
         const bikes = bikesSnapshot.docs.map((doc) => doc.data());
@@ -56,7 +101,7 @@ export default function ReserveScreen() {
         const availableCount = bikes.filter((b) => b.status === "available").length;
         const reservedCount = bikes.filter((b) => b.status === "reserved").length;
         const occupiedSlots = bikes.length; // # number of bikes in that rack
-        const emptySlots = totalSlots - occupiedSlots - reservedCount;
+        const emptySlots = totalSlots - availableCount - reservedCount;
 
         setRackData ({
           name: rackData.rack_name,
@@ -66,71 +111,28 @@ export default function ReserveScreen() {
           empty: emptySlots,
         });
 
-        console.log("Rack:", rackData.rack_name);
-        console.log("Available:", availableCount);
-        console.log("Reserved:", reservedCount);
-        console.log("Empty slots:", emptySlots);
+        console.log("[APP] Rack:", rackData.rack_name);
+        console.log("[APP] Available:", availableCount);
+        console.log("[APP] Reserved:", reservedCount);
+        console.log("[APP] Empty slots:", emptySlots);
       } catch (error) {
-        console.error("Error fetching racks:", error);
+        console.error("[APP] Error fetching racks:", error);
       }
     };
   
     fetchRackInfo();
   }, [rackID]);
 
-  
-  // handle reserve function
-  // post: bike_id, 
-  const handleReserve = async () => {
-    try {
-      const res = await fetch("http://localhost:3000/api/bikeActions/reserve", {
-        method: "POST", // post to server to handle reservation request
-        headers: {
-          'Content-Type': 'application/json', // Important to send JSON data
-        },
-        body: JSON.stringify({
-          rack: rackID,
-          date: "2025-05-13", 
-          time: "11:30",
-        }),
-      });
-  
-      if (res.ok) {
-        console.log("Bike reserved!");
-        router.replace("/");
-      } else {
-        const { error } = await res.json();
-        console.log(error || "Error reserving bike");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-    }
-  };
-  
-  const handleGoBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/'); // or router.push('/'), depending on your UX
-    }
-  };
-
-  // const handleDateConfirm = (date: Date) => {
-  //   console.log('User picked date:', date);
-  //   // send this date to your backend or store it in state
-  // };
-
   // return 3 segments: rack photo, rack status, reserve a bike container
   // reserving a bike has dropdown fields date, start time of reservation, and then reserve button
   // reserve button goes to backend handleReserve fucntion that adds a new trip doc but with status as reserved, which will be timed
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Stack.Screen options={{ headerShown: false }} />
       <Header 
         title="Reserve"
         subtitle="Reserve a bike from this rack!"
         hasBack={true}
-        prevCallback={handleGoBack}
+        prevCallback={handleBack}
       />
       <ScrollView
         contentContainerStyle={reserveStyles.container}
@@ -180,7 +182,9 @@ export default function ReserveScreen() {
 
         <TouchableOpacity
           style={reserveStyles.reserveButton}
-          onPress={handleReserve}
+          onPress={() => {
+            handleButtonPress();
+          }}
           activeOpacity={0.8}
         >
         <Text style={reserveStyles.buttonText}>Reserve</Text>
@@ -210,10 +214,6 @@ const reserveStyles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     width: '100%',
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.3,
-    // shadowRadius: 4,
     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
     elevation: 5,
   },

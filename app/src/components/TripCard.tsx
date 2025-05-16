@@ -197,5 +197,6 @@ const formatDate = (dateString: string): string => {
     })
 
     return `${datePart} (${timePart})`;
-    }
+  }
+  return "";
 };

@@ -18,7 +18,7 @@ import Option from "@/src/components/HomeOptions";
 // trips
 import React, { useState, useEffect } from "react";
 import TripCard from "@/src/components/TripCard";
-import { Trip } from "@/src/types/types";
+import { Trip } from "@/src/components/types";
 
 export default function ActionPage() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function ActionPage() {
 
         setActiveTrips(active);
 
-        console.log("Active Trips:", active);
+        console.log("[APP] Reserved Trips:", active);
       } catch (error) {
         console.error("Error fetching trips:", error);
       }
@@ -87,9 +87,9 @@ export default function ActionPage() {
           {activeTrips.map((trip, index) => (
             <TripCard
               key={index}
-              title={`Trip using ${trip.bike_id}`}
-              bikeID={`${trip.bike_id}`}
-              tripStart={`${trip.start_time.toDate().toLocaleString()}`}
+              title={`Trip using ${trip.bikeId}`}
+              bikeID={`${trip.bikeId}`}
+              tripStart={`${trip.startTime.toDate().toLocaleString()}`}
               tripEnd=""
               remarks={`${trip.status}`}
             />

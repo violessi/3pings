@@ -1,6 +1,6 @@
 import { BikeSchema } from "@/types/schema";
 
-const IP_ADDRESS = "192.168.1.29"; // change to your laptop's/server's IP
+const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
 
 // ========================RENT=============================
 
@@ -71,6 +71,28 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
     return []; // temporary solution
   }
 };
+
+// ======================RESERVE=============================
+
+export const getUserReservedTrip = async (userId: string) => {
+  try {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/getReservedTrip/${userId}`, {
+      method: "GET",
+    });
+
+    if (!res.ok) {
+      const { error } = await res.json();
+      throw new Error(error || "Error fetching reserved trip");
+    }
+
+    const data = await res.json();
+    return data; // expected reserved trip object or null
+  } catch (err) {
+    console.error("getUserReservedTrip error:", err);
+    return null;
+  }
+};
+
 
 // ======================RETURN=============================
 

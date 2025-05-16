@@ -31,6 +31,7 @@ router.get("/getAvailableBikes/:rackId", async (req, res) => {
       .where("rackId", "==", rackId)
       .where("status", "==", "available");
     const snapshot = await bikesRef.get();
+    console.log(`[CHECK Rent] Found ${snapshot.size} bikes for rack ${rackId}`);
 
     const availableBikes = [];
     snapshot.forEach((doc) => {
@@ -57,7 +58,8 @@ router.get("/getAvailableBikes/:rackId", async (req, res) => {
 
 router.post("/createTrip", async (req, res) => {
   try {
-    const { bikeId, userId, status, baseRate } = req.body;
+    const { bikeId, userId, status, baseRate, startTime, reservedTripId } = req.body;
+    const isReservation = status === "reserved"; // set if reserving a new trip
 
     // check if bike and user exist
     const userRef = db.collection("users").doc(userId);
@@ -72,29 +74,73 @@ router.post("/createTrip", async (req, res) => {
       return res.status(404).json({ error: "Bike not found" });
     }
 
-    // create a new trip
-    const newTrip = await db.collection("tripsTest").add({
-      bikeId,
-      userId,
-      status,
-      baseRate,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      startTime: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-    await newTrip.update({ id: newTrip.id });
+    // IF user has reserved bike at that rack, set bike 
+    if (reservedTripId) {
+      const reservedTripRef = db.collection("trips").doc(reservedTripId);
+      const reservedTripDoc = await reservedTripRef.get();
 
-    // update bike status
-    await bikeRef.update({
-      status: "getting",
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+      if (!reservedTripDoc.exists) {
+        return res.status(404).json({ error: "Reserved trip not found" });
+      }
 
-    // update user to have a trip
-    await userRef.update({
-      currentTrip: newTrip.id,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+      // Update reserved trip to active
+      await reservedTripRef.update({
+        status: "active",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        startTime: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // update bike status
+      await bikeRef.update({
+        status: "getting",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      // update user to have a trip
+      // add trip ID to user regardless if reserve or rent
+      await userRef.update({
+        currentTrip: reservedTripRef.id,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      return res.status(200).json({ message: "Reserved trip updated to active!" });
+    } else {
+      // ELSE, make a new trip
+      // initialize new trip fields
+      // set start time if not reservation
+      const newTripData = {
+        bikeId,
+        userId,
+        status,
+        baseRate,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+
+      if (isReservation) {
+        if (!startTime) return res.status(400).json({ error: "startTime required for reservation" });
+
+        const parsedStartTime = admin.firestore.Timestamp.fromDate(new Date(startTime));
+        newTripData.startTime = parsedStartTime;
+      } else {
+        newTripData.startTime = admin.firestore.FieldValue.serverTimestamp();
+      }
+
+      const newTripRef = await db.collection("trips").add(newTripData);
+      await newTripRef.update({ id: newTripRef.id });
+
+      // update bike status 
+      await bikeRef.update({
+        status: isReservation ? "reserved" : "getting",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // update user to have a trip
+      // add trip ID to user regardless if reserve or rent
+      await userRef.update({
+        currentTrip: newTripRef.id,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }    
 
     res.status(200).json({ message: "Done creating trip!" });
   } catch (err) {
@@ -102,6 +148,39 @@ router.post("/createTrip", async (req, res) => {
     res.status(500).json({ error: "Failed to create trip" });
   }
 });
+
+// Move this to reserve file later
+router.get("/getReservedTrip/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const reservedTripsSnapshot = await db
+      .collection("trips")
+      .where("userId", "==", userId)
+      .where("status", "==", "reserved")
+      .limit(1)
+      .get();
+
+    if (reservedTripsSnapshot.empty) {
+      return res.status(200).json(null); // No active reservation
+    }
+
+    const doc = reservedTripsSnapshot.docs[0];
+    const data = doc.data();
+
+    return res.status(200).json({
+      id: doc.id,
+      ...data,
+      startTime: data.startTime?.toDate?.() ?? null,
+      createdAt: data.createdAt?.toDate?.() ?? null,
+      updatedAt: data.updatedAt?.toDate?.() ?? null,
+    });
+  } catch (err) {
+    console.error("Error fetching reserved trip:", err);
+    return res.status(500).json({ error: "Failed to fetch reserved trip" });
+  }
+});
+
 
 // ========================= SERVER TO HARDWARE =========================
 

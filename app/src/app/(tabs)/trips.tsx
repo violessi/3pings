@@ -34,8 +34,8 @@ export default function TripScreen() {
         setActiveTrips(active);
         setCompletedTrips(completed);
 
-        console.log("Active Trips:", active);
-        console.log("Completed Trips:", completed);
+        console.log("[APP] Active Trips:", active);
+        console.log("[APP] Completed Trips:", completed);
       } catch (error) {
         console.error("Error fetching trips:", error);
       }
@@ -55,24 +55,24 @@ export default function TripScreen() {
         {activeTrips.map((trip, index) => (
           <TripCard
             key={index}
-            title={`Trip using ${trip.bike_id}`}
-            bikeID={`${trip.bike_id}`}
-            tripStart={`${trip.start_time.toDate().toLocaleString()}`}
+            title={`Trip using ${trip.bikeId}`}
+            bikeID={`${trip.bikeId}`}
+            tripStart={`${trip.startTime.toDate().toLocaleString()}`}
             tripEnd=""
             remarks={`${trip.status}`}
-            addtl_charge={trip.addtl_charge}
+            addtl_charge={trip.addtlCharge}
           />
         ))}
         <Text style={globalStyles.title}> Completed </Text>
         {completedTrips.map((trip, index) => (
           <TripCard
             key={index}
-            title={`Trip using ${trip.bike_id}`}
-            bikeID={`${trip.bike_id}`}
-            tripStart={`${trip.start_time.toDate().toLocaleString()}`}
-            tripEnd={`${trip.end_time.toDate().toLocaleString()}`}
+            title={`Trip using ${trip.bikeId}`}
+            bikeID={`${trip.bikeId}`}
+            tripStart={`${trip.startTime.toDate().toLocaleString()}`}
+            tripEnd={`${trip.endTime.toDate().toLocaleString()}`}
             remarks={`${trip.status}`}
-            addtl_charge={trip.addtl_charge}
+            addtl_charge={trip.addtlCharge}
           />
         ))}
       </ScrollView>
