@@ -3,7 +3,7 @@ import { createATrip, getRack, getAvailableBikes, getUserReservedTrip } from "@/
 import { listenToBikeStatus } from "@/service/listeners";
 
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/firebaseConfig"; // adjust to your actual import
+import { db } from "@/firebaseConfig";
 
 type BikeContextType = {
   rackId: string;
@@ -70,7 +70,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
   // ============ FULL RENT A BIKE FUNCTION ============
   async function rentABike() {
-    const userId = "user123";
+    const userId = "user123"; // PLACEHOLDER
 
     setShowLoadingModal(true);
     try {
@@ -87,16 +87,16 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       let bikeId: string;
       let reservedTripId: string | undefined;
 
-      console.log(reservedTripDoc); // success
+      console.log(reservedTripDoc);
       
-      // IF has reserved trip at that rack, take bikeId of already assigned bike
+      // IF user has a reserved trip at that rack, take bikeId of already assigned bike
       // Include reservedTripId in payload for CreateTrip
       if (reservedTripDoc && reservedTripDoc.status === "reserved") {
         bikeId = reservedTripDoc.bikeId;
         reservedTripId = reservedTripDoc.id;
 
-        console.log("[APP] User has reserved: " + reservedTripId); // NOT WORKING
-        // check if reservation is at that rack
+        console.log("[APP] User has reserved: " + reservedTripId);
+        // ADD check if reservation is at that rack
 
         console.log("[RENT] Using reserved bike:", bikeId);
       } else {
@@ -108,7 +108,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
           throw new Error("No available bikes found");
         }
 
-        // Randomly assign a bike to user
+        // randomly assign a bike to user
         const randomIndex = Math.floor(Math.random() * availableBikes.length);
         const bike = availableBikes[randomIndex];
         bikeId = bike.id;
@@ -117,7 +117,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // CreateTrip handles creating new trip or updating reserved trip
       const payload: CreateTrip = {
         bikeId: bikeId,
-        userId: "user123", // Replace with actual user ID
+        userId: "user123", // PLACEHOLDER
         status: "active",
         baseRate: 10,
         startTime: "",
@@ -166,7 +166,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
       const payload: CreateTrip = {
         bikeId: bike.id,
-        userId: "user123", // Replace with actual user ID
+        userId: "user123", // PLACEHOLDER
         status: "reserved",
         baseRate: 10,
         startTime: selectedDate.toISOString(),

@@ -10,12 +10,13 @@ import Header from "@/src/components/Header";
 import { Reward } from "@/src/components/types";
 import RewardsCard from "@/src/components/RewardsCard";
 
-const currentUserId = "user123";
+const currentUserId = "user123"; // PLACEHOLDER
 
 export default function RewardsScreen() {
   const [activeRewards, setActiveRewards] = useState<Reward[]>([]);
   const [claimedRewards, setClaimedRewards] = useState<Reward[]>([]);
 
+  // fetch user-specific rewards
   const fetchUserClaimedRewards = async () => {
     try {
       const userRef = doc(db, "users", currentUserId);
@@ -35,6 +36,7 @@ export default function RewardsScreen() {
     }
   };
 
+  // fetch all rewards to display
   const fetchRewards = async () => {
     try {
       const claimedIds = await fetchUserClaimedRewards();

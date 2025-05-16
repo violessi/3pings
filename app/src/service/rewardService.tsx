@@ -20,7 +20,7 @@ export const verifyReward = async (
     });
 
     if (res.ok) {
-      console.log("Reward claimed");
+      console.log("[APP] Reward claimed");
       onUpdate?.();
     } else {
       const { error } = await res.json();

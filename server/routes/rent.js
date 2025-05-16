@@ -83,7 +83,7 @@ router.post("/createTrip", async (req, res) => {
         return res.status(404).json({ error: "Reserved trip not found" });
       }
 
-      // Update reserved trip to active
+      // update reserved trip to active
       await reservedTripRef.update({
         status: "active",
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -149,7 +149,7 @@ router.post("/createTrip", async (req, res) => {
   }
 });
 
-// Move this to reserve file later
+// Move this to reserve file later?
 router.get("/getReservedTrip/:userId", async (req, res) => {
   try {
     const { userId } = req.params;

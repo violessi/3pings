@@ -6,6 +6,8 @@ import { db } from "@/firebaseConfig";
 
 import globalStyles from "@/src/assets/styles";
 import Header from "@/src/components/Header";
+import LoadingModal from "@/components/LoadingModal";
+import SuccessModal from "@/components/SuccessModal";
 
 // handling multiple racks
 import { Rack } from "@/src/components/types";
@@ -18,7 +20,7 @@ import { useBike } from "@/context/BikeContext";
 export default function Reserve({ params }: { params: { rackID: string } }) {
   const router = useRouter();    
 
-  // for bike
+  // for bike-related functions 
   const {
     rackId,
     showSuccessModal,
@@ -32,22 +34,20 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
   } = useBike();
   const [assignedBike, setAssignedBike] = useState<Bike | null>(null);
 
-  // for rack info
+  // for getting current rack info; rack is input parameter to reserve function
   const { rackID } = useLocalSearchParams();
-
   const [rackData, setRackData] = useState<Rack | null>(null);
   
-  // for date and time
-  // const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const selectedDate = new Date("2025-05-16T10:30:00"); // placeholder
+  // for date and time; date and time is posted to server 
+  const selectedDate = new Date("2025-05-16T10:30:00"); // PLACEHOLDER
   
-  // handlers
+  // handler functions
   const handleButtonPress = async () => {
     try {
       const res = await reserveABike(selectedDate);
       setAssignedBike(res);
     } catch (err: any) {
-      console.log("[CHECK] Error!", err.message); // temporary; replace with modal
+      console.log("[CHECK] Error!", err.message); // PLACEHOLDER
     }
   }; 
   
@@ -73,20 +73,18 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
       if (!rackID || typeof rackID !== "string") return;
 
       try {
-        const totalSlots = 5;
+        const totalSlots = 5; // PLACEHOLDER; HARDCODED
 
         // fetch bike rack info
-        // details/address from db = racks, fields = rack_name, location
         const rackDoc = await getDoc(doc(db, "racks", rackID));
         if (!rackDoc.exists()) {
-          console.error("[APP] Rack not found"); // modal/go back
+          console.error("[APP] Rack not found"); // PLACEHOLDER; modal/go back
           return;
         }
-
         const rackData = rackDoc.data();
         console.log("Rack Name:", rackData.location);
 
-        // get rack slots info (based on bikes info)
+        // get rack slots info
         // taken from bike info (db = bikes) where the rack_id and bike status is stored
         const bikesQuery = query(
           collection(db, "bikes"),
@@ -95,9 +93,9 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
         const bikesSnapshot = await getDocs(bikesQuery); // get all bikes in that rack
         const bikes = bikesSnapshot.docs.map((doc) => doc.data());
         
-        // # available means bikes where rack_id = rack specified and states = available
-        // # reserved means bikes where rack_id = rack specified and states = reserved
-        // # empty slots means 5 (number of slots) - number of bikes where rack_id = rack specified
+        // # available => bikes where rack_id = rack specified && status = available
+        // # reserved => bikes where rack_id = rack specified && status = reserved
+        // # empty => 5 (number of slots) - number of bikes where rack_id = rack specified
         const availableCount = bikes.filter((b) => b.status === "available").length;
         const reservedCount = bikes.filter((b) => b.status === "reserved").length;
         const occupiedSlots = bikes.length; // # number of bikes in that rack
@@ -160,19 +158,18 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
             <Text style={globalStyles.detail}> Date </Text>
             <TouchableOpacity
               style={reserveStyles.placeholderPicker}
-              onPress={() => {}}
+              onPress={() => {}} // PLACEHOLDER
               activeOpacity={0.8}
               >
               <Text style={reserveStyles.buttonText}>Select a Date</Text>
             </TouchableOpacity>
-            {/* <DateTime onConfirm={handleDateConfirm} /> */}
           </View>
 
           <View style={globalStyles.column}> 
             <Text style={globalStyles.detail}> Start Time </Text>
             <TouchableOpacity
               style={reserveStyles.placeholderPicker}
-              onPress={() => {}}
+              onPress={() => {}} // PLACEHOLDER
               activeOpacity={0.8}
               >
               <Text style={reserveStyles.buttonText}>Select a Time</Text>
@@ -189,8 +186,17 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
         >
         <Text style={reserveStyles.buttonText}>Reserve</Text>
         </TouchableOpacity>
-
+        
         <Text style={globalStyles.note}>Note: Your reservation will only hold for 15 mins! Bike will automatically be reverted to Available if not claimed.  </Text>
+
+        <LoadingModal showLoadingModal={showLoadingModal} />
+        <SuccessModal
+          title="Bike reserved successfully!"
+          description1={`Please make sure to claim your bike from slot ${assignedBike?.rackSlot} at this rack.`}
+          description2="Your reservation will only hold for 15 mins! Bike will automatically be made available if not claimed."
+          showSuccessModal={showSuccessModal}
+        />
+        {/* Add close modal button, placeholder: refresh */}
       </View>
 
 

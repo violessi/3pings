@@ -69,7 +69,7 @@ export default function RewardsCard({
       { (!claimed) && (
         <TouchableOpacity
           style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
-          onPress={() => handleButtonPress()} // handle verifying
+          onPress={() => handleButtonPress()}
           activeOpacity={0.8}
           >
           <Text>Claim Reward</Text>
