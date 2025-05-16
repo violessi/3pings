@@ -1,4 +1,4 @@
-import { BikeSchema } from "@/types/schema";
+import { BikeSchema , RackSchema } from "@/types/schema";
 
 const IP_ADDRESS = "10.195.82.188"; // change to your laptop's/server's IP
 
@@ -71,6 +71,28 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
     return []; // temporary solution
   }
 };
+
+// export const getRackId = async (tripId: string): Promise<string> => {
+//   try {
+//     const response = await fetch(
+//       `http://${IP_ADDRESS}:3000/api/rent/getRackId/${tripId}`,
+//       {
+//         method: "GET",
+//       }
+//     );
+//     if (!response.ok) {
+//       const data = await response.json();
+//       console.error("Backend error:", data.message);
+//       throw new Error(data.message);  // this gets caught in try-catch
+//     }
+
+//     const data = await response.json();
+//     return data.rackId;
+//   } catch (err) {
+//     console.error("Error in getRackFromBike:", err);
+//     throw err;
+//   }
+// };
 
 // ======================RESERVE=============================
 

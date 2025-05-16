@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
-import { useRouter } from "expo-router";
+import { useRouter , useLocalSearchParams} from "expo-router";
 import { useBike } from "@/context/BikeContext";
 
 // fields and style of trip card 
@@ -15,6 +15,8 @@ type TripCardProps = {
   tripEnd: string;
   remarks: string;
   addtl_charge?: number;
+  // startRack: string;
+  // endRack: string;
 };
 
 export default function TripCard({
@@ -25,6 +27,8 @@ export default function TripCard({
   tripEnd,
   remarks,
   addtl_charge,
+  // startRack,
+  // endRack,
 }: TripCardProps) {
   const statusStyles = getStatusStyles(remarks, addtl_charge); // remarks = status string
   const router = useRouter(); 
@@ -39,7 +43,8 @@ export default function TripCard({
     updateRackId,
     rentABike,
     reserveABike,
-    cancelReservation
+    cancelReservation,
+    // getRackFromBike
   } = useBike();
 
   const handleCancel = async () => {
@@ -59,8 +64,13 @@ export default function TripCard({
   // optional: release button in reserved card
   // const handleRelease = async () => {
   //   try {
-  //     updateRackId(rackId);
-  //     console.log("Release from rack:", rackId);
+  //     if (!tripID){
+  //       console.error("No tripId passed to TripCard!");
+  //       return;
+  //     }
+  //     console.log("Release bike from this trip:", tripID);
+  //     const rackID = await getRackFromBike(tripID);
+  //     updateRackId(rackID);
   //     const res = await rentABike();
   //   } catch (err: any) {
   //     console.log("Error!", err.message); // temporary; replace with modal
@@ -83,9 +93,9 @@ export default function TripCard({
         {/*Right*/}
         <View style={globalStyles.column}>
           <Text style={tripStyles.label}> From: </Text>
-          <Text style={tripStyles.detail}> Start Rack</Text>
+          {/* <Text style={tripStyles.detail}>{startRack}</Text> */}
           <Text style={tripStyles.label}> To: </Text>
-          <Text style={tripStyles.detail}> End Rack</Text>
+          {/* <Text style={tripStyles.detail}>{endRack}</Text> */}
         </View>
       </View>
       

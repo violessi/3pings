@@ -114,6 +114,7 @@ router.post("/createTrip", async (req, res) => {
         baseRate,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        // startRack: rackId,
       };
 
       if (isReservation) {
@@ -148,6 +149,46 @@ router.post("/createTrip", async (req, res) => {
     res.status(500).json({ error: "Failed to create trip" });
   }
 });
+
+// router.get("/getRackId/:tripId", async (req, res) => {
+//   const { tripId } = req.params;
+//   console.log(tripId);
+
+//   try {
+//     // Step 1: Get the trip doc
+//     const tripSnap = await db.collection("trips").doc(tripId).get();
+//     if (!tripSnap.exists) {
+//       console.log(`Trip ${tripId} not found`);
+//       return res.status(404).json({ message: "Trip not found" });
+//     }
+
+//     const tripData = tripSnap.data();
+//     const bikeId = tripData?.bikeId;
+
+//     if (!bikeId) {
+//       return res.status(400).json({ message: "Trip has no bikeId" });
+//     }
+
+//     // Step 2: Get the bike doc
+//     const bikeSnap = await db.collection("bikes").doc(bikeId).get();
+//     if (!bikeSnap.exists) {
+//       return res.status(404).json({ message: "Bike not found" });
+//     }
+
+//     const bikeData = bikeSnap.data();
+//     const rackId = bikeData?.rackId;
+
+//     if (!rackId) {
+//       return res.status(400).json({ message: "Bike has no rackId" });
+//     }
+
+//     return res.status(200).json({ rackId });
+//   } catch (err) {
+//     console.error("Error in getRackFromBike:", err);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// });
+
 
 // ========================= SERVER TO HARDWARE =========================
 

@@ -97,6 +97,8 @@ export default function ActionPage() {
               tripStart={`${trip.startTime.toDate().toLocaleString()}`}
               tripEnd=""
               remarks={`${trip.status}`}
+              // startRack={trip.startRack}
+              // endRack=""
             />
           ))}
         </View>

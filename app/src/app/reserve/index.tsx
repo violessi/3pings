@@ -195,8 +195,11 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
           description1={`Please make sure to claim your bike from slot ${assignedBike?.rackSlot} at this rack.`}
           description2="Your reservation will only hold for 15 mins! Bike will automatically be made available if not claimed."
           showSuccessModal={showSuccessModal}
+          onClose={() => {
+            setShowSuccessModal(false); // Hide modal
+            router.replace("/action"); // Or navigate to any route (e.g. router.push("/home"))
+          }}
         />
-        {/* Add close modal button, placeholder: refresh */}
       </View>
 
 

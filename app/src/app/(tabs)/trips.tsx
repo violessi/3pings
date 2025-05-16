@@ -65,6 +65,8 @@ export default function TripScreen() {
             tripEnd=""
             remarks={`${trip.status}`}
             addtl_charge={trip.addtlCharge}
+            // startRack={trip.startRack}
+            // endRack=""
           />
         ))}
         <Text style={globalStyles.title}> Completed </Text>
@@ -78,6 +80,8 @@ export default function TripScreen() {
             tripEnd={`${trip.endTime.toDate().toLocaleString()}`}
             remarks={`${trip.status}`}
             addtl_charge={trip.addtlCharge}
+            // startRack={trip.startRack}
+            // endRack=""
           />
         ))}
       </ScrollView>

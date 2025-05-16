@@ -60,4 +60,6 @@ export const TripSchema = z.object({
   finalFee: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  // startRack: z.string(),
+  // endRack: z.string().nullable(),
 });

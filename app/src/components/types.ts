@@ -9,6 +9,8 @@ export type Trip = {
     endTime: Timestamp;
     status: string;
     addtlCharge: number;
+    // startRack: string;
+    // endRack: string;
   };
 
 export type Rack = {
