@@ -377,6 +377,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     } catch (err: any) {
       setShowLoadingModal(false);
       throw new Error(`Payment failed: ${err.message}`);
+      setShowErrorModal(true);
+      return null;
     }
   }
 
