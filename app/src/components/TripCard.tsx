@@ -2,11 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
 import { useRouter } from "expo-router";
+import { useBike } from "@/context/BikeContext";
 
 // fields and style of trip card 
 // displayed in trips page
 
 type TripCardProps = {
+  tripID: string;
   title: string;
   bikeID: string;
   tripStart: string;
@@ -16,6 +18,7 @@ type TripCardProps = {
 };
 
 export default function TripCard({
+  tripID,
   title,
   bikeID,
   tripStart,
@@ -24,7 +27,38 @@ export default function TripCard({
   addtl_charge,
 }: TripCardProps) {
   const statusStyles = getStatusStyles(remarks, addtl_charge); // remarks = status string
-  const router = useRouter();  
+  const router = useRouter(); 
+  
+  const {
+    rackId,
+    showSuccessModal,
+    showErrorModal,
+    setShowErrorModal,
+    setShowSuccessModal,
+    showLoadingModal,
+    updateRackId,
+    rentABike,
+    reserveABike,
+    cancelReservation
+  } = useBike();
+
+  const handleButtonPress = async () => {
+      try {
+        if (!tripID){
+          console.error("No tripId passed to TripCard!");
+          return;
+        }
+        const res = await cancelReservation(tripID); // hwo to get tripId?
+        // function to cancel reservation post to backend, pass tripID?
+        // or make a cancelReservation function where rent/reserve a bike is, then inside do the ff:
+        // can use getUserReservedTrip to check if theres a reserved trip
+        // then delete that trip, update bike and user dbs
+        // basically same as rent logic but reverse
+        console.log("Cancelled.");
+      } catch (err: any) {
+        console.log("Error!", err.message); // temporary; replace with modal
+      }
+    };
 
   return (
     <View style={globalStyles.card}>
@@ -82,7 +116,7 @@ export default function TripCard({
           { remarks === 'reserved' && ( // cancel reservation 
             <TouchableOpacity
               style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
-              //onPress={} // handle delete
+              onPress={() => {handleButtonPress();}} // handle cancel reservation
               activeOpacity={0.8}
               >
               <Text>Cancel reservation</Text>

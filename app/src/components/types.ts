@@ -3,6 +3,7 @@ import { Timestamp } from 'firebase/firestore';
 // should match actual fields from database
 
 export type Trip = {
+    id: string;
     bikeId: string;
     startTime: Timestamp;
     endTime: Timestamp;

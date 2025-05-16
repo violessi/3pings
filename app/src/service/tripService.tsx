@@ -1,6 +1,6 @@
 import { BikeSchema } from "@/types/schema";
 
-const IP_ADDRESS = "10.150.244.52"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.195.82.188"; // change to your laptop's/server's IP
 
 // ========================RENT=============================
 
@@ -76,7 +76,7 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
 
 export const getUserReservedTrip = async (userId: string) => {
   try {
-    const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/getReservedTrip/${userId}`, {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/getReservedTrip/${userId}`, {
       method: "GET",
     });
 
@@ -93,6 +93,27 @@ export const getUserReservedTrip = async (userId: string) => {
   }
 };
 
+export const deleteTrip = async (payload: { bikeId: string; userId: string; tripId: string }) => {
+  try {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/deleteReservedTrip`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+  if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to delete trip");
+    }
+
+    return await res.json(); // return server response
+  } catch (err) {
+    console.error("Error deleting trip:", err);
+    throw err; // rethrow so it can be caught in cancelReservation
+  }
+};
 
 // ======================RETURN=============================
 

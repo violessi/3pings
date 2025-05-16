@@ -149,39 +149,6 @@ router.post("/createTrip", async (req, res) => {
   }
 });
 
-// Move this to reserve file later?
-router.get("/getReservedTrip/:userId", async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const reservedTripsSnapshot = await db
-      .collection("trips")
-      .where("userId", "==", userId)
-      .where("status", "==", "reserved")
-      .limit(1)
-      .get();
-
-    if (reservedTripsSnapshot.empty) {
-      return res.status(200).json(null); // No active reservation
-    }
-
-    const doc = reservedTripsSnapshot.docs[0];
-    const data = doc.data();
-
-    return res.status(200).json({
-      id: doc.id,
-      ...data,
-      startTime: data.startTime?.toDate?.() ?? null,
-      createdAt: data.createdAt?.toDate?.() ?? null,
-      updatedAt: data.updatedAt?.toDate?.() ?? null,
-    });
-  } catch (err) {
-    console.error("Error fetching reserved trip:", err);
-    return res.status(500).json({ error: "Failed to fetch reserved trip" });
-  }
-});
-
-
 // ========================= SERVER TO HARDWARE =========================
 
 router.get("/pingHardware", async (req, res) => {});

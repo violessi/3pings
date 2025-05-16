@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import { createATrip, getRack, getAvailableBikes, getUserReservedTrip } from "@/service/tripService";
+import { createATrip, getRack, getAvailableBikes, getUserReservedTrip, deleteTrip } from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
 
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 
 type BikeContextType = {
@@ -14,6 +14,7 @@ type BikeContextType = {
   updateRackId: (newRackId: string) => void;
   rentABike: () => Promise<Bike | null>;
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
+  cancelReservation: (tripId: string) => void;
   showLoadingModal: boolean;
 };
 
@@ -67,6 +68,16 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  async function cancelTrip(payload: { bikeId: string; userId: string; tripId: string }) {
+    try {
+      console.log("Cancel params:", payload.bikeId, payload.userId, payload.tripId);
+      const res = await deleteTrip(payload); // tripService function
+      return res;
+    } catch (err) {
+      console.error("Error in cancelTrip:", err);
+      throw err;
+    }
+  }
 
   // ============ FULL RENT A BIKE FUNCTION ============
   async function rentABike() {
@@ -148,7 +159,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  // ============ FULL RENT A BIKE FUNCTION ============
+  // ============ FULL RESERVE A BIKE FUNCTION ============
   async function reserveABike(selectedDate: Date) {
     setShowLoadingModal(true);
 
@@ -186,6 +197,48 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+// ============ FULL RENT A BIKE FUNCTION ============
+  async function cancelReservation(tripId: string) {
+    setShowLoadingModal(true);
+
+    try {
+      // get reserved trip data
+      console.log("Cancelling", tripId);
+      const tripRef = doc(db, "trips", tripId);
+      const tripSnap = await getDoc(tripRef);
+
+      if (!tripSnap.exists()) {
+        throw new Error("Trip not found");
+      }
+
+      const tripData = tripSnap.data();
+      if (!tripData) {
+        throw new Error("Trip data is undefined");
+      }
+
+      if (tripData.status !== "reserved") {
+        throw new Error("Trip is not reserved");
+      }
+
+      const payload = {
+        bikeId: tripData.bikeId, // get assigned bike from reservation,
+        userId: "user123", // PLACEHOLDER
+        tripId,
+      };
+
+      await cancelTrip(payload); // post failed
+      console.log("[CANCEL] Cancel trip:", tripId);
+
+      setShowLoadingModal(false);
+      setShowSuccessModal(true);
+      updateRackId("");
+
+    } catch (err: any) {
+      setShowLoadingModal(false);
+      throw new Error(`Cancellation failed: ${err.message}`);
+    }
+  }
+
   return (
     <BikeContext.Provider
       value={{
@@ -197,6 +250,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         updateRackId,
         rentABike,
         reserveABike,
+        cancelReservation,
         showLoadingModal,
       }}
     >

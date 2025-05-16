@@ -19,6 +19,7 @@ import Option from "@/src/components/HomeOptions";
 import React, { useState, useEffect } from "react";
 import TripCard from "@/src/components/TripCard";
 import { Trip } from "@/src/components/types";
+import globalStyles from "@/src/assets/styles";
 
 export default function ActionPage() {
   const router = useRouter();
@@ -31,9 +32,10 @@ export default function ActionPage() {
         const tripsCollection = collection(db, "trips");
         const tripSnapshot = await getDocs(tripsCollection);
 
-        const allTrips: Trip[] = tripSnapshot.docs.map(
-          (doc) => doc.data() as Trip
-        );
+        const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
+          ...(doc.data() as Trip),
+          id: doc.id,
+        }));
 
         const active = allTrips.filter((trip) => trip.status === "reserved");
 
@@ -70,6 +72,7 @@ export default function ActionPage() {
             icon="arrow-left"
             onPress={() => router.replace("/return")}
           />
+          <Text style = {globalStyles.detail}> Reserve a bike: </Text>
           <Option
             title="Reserve"
             description="Reserve a bike"
@@ -77,15 +80,18 @@ export default function ActionPage() {
             onPress={() => router.replace("/")}
           />
         </View>
-        <Header
+        <View style = {{marginTop: 20}}>
+          <Header
           title="Your Reservations"
           subtitle="Please use the Rent page to finish your reservation."
           hasBack={false}
           isHomepage={true}
         />
+        </View>
         <View style={{ marginHorizontal: 20 }}>
           {activeTrips.map((trip, index) => (
             <TripCard
+              tripID={trip.id}
               key={index}
               title={`Trip using ${trip.bikeId}`}
               bikeID={`${trip.bikeId}`}

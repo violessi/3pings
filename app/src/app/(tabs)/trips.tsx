@@ -21,7 +21,10 @@ export default function TripScreen() {
         const tripsCollection = collection(db, "trips");
         const tripSnapshot = await getDocs(tripsCollection);
 
-        const allTrips: Trip[] = tripSnapshot.docs.map((doc) => doc.data() as Trip);
+        const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
+          ...(doc.data() as Trip),
+          id: doc.id,
+        }));
 
         const active = allTrips.filter(trip =>
           trip.status === "active"
@@ -55,6 +58,7 @@ export default function TripScreen() {
         {activeTrips.map((trip, index) => (
           <TripCard
             key={index}
+            tripID={trip.id}
             title={`Trip using ${trip.bikeId}`}
             bikeID={`${trip.bikeId}`}
             tripStart={`${trip.startTime.toDate().toLocaleString()}`}
@@ -67,6 +71,7 @@ export default function TripScreen() {
         {completedTrips.map((trip, index) => (
           <TripCard
             key={index}
+            tripID={trip.id}
             title={`Trip using ${trip.bikeId}`}
             bikeID={`${trip.bikeId}`}
             tripStart={`${trip.startTime.toDate().toLocaleString()}`}

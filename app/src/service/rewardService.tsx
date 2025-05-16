@@ -1,7 +1,7 @@
 import { BikeSchema } from "@/types/schema";
 import RewardsCard from "@/src/components/RewardsCard";
 
-const IP_ADDRESS = "10.150.244.52"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.195.82.188"; // change to your laptop's/server's IP
 
 // ========================CLAIM=============================
 
