@@ -64,33 +64,41 @@ export default function ActionPage() {
             title="Rent"
             description="Rent a bike"
             icon="bike"
-            onPress={() => router.replace("/rent")}
+            onPress={() => router.navigate("/rent")}
           />
           <Option
             title="Return"
             description="Return a bike"
             icon="arrow-left"
-            onPress={() => router.replace("/return")}
+            onPress={() => router.navigate("/return")}
           />
           <Option
             title="Reserve"
             description="Reserve a bike"
             icon="calendar"
-            onPress={() => router.replace("/")}
+            onPress={() => router.navigate("/")}
           />
         </View>
-        <View style = {{marginTop: 20}}>
+        <View style={{ marginTop: 20 }}>
           <Header
-          title="Your Reservations"
-          subtitle="Please use the Rent page to claim your bike."
-          hasBack={false}
-          isHomepage={true}
-        />
+            title="Your Reservations"
+            subtitle="Please use the Rent page to claim your bike."
+            hasBack={false}
+            isHomepage={true}
+          />
         </View>
         <View style={{ marginHorizontal: 20 }}>
-          { activeTrips.length === 0 ? (
-            <Text style={[globalStyles.subtitle, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
-          ) : ( 
+          {activeTrips.length === 0 ? (
+            <Text
+              style={[
+                globalStyles.subtitle,
+                { marginLeft: 40 },
+                { marginBottom: 30 },
+              ]}
+            >
+              No trips to show.
+            </Text>
+          ) : (
             activeTrips.map((trip, index) => (
               <TripCard
                 tripID={trip.id}

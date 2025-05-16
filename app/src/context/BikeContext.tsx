@@ -206,7 +206,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       return bikeId;
     } catch (err: any) {
       setShowLoadingModal(false);
-      throw new Error(`Error: ${err.message}`);
+      setShowErrorModal(true);
+      return null;
     }
   }
 
