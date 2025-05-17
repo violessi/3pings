@@ -39,7 +39,7 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
   const [rackData, setRackData] = useState<Rack | null>(null);
   
   // for date and time; date and time is posted to server 
-  const selectedDate = new Date("2025-05-16T10:30:00"); // PLACEHOLDER
+  const selectedDate = new Date(); // Reserves from current time
   
   // handler functions
   const handleButtonPress = async () => {
@@ -67,7 +67,7 @@ export default function Reserve({ params }: { params: { rackID: string } }) {
 
   // fetch rack info to display in card
   useEffect(() => {
-    updateRackId(rackID);
+    updateRackId(rackID); // raising a problem, but works
 
     const fetchRackInfo = async () => {
       if (!rackID || typeof rackID !== "string") return;

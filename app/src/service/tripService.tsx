@@ -1,6 +1,6 @@
 import { BikeSchema , RackSchema } from "@/types/schema";
 
-const IP_ADDRESS = "10.195.82.188"; // change to your laptop's/server's IP
+const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
 
 // ========================RENT=============================
 
@@ -157,3 +157,27 @@ export const deleteTrip = async (payload: { bikeId: string; userId: string; trip
 //     console.error("Error:", err);
 //   }
 // };
+
+
+// date time display format
+export const formatDate = (dateString: string): string => {
+
+  if (dateString) {
+    const date = new Date(dateString);
+
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'short',  
+      day: 'numeric', 
+    };
+
+    const datePart = date.toLocaleDateString('en-US', options);
+    const timePart = date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
+
+    return `${datePart} (${timePart})`;
+  }
+  return "";
+};

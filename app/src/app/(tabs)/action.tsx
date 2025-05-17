@@ -82,7 +82,7 @@ export default function ActionPage() {
         <View style = {{marginTop: 20}}>
           <Header
           title="Your Reservations"
-          subtitle="Please use the Rent page to finish your reservation."
+          subtitle="Please use the Rent page to claim your bike."
           hasBack={false}
           isHomepage={true}
         />
@@ -92,7 +92,11 @@ export default function ActionPage() {
             <TripCard
               tripID={trip.id}
               key={index}
-              title={`Trip using ${trip.bikeId}`}
+              title={`Reservation from ${trip.startTime.toDate().toLocaleString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              })}`}
               bikeID={`${trip.bikeId}`}
               tripStart={`${trip.startTime.toDate().toLocaleString()}`}
               tripEnd=""

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
 import { useRouter , useLocalSearchParams} from "expo-router";
 import { useBike } from "@/context/BikeContext";
+import { formatDate } from '../service/tripService';
 
 // fields and style of trip card 
 // displayed in trips page
@@ -128,7 +129,7 @@ export default function TripCard({
               onPress={() => router.replace('/profile')} // go to profile
               activeOpacity={0.8}
               >
-              <Text>Penalty information</Text>
+              <Text>Penalty payment</Text>
             </TouchableOpacity>
           )}
           { remarks === 'active' && ( // nearest rack to me 
@@ -137,7 +138,7 @@ export default function TripCard({
               onPress={() => router.replace('/')} // go to maps?
               activeOpacity={0.8}
               >
-              <Text> Nearest rack to me</Text>
+              <Text>View racks</Text>
             </TouchableOpacity>
           )}
           { remarks === 'reserved' && ( // cancel reservation 
@@ -152,12 +153,11 @@ export default function TripCard({
         </View>
       </View>
       
-      { remarks != 'reserved' && ( // nearest rack to me 
+      {/* { remarks != 'reserved' && ( // optional: remarks
         <Text style={[tripStyles.detail, {color: '#721c24'}]}>
           <Text style={[tripStyles.label, {color: '#721c24'}]}>Remarks: </Text>
-          [time left or overdue balance]
         </Text>
-      )}
+      )} */}
     </View>
   );
 }
@@ -230,25 +230,3 @@ const getStatusStyles = (status: string, addtlCharge?: number) => {
   }
 };
 
-// date time display format
-const formatDate = (dateString: string): string => {
-
-  if (dateString) {
-    const date = new Date(dateString);
-
-    const options: Intl.DateTimeFormatOptions = {
-      month: 'short',  
-      day: 'numeric', 
-    };
-
-    const datePart = date.toLocaleDateString('en-US', options);
-    const timePart = date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
-
-    return `${datePart} (${timePart})`;
-  }
-  return "";
-};

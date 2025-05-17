@@ -59,7 +59,7 @@ export default function TripScreen() {
           <TripCard
             key={index}
             tripID={trip.id}
-            title={`Trip using ${trip.bikeId}`}
+            title={`${trip.startTime.toDate().toLocaleString("en-US", { weekday: "long" })} trip`} // PLACEHOLDER; change to Trip from ${trip.startRack}
             bikeID={`${trip.bikeId}`}
             tripStart={`${trip.startTime.toDate().toLocaleString()}`}
             tripEnd=""
@@ -74,7 +74,7 @@ export default function TripScreen() {
           <TripCard
             key={index}
             tripID={trip.id}
-            title={`Trip using ${trip.bikeId}`}
+            title={`${trip.startTime.toDate().toLocaleString("en-US", { weekday: "long" })} trip`} 
             bikeID={`${trip.bikeId}`}
             tripStart={`${trip.startTime.toDate().toLocaleString()}`}
             tripEnd={`${trip.endTime.toDate().toLocaleString()}`}
