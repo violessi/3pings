@@ -87,7 +87,6 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
   async function getRackNameById(rackId: string): Promise<string> {
     if (!rackId) {
-      console.error("No rack ID provided");
       return "";
     }
 
