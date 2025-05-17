@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import { createATrip, getRack, getAvailableBikes, getUserReservedTrip, deleteTrip } from "@/service/tripService";
+import { createATrip, getRack, getAvailableBikes, getUserReservedTrip, deleteTrip, payTrip } from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
 
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
@@ -11,12 +11,13 @@ type BikeContextType = {
   showErrorModal: boolean;
   setShowErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
+  showLoadingModal: boolean;
   updateRackId: (newRackId: string) => void;
   rentABike: () => Promise<Bike | null>;
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
   cancelReservation: (tripId: string) => void;
+  payForTrip: (tripId: string) => void;
   // getRackFromBike: (tripId: string) => Promise<string>;
-  showLoadingModal: boolean;
 };
 
 export const BikeContext = createContext<BikeContextType | null>(null);
@@ -147,6 +148,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         baseRate: 10,
         startTime: "",
         ...(reservedTripId && { reservedTripId }),
+        paid: false,
         // startRack: rackId,
         // endRack: "",
       };
@@ -197,6 +199,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         status: "reserved",
         baseRate: 10,
         startTime: selectedDate.toISOString(),
+        paid: false,
         // startRack: rackId,
         // endRack: "",
       };
@@ -215,7 +218,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-// ============ FULL RENT A BIKE FUNCTION ============
+// ============ FULL CANCEL A BIKE FUNCTION ============
   async function cancelReservation(tripId: string) {
     setShowLoadingModal(true);
 
@@ -257,6 +260,23 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  // ============ FULL PAY FUNCTION ============
+  async function payForTrip(tripId: string) {
+    setShowLoadingModal(true);
+
+    try {
+      console.log("Paying for", tripId);
+      // set parameters/payload
+      // call function from tripService
+      // that will handle server posts/functions
+      // await and store response, return response as success
+
+    } catch (err: any) {
+      setShowLoadingModal(false);
+      throw new Error(`Payment failed: ${err.message}`);
+    }
+  }
+
   return (
     <BikeContext.Provider
       value={{
@@ -265,12 +285,13 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         showErrorModal,
         setShowErrorModal,
         setShowSuccessModal,
+        showLoadingModal,
         updateRackId,
         rentABike,
         reserveABike,
         cancelReservation,
+        payForTrip,
         // getRackFromBike,
-        showLoadingModal,
       }}
     >
       {children}

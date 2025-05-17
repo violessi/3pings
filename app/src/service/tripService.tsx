@@ -158,8 +158,30 @@ export const deleteTrip = async (payload: { bikeId: string; userId: string; trip
 //   }
 // };
 
+// ======================PAY FOR A TRIP======================
+export const payTrip = async (tripId: string ) => {
+  try {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/payTrip`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(tripId),
+    });
 
-// date time display format
+  if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to delete trip");
+    }
+
+    return await res.json(); // return server response
+  } catch (err) {
+    console.error("Error paying for trip:", err);
+    throw err; // rethrow so it can be caught in cancelReservation
+  }
+};
+
+// ======================FORMAT DATE/TIME======================
 export const formatDate = (dateString: string): string => {
 
   if (dateString) {

@@ -28,6 +28,7 @@ export const ProfileSchema = z.object({
   currentTrip: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  credits: z.number(),
 });
 
 export const BikeSchema = z.object({
@@ -60,6 +61,7 @@ export const TripSchema = z.object({
   finalFee: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  paid: z.boolean().nullable(),
   // startRack: z.string(),
   // endRack: z.string().nullable(),
 });

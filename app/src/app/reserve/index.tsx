@@ -19,7 +19,7 @@ export default function Reserve() {
   const router = useRouter();
 
   // for getting current rack info; rack is input parameter to reserve function
-  const { rackID } = useLocalSearchParams();
+  const { rackID } = useLocalSearchParams<{ rackID: string }>();
   const [rackData, setRackData] = useState<Rack | null>(null);
 
   // for bike-related functions

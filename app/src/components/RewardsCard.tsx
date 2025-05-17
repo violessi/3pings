@@ -43,7 +43,7 @@ export default function RewardsCard({
   };
   
   return (
-    <View style={globalStyles.card}>
+    <View style={[globalStyles.card, {backgroundColor: "#fff"}]}>
       <Text style={globalStyles.subtitle}>{title}</Text>
 
       <View style={globalStyles.row}>

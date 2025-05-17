@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Text, ScrollView, SafeAreaView } from "react-native";
+import Header from "@/src/components/Header";
 import globalStyles from "@/src/assets/styles";
 
 import { collection, getDocs , doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
-import Header from "@/src/components/Header";
-
-// rewards
 import { Reward } from "@/src/components/types";
 import RewardsCard from "@/src/components/RewardsCard";
 

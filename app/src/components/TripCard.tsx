@@ -212,7 +212,7 @@ const getStatusStyles = (status: string, addtlCharge?: number) => {
           color: '#155724',
         },
       };
-    default: // 
+    default:
       return {
         container: {
           backgroundColor: '#e2e3e5',
@@ -224,4 +224,3 @@ const getStatusStyles = (status: string, addtlCharge?: number) => {
       };
   }
 };
-
