@@ -8,6 +8,7 @@ import globalStyles from "@/src/assets/styles";
 import Header from "@/src/components/Header";
 import LoadingModal from "@/components/LoadingModal";
 import SuccessModal from "@/components/SuccessModal";
+import ErrorModal from "@/components/ErrorModal";
 
 import RackStatus from "@/src/components/RackStatus";
 import ReserveForm from "@/src/components/ReserveForm"; // New component

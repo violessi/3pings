@@ -88,19 +88,23 @@ export default function ActionPage() {
         />
         </View>
         <View style={{ marginHorizontal: 20 }}>
-          {activeTrips.map((trip, index) => (
-            <TripCard
-              tripID={trip.id}
-              key={index}
-              title={`Reservation from`}
-              bikeID={`${trip.bikeId}`}
-              tripStart={`${trip.startTime.toDate().toLocaleString()}`}
-              tripEnd=""
-              remarks={`${trip.status}`}
-              startRack={trip.startRack}
-              endRack=""
-            />
-          ))}
+          { activeTrips.length === 0 ? (
+            <Text style={[globalStyles.subtitle, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
+          ) : ( 
+            activeTrips.map((trip, index) => (
+              <TripCard
+                tripID={trip.id}
+                key={index}
+                title={`Reservation from`}
+                bikeID={`${trip.bikeId}`}
+                tripStart={`${trip.startTime.toDate().toLocaleString()}`}
+                tripEnd=""
+                remarks={`${trip.status}`}
+                startRack={trip.startRack}
+                endRack=""
+              />
+            ))
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
