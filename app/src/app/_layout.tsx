@@ -14,7 +14,6 @@ export default function RootLayout() {
           <Stack.Screen name="return" options={{ headerShown: false }} />
           <Stack.Screen name="reserve" options={{ headerShown: false }} />
           <Stack.Screen name="payment" options={{ headerShown: false }} />
-          <Stack.Screen name="payment/pay" options={{ headerShown: false }} />
         </Stack>
       </PaperProvider>
     </BikeProvider>

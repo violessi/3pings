@@ -22,9 +22,8 @@ router.post("/verify", async (req, res) => {
     }
 
     const rewardData = rewardSnap.data();
-    const { reqs, timeLowerReq, timeUpperReq } = rewardData;
-    const requiredDay = reqs[1]; 
-    const requiredRack = reqs[2]; 
+    const { reqs, timeLowerReq, timeUpperReq, targetRack } = rewardData;
+    const targetDay = reqs[1]; 
 
     // Get user doc to access rewardTrips
     const userRef = db.collection("users").doc(userId);
@@ -56,14 +55,14 @@ router.post("/verify", async (req, res) => {
       const hour = tripEnd.getHours();
       const day = tripEnd.toLocaleString("en-US", { weekday: "long" });
       
-      console.log("[VERIFY]", hour, day);
-      console.log("[VERIFY]", timeLowerReq, timeUpperReq, requiredDay);
+      console.log("[VERIFY]", hour, day, trip.endRack);
+      console.log("[VERIFY]", timeLowerReq, timeUpperReq, targetDay, targetRack);
 
       const timeValid = hour >= timeLowerReq && hour < timeUpperReq;
-      const dayValid = day === requiredDay;
-      // const rackValid = trip.endRack === requiredRack;
+      const dayValid = day === targetDay;
+      const rackValid = trip.endRack === targetRack;
 
-      return timeValid && dayValid; // && rackValid;
+      return timeValid && dayValid && rackValid;
     });
     
     

@@ -27,7 +27,6 @@ declare global {
     | "id"
     | "createdAt"
     | "updatedAt"
-    | "endTime"
     | "addtlCharge"
     | "finalFee"
   >;

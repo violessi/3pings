@@ -59,14 +59,16 @@ export default function TripScreen() {
           <TripCard
             key={index}
             tripID={trip.id}
-            title={`${trip.startTime.toDate().toLocaleString("en-US", { weekday: "long" })} trip`} // PLACEHOLDER; change to Trip from ${trip.startRack}
+            title={`Trip from`}
             bikeID={`${trip.bikeId}`}
             tripStart={`${trip.startTime.toDate().toLocaleString()}`}
-            tripEnd=""
+            tripEnd={trip.endTime
+              ? trip.endTime.toDate().toLocaleString()
+              : ""}
             remarks={`${trip.status}`}
             addtl_charge={trip.addtlCharge}
-            // startRack={trip.startRack}
-            // endRack=""
+            startRack={trip.startRack}
+            endRack={trip.endRack}
           />
         ))}
         <Text style={globalStyles.title}> Completed </Text>
@@ -74,14 +76,16 @@ export default function TripScreen() {
           <TripCard
             key={index}
             tripID={trip.id}
-            title={`${trip.startTime.toDate().toLocaleString("en-US", { weekday: "long" })} trip`} 
+            title={`Trip from`}
             bikeID={`${trip.bikeId}`}
             tripStart={`${trip.startTime.toDate().toLocaleString()}`}
-            tripEnd={`${trip.endTime.toDate().toLocaleString()}`}
+            tripEnd={trip.endTime
+              ? trip.endTime.toDate().toLocaleString()
+              : ""}
             remarks={`${trip.status}`}
             addtl_charge={trip.addtlCharge}
-            // startRack={trip.startRack}
-            // endRack=""
+            startRack={trip.startRack}
+            endRack={trip.endRack}
           />
         ))}
       </ScrollView>

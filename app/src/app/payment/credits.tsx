@@ -35,16 +35,14 @@ export default function Rent() {
     router.replace("/(tabs)/profile");
   };
 
-  // .push() used to /pay
-  // go back to page based on callstack
   const handleBack = () => {
-    router.back();
+    router.replace("/(tabs)/profile");
   };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <Header
-        title="Pay for a Trip"
+        title="Your credits"
         hasBack={true}
         prevCallback={handleBack}
       />

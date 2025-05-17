@@ -92,17 +92,13 @@ export default function ActionPage() {
             <TripCard
               tripID={trip.id}
               key={index}
-              title={`Reservation from ${trip.startTime.toDate().toLocaleString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true,
-              })}`}
+              title={`Reservation from`}
               bikeID={`${trip.bikeId}`}
               tripStart={`${trip.startTime.toDate().toLocaleString()}`}
               tripEnd=""
               remarks={`${trip.status}`}
-              // startRack={trip.startRack}
-              // endRack=""
+              startRack={trip.startRack}
+              endRack=""
             />
           ))}
         </View>

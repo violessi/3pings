@@ -17,7 +17,7 @@ type BikeContextType = {
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
   cancelReservation: (tripId: string) => void;
   payForTrip: (tripId: string) => void;
-  // getRackFromBike: (tripId: string) => Promise<string>;
+  getRackNameById: (rackId: string) => Promise<string>;
 };
 
 export const BikeContext = createContext<BikeContextType | null>(null);
@@ -85,15 +85,27 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  // async function getRackFromBike(tripId: string): Promise<string> {
-  //   try {
-  //     const rackID = await getRackId(tripId);
-  //     return rackID;
-  //   } catch (err) {
-  //     console.error("Error in getRackFromBike:", err);
-  //     throw err;
-  //   }
-  // }
+  async function getRackNameById(rackId: string): Promise<string> {
+    if (!rackId) {
+      console.error("No rack ID provided");
+      return "";
+    }
+
+    try {
+      const rackRef = doc(db, "racks", rackId);
+      const rackSnap = await getDoc(rackRef);
+
+      if (rackSnap.exists()) {
+        const data = rackSnap.data();
+        return data.rackName || rackId; // fallback to ID if name missing
+      } else {
+        return rackId;
+      }
+    } catch (error) {
+      console.error("Error fetching rack:", error);
+      return rackId;
+    }
+  }
 
   // ============ FULL RENT A BIKE FUNCTION ============
   async function rentABike() {
@@ -141,18 +153,21 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // CreateTrip handles creating new trip or updating reserved trip
+      console.log(rackId);
+      const now = new Date();
       const payload: CreateTrip = {
         bikeId: bikeId,
         userId: "user123", // PLACEHOLDER
         status: "active",
         baseRate: 10,
-        startTime: "",
+        startTime: now.toISOString(),
+        endTime: null,
         ...(reservedTripId && { reservedTripId }),
         paid: false,
-        // startRack: rackId,
-        // endRack: "",
+        startRack: rackId,
+        endRack: "",
       };
-
+      
       await initializeTrip(payload);
 
       setShowLoadingModal(false);
@@ -199,9 +214,10 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         status: "reserved",
         baseRate: 10,
         startTime: selectedDate.toISOString(),
+        endTime: null,
         paid: false,
-        // startRack: rackId,
-        // endRack: "",
+        startRack: rackId,
+        endRack: "",
       };
 
       await initializeTrip(payload);
@@ -291,7 +307,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         reserveABike,
         cancelReservation,
         payForTrip,
-        // getRackFromBike,
+        getRackNameById,
       }}
     >
       {children}

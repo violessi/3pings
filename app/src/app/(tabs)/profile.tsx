@@ -145,7 +145,7 @@ export default function ProfileScreen() {
       {/* show total credits* and list preview rewards */}
       {/* 'see more' -> clicking goes to a full page to view */}
       <Text style={globalStyles.title}> Spin Credits </Text>
-      <Card onPress={() => router.push("/")} style={{backgroundColor: "#fff"}}>
+      <Card onPress={() => router.push("../payment/credits")} style={{backgroundColor: "#fff"}}>
         <View className="mt-2">
           {rewardsData.map((reward) => (
             <View key={reward.id} className="text-sm text-gray-600">

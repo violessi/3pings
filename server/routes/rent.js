@@ -58,7 +58,7 @@ router.get("/getAvailableBikes/:rackId", async (req, res) => {
 
 router.post("/createTrip", async (req, res) => {
   try {
-    const { bikeId, userId, status, baseRate, startTime, reservedTripId } = req.body;
+    const { bikeId, userId, status, baseRate, startTime, reservedTripId, startRack, endRack } = req.body;
     const isReservation = status === "reserved"; // set if reserving a new trip
 
     // check if bike and user exist
@@ -112,9 +112,11 @@ router.post("/createTrip", async (req, res) => {
         userId,
         status,
         baseRate,
+        startTime,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        // startRack: rackId,
+        startRack,
+        endRack,
       };
 
       if (isReservation) {

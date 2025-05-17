@@ -10,8 +10,8 @@ export type Trip = {
   status: string;
   addtlCharge: number;
   paid: boolean;
-  // startRack: string;
-  // endRack: string;
+  startRack: string;
+  endRack: string;
 };
 
 export type Rack = {

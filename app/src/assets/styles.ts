@@ -58,7 +58,7 @@ const globalStyles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     width: '100%',
-    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
     elevation: 5,
   },
   statusBox: {

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
-import { useRouter , useLocalSearchParams} from "expo-router";
+import { useRouter } from "expo-router";
 import { useBike } from "@/context/BikeContext";
 import { formatDate } from '../service/tripService';
 
@@ -16,8 +16,8 @@ type TripCardProps = {
   tripEnd: string;
   remarks: string;
   addtl_charge?: number;
-  // startRack: string;
-  // endRack: string;
+  startRack: string;
+  endRack: string;
 };
 
 export default function TripCard({
@@ -28,8 +28,8 @@ export default function TripCard({
   tripEnd,
   remarks,
   addtl_charge,
-  // startRack,
-  // endRack,
+  startRack,
+  endRack,
 }: TripCardProps) {
   const statusStyles = getStatusStyles(remarks, addtl_charge); // remarks = status string
   const router = useRouter(); 
@@ -45,7 +45,7 @@ export default function TripCard({
     rentABike,
     reserveABike,
     cancelReservation,
-    // getRackFromBike
+    getRackNameById
   } = useBike();
 
   const handleCancel = async () => {
@@ -62,26 +62,22 @@ export default function TripCard({
     }
   };
 
-  // optional: release button in reserved card
-  // will be easier once startRack is fixed
-  // const handleRelease = async () => {
-  //   try {
-  //     if (!tripID){
-  //       console.error("No tripId passed to TripCard!");
-  //       return;
-  //     }
-  //     console.log("Release bike from this trip:", tripID);
-  //     const rackID = await getRackFromBike(tripID);
-  //     updateRackId(rackID);
-  //     const res = await rentABike();
-  //   } catch (err: any) {
-  //     console.log("Error!", err.message); // temporary; replace with modal
-  //   }    
-  // };
+  const [startRackName, setStartRackName] = useState(startRack);
+  const [endRackName, setEndRackName] = useState(endRack);
+
+  useEffect(() => {
+    const fetchRackNames = async () => {
+      const startName = await getRackNameById(startRack);
+      const endName = await getRackNameById(endRack);
+      setStartRackName(startName);
+      setEndRackName(endName);
+    };
+    fetchRackNames();
+  }, [startRack, endRack]);
 
   return (
     <View style={globalStyles.card}>
-      <Text style={globalStyles.subtitle}>{title}</Text>
+      <Text style={globalStyles.subtitle}>{title} {startRackName}</Text>
 
       <View style={globalStyles.row}>
         {/*Left*/}
@@ -95,9 +91,9 @@ export default function TripCard({
         {/*Right*/}
         <View style={globalStyles.column}>
           <Text style={tripStyles.label}> From: </Text>
-          {/* <Text style={tripStyles.detail}>{startRack}</Text> */}
+          <Text style={tripStyles.detail}>{startRackName}</Text>
           <Text style={tripStyles.label}> To: </Text>
-          {/* <Text style={tripStyles.detail}>{endRack}</Text> */}
+          <Text style={tripStyles.detail}>{endRackName}</Text>
         </View>
       </View>
       
@@ -111,15 +107,6 @@ export default function TripCard({
               </Text>
             </View>
           )}
-          {/* { remarks === 'reserved' && ( // optional: entrypoint to rent from here; once we have startRack
-            <TouchableOpacity
-              style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
-              onPress={() => {handleRelease();}} // handle cancel reservation
-              activeOpacity={0.8}
-              >
-              <Text>Release bike</Text>
-            </TouchableOpacity>
-          )} */}
         </View>
 
         {/*Right*/}
@@ -127,7 +114,7 @@ export default function TripCard({
           { addtl_charge && addtl_charge > 0 && ( // penalty information 
             <TouchableOpacity
               style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
-              onPress={() => router.replace('/profile')} // go to profile
+              onPress={() => router.push('/payment/pay')} // go to profile
               activeOpacity={0.8}
               >
               <Text>Penalty payment</Text>

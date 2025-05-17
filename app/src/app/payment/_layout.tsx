@@ -5,6 +5,7 @@ export default function PaymentLayout() {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="pay" options={{ headerShown: false }} />
+      <Stack.Screen name="credits" options={{ headerShown: false }} />
     </Stack>
   );
 }
