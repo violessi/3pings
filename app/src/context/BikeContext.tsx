@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import { createATrip, getRack, getAvailableBikes, getUserReservedTrip, deleteTrip, payTrip } from "@/service/tripService";
+import { createATrip, getRack, getAvailableBikes, getUserReservedTrip, deleteTrip, preRentCheck } from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
 
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
@@ -44,6 +44,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
   async function checkAvailableBikes(): Promise<Bike[]> {
     try {
+      // server also checks for reservations that have expired 
+      // when getting available bikes
       const res = await getAvailableBikes(rackId);
       return res;
     } catch (err: any) {
@@ -106,13 +108,23 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  async function doPreRentCheck(userId: string, rackId: string) {
+    try {
+      const data = await preRentCheck(userId, rackId);
+      return data;
+    } catch (err) {
+      console.error("Error in checkReserved:", err);
+      return null;
+    }
+  }
+
   // ============ FULL RENT A BIKE FUNCTION ============
   async function rentABike() {
     const userId = "user123"; // PLACEHOLDER
 
     setShowLoadingModal(true);
     try {
-      // Check if rackId is valid
+      // check if rackId is valid
       const validRackId = await checkRackId();
       console.log("[CHECK Rent] Rack valid?", validRackId);
       
@@ -120,7 +132,14 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("Invalid rack ID");
       }
 
-      // Check if user has a reservation at this rack
+      // handle prechecking before renting
+      const result = await doPreRentCheck(userId, rackId);
+      if (!result.allowed) {
+        alert(result.reason);
+        return;
+      }
+
+      // check if user has a reservation at this rack
       const reservedTripDoc = await checkReserved(userId, rackId);
       let bikeId: string;
       let reservedTripId: string | undefined;

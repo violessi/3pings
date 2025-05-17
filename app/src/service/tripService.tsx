@@ -42,6 +42,19 @@ export const getRack = async (rackId: string) => {
   }
 };
 
+export const preRentCheck = async (userId: string, rackId: string) => {
+  const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/preCheck`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId, rackId }),
+  });
+
+  const data = await res.json();
+  return data;
+};
+
 export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
   try {
     const res = await fetch(

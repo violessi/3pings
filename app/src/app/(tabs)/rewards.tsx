@@ -82,7 +82,7 @@ export default function RewardsScreen() {
         {activeRewards.map((reward, index) => (
           <RewardsCard
             key={reward.id}
-            title={`Return to ${reward.end_rack}`}
+            title={`Return to ${reward.reqs[2]}`}
             desc={reward.desc}
             prize={reward.prize}
             claimed={false}
@@ -96,7 +96,7 @@ export default function RewardsScreen() {
         {claimedRewards.map((reward, index) => (
           <RewardsCard
             key={reward.id}
-            title={`Return to ${reward.end_rack}`}
+            title={`Return to ${reward.reqs[2]}`}
             desc={reward.desc}
             prize={reward.prize}
             claimed={true}

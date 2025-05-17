@@ -23,9 +23,89 @@ router.get("/getRack/:rackId", async (req, res) => {
   }
 });
 
+router.post("/preCheck", async (req, res) => {
+  try {
+    const { userId, rackId } = req.body;
+
+    // USE RACKID to check reservations in that rack
+    // check if current reservations are still valid
+    // set cutoff for valid reservations (expiry = N_MINS ago)
+    const now = Date.now();
+    const N_MINUTES = 3;
+    const expiryCutoff = new Date(now - N_MINUTES * 60 * 1000);
+
+    const reservedTripsRef = db
+      .collection("trips")
+      .where("status", "==", "reserved")
+      .where("startRack", "==", rackId);
+
+    const reservedTripsSnap = await reservedTripsRef.get();
+    const batch = db.batch();
+
+    // if not (if res made more than N_MINS ago)
+    // update trip status and make bike available 
+    reservedTripsSnap.forEach((doc) => {
+      const trip = doc.data();
+      const reservedAt = trip.createdAt?.toDate?.();
+
+      if (reservedAt && reservedAt <= expiryCutoff) {
+        const tripRef = doc.ref;
+        batch.update(tripRef, { status: "cancelled" });
+        const bikeRef = db.collection("bikes").doc(trip.bikeId);
+        batch.update(bikeRef, { status: "available" });
+      }
+    });
+
+    if (!batch._ops || batch._ops.length > 0) {
+      await batch.commit();
+      console.log(`[CLEANUP] Expired ${reservedTripsSnap.size} reservations`);
+    }
+  
+    // USE USERID check if user has an active trip
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ allowed: false, reason: "User not found" });
+    }
+
+    const userData = userDoc.data();
+    const activeTripId = userData.currentTrip;
+    if (activeTripId != "") {
+      return res.status(200).json({ allowed: false, reason: "User already has an active trip" });
+    }
+
+    // USE USERID check if user has too many penalties
+    const penaltySnap = await db
+      .collection("trips")
+      .where("userId", "==", userId)
+      .where("paid", "==", false)
+      .get();
+
+    let totalPenalty = 0;
+    penaltySnap.forEach(doc => {
+      const data = doc.data();
+      totalPenalty += data.finalFee ?? 0;
+    });
+
+    const MAX_PENALTY = 50; // MAX PENALTY HARDCODED
+    if (totalPenalty >= MAX_PENALTY) {
+      return res.status(200).json({ allowed: false, reason: "Penalty limit exceeded" });
+    }
+
+    return res.status(200).json({ allowed: true });
+  } catch (error) {
+    console.error("Rental eligibility check failed:", error);
+    res.status(500).json({ allowed: false, reason: "Internal server error" });
+  }
+
+
+});
+
 router.get("/getAvailableBikes/:rackId", async (req, res) => {
   try {
     const rackId = req.params.rackId;
+
     const bikesRef = db
       .collection("bikes")
       .where("rackId", "==", rackId)
@@ -137,12 +217,13 @@ router.post("/createTrip", async (req, res) => {
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // update user to have a trip
-      // add trip ID to user regardless if reserve or rent
-      await userRef.update({
-        currentTrip: newTripRef.id,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      if (!isReservation) {
+        await userRef.update({
+          currentTrip: newTripRef.id,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+
     }    
 
     res.status(200).json({ message: "Done creating trip!" });
