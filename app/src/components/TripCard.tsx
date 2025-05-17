@@ -63,6 +63,7 @@ export default function TripCard({
   };
 
   // optional: release button in reserved card
+  // will be easier once startRack is fixed
   // const handleRelease = async () => {
   //   try {
   //     if (!tripID){
@@ -110,7 +111,7 @@ export default function TripCard({
               </Text>
             </View>
           )}
-          {/* { remarks === 'reserved' && ( // optional: entrypoint to rent from here 
+          {/* { remarks === 'reserved' && ( // optional: entrypoint to rent from here; once we have startRack
             <TouchableOpacity
               style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
               onPress={() => {handleRelease();}} // handle cancel reservation
@@ -152,12 +153,6 @@ export default function TripCard({
           )}
         </View>
       </View>
-      
-      {/* { remarks != 'reserved' && ( // optional: remarks
-        <Text style={[tripStyles.detail, {color: '#721c24'}]}>
-          <Text style={[tripStyles.label, {color: '#721c24'}]}>Remarks: </Text>
-        </Text>
-      )} */}
     </View>
   );
 }
