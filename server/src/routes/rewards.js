@@ -1,5 +1,5 @@
 const express = require("express");
-const { admin, db } = require("../firebaseAdmin");
+const { admin, db } = require("../config/firebaseAdmin");
 
 const router = express.Router();
 router.use(express.json());
@@ -23,7 +23,7 @@ router.post("/verify", async (req, res) => {
 
     const rewardData = rewardSnap.data();
     const { reqs, timeLowerReq, timeUpperReq, targetRack } = rewardData;
-    const targetDay = reqs[1]; 
+    const targetDay = reqs[1];
 
     // Get user doc to access rewardTrips
     const userRef = db.collection("users").doc(userId);
@@ -43,7 +43,7 @@ router.post("/verify", async (req, res) => {
 
     // check if tripEnd within [timeLowerReq, timeUpperReq]
     // check if tripEnd in day of week
-    // check if endRack (coded later) == targetRack 
+    // check if endRack (coded later) == targetRack
     const validTrips = tripsSnap.docs.filter((doc) => {
       const trip = doc.data();
       const tripEnd = trip.endTime?.toDate?.();
@@ -54,9 +54,15 @@ router.post("/verify", async (req, res) => {
 
       const hour = tripEnd.getHours();
       const day = tripEnd.toLocaleString("en-US", { weekday: "long" });
-      
+
       console.log("[VERIFY]", hour, day, trip.endRack);
-      console.log("[VERIFY]", timeLowerReq, timeUpperReq, targetDay, targetRack);
+      console.log(
+        "[VERIFY]",
+        timeLowerReq,
+        timeUpperReq,
+        targetDay,
+        targetRack
+      );
 
       const timeValid = hour >= timeLowerReq && hour < timeUpperReq;
       const dayValid = day === targetDay;
@@ -64,12 +70,13 @@ router.post("/verify", async (req, res) => {
 
       return timeValid && dayValid && rackValid;
     });
-    
-    
-    const claimedTripIds = validTrips.map(doc => doc.id);
+
+    const claimedTripIds = validTrips.map((doc) => doc.id);
     // no matching trips
     if (claimedTripIds.length === 0) {
-      return res.status(403).json({ error: "No eligible trips to claim reward" });
+      return res
+        .status(403)
+        .json({ error: "No eligible trips to claim reward" });
     }
     // update user log
     await userRef.update({

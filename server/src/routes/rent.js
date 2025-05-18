@@ -1,5 +1,5 @@
 const express = require("express");
-const { admin, db } = require("../firebaseAdmin");
+const { admin, db } = require("../config/firebaseAdmin");
 
 const router = express.Router();
 router.use(express.json());
@@ -72,9 +72,10 @@ router.post("/preCheck", async (req, res) => {
     const userData = userDoc.data();
     const activeTripId = userData.currentTrip;
     if (activeTripId && activeTripId !== "") {
-      return res
-        .status(200)
-        .json({ allowed: false, reason: "User already has an active trip" });
+      return res.status(200).json({
+        allowed: false,
+        reason: "User already has an active trip",
+      });
     }
 
     // USE USERID check if user has too many penalties
@@ -100,7 +101,10 @@ router.post("/preCheck", async (req, res) => {
     return res.status(200).json({ allowed: true });
   } catch (error) {
     console.error("Rental eligibility check failed:", error);
-    res.status(500).json({ allowed: false, reason: "Internal server error" });
+    res.status(500).json({
+      allowed: false,
+      reason: "Internal server error",
+    });
   }
 });
 

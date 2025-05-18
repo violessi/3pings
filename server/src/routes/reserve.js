@@ -1,5 +1,5 @@
 const express = require("express");
-const { admin, db } = require("../firebaseAdmin");
+const { admin, db } = require("../config/firebaseAdmin");
 
 const router = express.Router();
 router.use(express.json());
@@ -27,9 +27,11 @@ router.post("/getReservedTrip", async (req, res) => {
 
       const bikeData = bikeSnap.data();
       if (bikeData.rackId === rackId) {
-        return res
-          .status(200)
-          .json({ id: tripDoc.id, ...tripData, rackSlot: bikeData.rackSlot });
+        return res.status(200).json({
+          id: tripDoc.id,
+          ...tripData,
+          rackSlot: bikeData.rackSlot,
+        });
       }
     }
     // If none of the reserved trips are at the given rack
