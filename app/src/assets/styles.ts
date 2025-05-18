@@ -3,11 +3,9 @@ import { StyleSheet } from 'react-native';
 const globalStyles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#ffffff',
   },
   container: {
     flexGrow: 1, 
-    backgroundColor: '#ffffff',
     justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 20,
@@ -54,23 +52,24 @@ const globalStyles = StyleSheet.create({
     width: '49%',
     marginBottom: 5,
   },
-    
-      // Images
-      imageContainer: {
-        flex: 1,
-      },
-      image: {
-        width: 320,
-        height: 440,
-        borderRadius: 18,
-      },
-    
-      // Footer OF PAGE
-      footerContainer: {
-        flex: 1 / 3,
-        alignItems: 'center',
-        
-      },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 20,
+    width: '100%',
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+    elevation: 5,
+  },
+  statusBox: {
+    marginTop: 15,
+    marginRight: 8,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
 });
 
 export default globalStyles;
