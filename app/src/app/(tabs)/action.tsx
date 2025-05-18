@@ -106,17 +106,9 @@ export default function ActionPage() {
           />
         </View>
         <View style={{ marginHorizontal: 20 }}>
-          {activeTrips.length === 0 ? (
-            <Text
-              style={[
-                globalStyles.subtitle,
-                { marginLeft: 40 },
-                { marginBottom: 30 },
-              ]}
-            >
-              No trips to show.
-            </Text>
-          ) : (
+          { activeTrips.length === 0 ? (
+            <Text style={[globalStyles.detail, {fontSize: 20}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
+          ) : ( 
             activeTrips.map((trip, index) => (
               <TripCard
                 tripID={trip.id}

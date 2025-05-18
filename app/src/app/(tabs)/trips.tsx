@@ -56,7 +56,7 @@ export default function TripScreen() {
       >
         <Text style={globalStyles.title}> Active </Text>
         { activeTrips.length === 0 ? (
-          <Text style={[globalStyles.subtitle, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
+          <Text style={[globalStyles.detail, {fontSize: 20}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
         ) : (  
           activeTrips.map((trip, index) => (
             <TripCard
@@ -77,7 +77,7 @@ export default function TripScreen() {
         )}
         <Text style={globalStyles.title}> Completed </Text>
         { completedTrips.length === 0 ? (
-          <Text style={[globalStyles.subtitle, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
+          <Text style={[globalStyles.detail, {fontSize: 20}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
         ) : ( 
           completedTrips.map((trip, index) => (
             <TripCard

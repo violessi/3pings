@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, ScrollView, View, SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, ScrollView, View, SafeAreaView, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import Header from "@/src/components/Header";
 import globalStyles from "@/src/assets/styles";
 
@@ -8,7 +8,6 @@ import { collection, getDocs , doc, getDoc, query, where } from "firebase/firest
 import { db } from "@/firebaseConfig";
 import { Card } from "@/src/components/Card";
 import { resetDatabase } from "@/service/admin";
-
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -168,6 +167,9 @@ export default function ProfileScreen() {
         <Text>Reset Demo</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity onPress={() => handleReset()}>
+      <Text>Reset Demo</Text>
+      </TouchableOpacity>
 
       </ScrollView>
     </SafeAreaView>
