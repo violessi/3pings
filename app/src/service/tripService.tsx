@@ -1,6 +1,6 @@
-import { BikeSchema , RackSchema } from "@/types/schema";
+import { BikeSchema, RackSchema } from "@/types/schema";
 
-const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
+const IP_ADDRESS = "192.168.1.29"; // change to your laptop's/server's IP
 
 // ========================RENT=============================
 
@@ -36,6 +36,26 @@ export const getRack = async (rackId: string) => {
     } else {
       const { error } = await res.json();
       throw new Error(error || "Error fetching rack ID");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+  }
+};
+
+export const getBike = async (bikeId: string) => {
+  try {
+    const res = await fetch(
+      `http://${IP_ADDRESS}:3000/api/rent/getBike/${bikeId}`,
+      {
+        method: "GET",
+      }
+    );
+
+    if (res.ok) {
+      return res.json(); // SHOULD RETURN BIKE
+    } else {
+      const { error } = await res.json();
+      throw new Error(error || "Error fetching bike ID");
     }
   } catch (err) {
     console.error("Error:", err);
@@ -87,14 +107,20 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
 
 // ======================RESERVE=============================
 
-export const getUserReservedTrip = async (payload: { userId: string; rackId: string }) => {
-  const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/getReservedTrip`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+export const getUserReservedTrip = async (payload: {
+  userId: string;
+  rackId: string;
+}) => {
+  const res = await fetch(
+    `http://${IP_ADDRESS}:3000/api/reserve/getReservedTrip`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (!res.ok) {
     throw new Error("Failed to fetch reserved trip");
@@ -103,18 +129,24 @@ export const getUserReservedTrip = async (payload: { userId: string; rackId: str
   return res.json();
 };
 
-
-export const deleteTrip = async (payload: { bikeId: string; userId: string; tripId: string }) => {
+export const deleteTrip = async (payload: {
+  bikeId: string;
+  userId: string;
+  tripId: string;
+}) => {
   try {
-    const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/deleteReservedTrip`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(
+      `http://${IP_ADDRESS}:3000/api/reserve/deleteReservedTrip`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
-  if (!res.ok) {
+    if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.error || "Failed to delete trip");
     }
@@ -150,7 +182,7 @@ export const deleteTrip = async (payload: { bikeId: string; userId: string; trip
 // };
 
 // ======================PAY FOR A TRIP======================
-export const payTrip = async (tripId: string ) => {
+export const payTrip = async (tripId: string) => {
   try {
     const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/payTrip`, {
       method: "POST",
@@ -160,7 +192,7 @@ export const payTrip = async (tripId: string ) => {
       body: JSON.stringify(tripId),
     });
 
-  if (!res.ok) {
+    if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.error || "Failed to delete trip");
     }
@@ -174,21 +206,20 @@ export const payTrip = async (tripId: string ) => {
 
 // ======================FORMAT DATE/TIME======================
 export const formatDate = (dateString: string): string => {
-
   if (dateString) {
     const date = new Date(dateString);
 
     const options: Intl.DateTimeFormatOptions = {
-      month: 'short',  
-      day: 'numeric', 
+      month: "short",
+      day: "numeric",
     };
 
-    const datePart = date.toLocaleDateString('en-US', options);
-    const timePart = date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
+    const datePart = date.toLocaleDateString("en-US", options);
+    const timePart = date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
       hour12: true,
-    })
+    });
 
     return `${datePart} (${timePart})`;
   }
