@@ -19,8 +19,8 @@ export default function SuccessModal({
   return (
     <Modal animationType="fade" transparent={true} visible={showSuccessModal}>
       <View className="absolute inset-0 bg-white opacity-50" />
-      <View className="flex-1 justify-center items-center gap-7">
-        <View className="bg-white rounded-lg shadow-lg p-5 m-5 gap-3">
+      <View className="flex-1 justify-center items-center gap-7 px-5">
+        <View className="bg-white rounded-lg shadow-lg p-5 m-5 gap-3 w-full">
           <Text className="text-primary text-2xl font-semibold">{title}</Text>
           {description1 && (
             <Text className="text-secondary text-base">{description1}</Text>
