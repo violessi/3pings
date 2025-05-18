@@ -15,9 +15,10 @@ type TripCardProps = {
   tripStart: string;
   tripEnd: string;
   remarks: string;
-  addtl_charge?: number;
+  finalFee?: number;
   startRack: string;
   endRack: string;
+  paid?: boolean;
 };
 
 export default function TripCard({
@@ -27,11 +28,12 @@ export default function TripCard({
   tripStart,
   tripEnd,
   remarks,
-  addtl_charge,
+  finalFee,
   startRack,
   endRack,
+  paid,
 }: TripCardProps) {
-  const statusStyles = getStatusStyles(remarks, addtl_charge); // remarks = status string
+  const statusStyles = getStatusStyles(remarks, finalFee); // remarks = status string
   const router = useRouter(); 
   
   const {
@@ -100,10 +102,10 @@ export default function TripCard({
       <View style={globalStyles.row}>
         {/*Left*/}
         <View style={[globalStyles.column, { alignItems: 'flex-start' }]}>
-          { remarks != 'reserved' && ( // display status if not reserved
+          { (remarks != 'reserved') && (!paid) && ( // display status if not reserved
             <View style={[globalStyles.statusBox, statusStyles.container]}>
               <Text style={[{ fontWeight: '600' }, {textTransform: 'capitalize'}, statusStyles.text]}>
-                {addtl_charge && addtl_charge > 0 ? 'Overdue: Php ' + addtl_charge : remarks}
+                {finalFee && finalFee > 0 ? 'Balance: Php ' + finalFee : remarks} 
               </Text>
             </View>
           )}
@@ -111,7 +113,7 @@ export default function TripCard({
 
         {/*Right*/}
         <View style={[globalStyles.column, { alignItems: 'flex-end' }]}> 
-          { addtl_charge && addtl_charge > 0 && ( // penalty information 
+          { !paid && (remarks == "completed") && ( // penalty information
             <TouchableOpacity
               style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
               onPress={() => router.push('/payment/pay')} // go to profile

@@ -387,7 +387,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       console.log("Paying for", tripId);
-      // set parameters/payload
+      // set parameters/payload (tripid, minusbalance, minuscredits)
       // call function from tripService
       // that will handle server posts/functions
       // await and store response, return response as success

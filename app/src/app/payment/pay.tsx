@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SafeAreaView, View, Text, Alert } from "react-native";
+import { SafeAreaView, View, Text, Alert, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
 import Header from "@/components/Header";
@@ -24,7 +24,10 @@ export default function Rent() {
 
   const handleButtonPress = async () => {
     try {
-      const res = await payForTrip(tripId); // payForTrip in BikeContext.tsx; calls handler for server calls in TripService.tsx
+      // payForTrip in BikeContext.tsx
+      // calls handler for server calls in TripService.tsx
+      // ADD: pass as payload tripId, minusBalance, minusCredit
+      const res = await payForTrip(tripId);
     } catch (err: any) {
       Alert.alert("Error!", err.message); // temporary; replace with modal
     }
@@ -48,9 +51,39 @@ export default function Rent() {
         hasBack={true}
         prevCallback={handleBack}
       />
+      {/* show trip details */}
+
+
       {/* way to pay for trip, use credits, etc */}
-      {/* pass as input tripid? */}
+      {/* set amount of credits to use, max allowable = total credits OR finalFee*/}
+      {/* i think need to set minusCredits and minusBalance on button press... but also go to payForTrip() with payload*/}
+      {/* set minusCredits = amount set by user; set minusBalance = diff of finalFee and minusCredits*/}
+
+
+      <TouchableOpacity
+        onPress={() => handleButtonPress()}
+        style={styles.payButton}
+        >
+        <Text style={styles.payText}>Pay</Text>
+      </TouchableOpacity>
+
+      {/* loading, success, and error modal */}
       
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  payButton: {
+    backgroundColor: "#EFC89B",
+    borderColor: "#A35700" ,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  payText: {
+    color: "#A35700",
+    fontWeight: "600",
+  },
+});

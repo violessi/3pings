@@ -153,6 +153,7 @@ export default function ProfileScreen() {
       {/* show total credits* and list preview rewards */}
       {/* 'see more' -> clicking goes to a full page to view */}
       <Text style={globalStyles.title}> Spin Credits </Text>
+      {/* add total credits (not necessarily same as total of rewards), so outside card */}
       <Card onPress={() => router.push("../payment/credits")} style={{backgroundColor: "#fff"}}>
         <View className="mt-2">
           {rewardsData.map((reward) => (
@@ -161,7 +162,7 @@ export default function ProfileScreen() {
             </View>
           ))}
         </View>
-        <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>See all rewards</Text>
+        <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>See all claimed rewards</Text>
       </Card>
       <TouchableOpacity onPress={() => handleReset()}>
         <Text>Reset Demo</Text>

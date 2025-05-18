@@ -69,9 +69,10 @@ export default function TripScreen() {
                 ? trip.endTime.toDate().toLocaleString()
                 : ""}
               remarks={`${trip.status}`}
-              addtl_charge={trip.addtlCharge}
+              finalFee={trip.finalFee}
               startRack={trip.startRack}
               endRack={trip.endRack}
+              paid={trip.paid}
             />
           ))
         )}
@@ -90,9 +91,10 @@ export default function TripScreen() {
                 ? trip.endTime.toDate().toLocaleString()
                 : ""}
               remarks={`${trip.status}`}
-              addtl_charge={trip.addtlCharge}
+              finalFee={trip.finalFee}
               startRack={trip.startRack}
               endRack={trip.endRack}
+              paid={trip.paid}
             />
           ))
         )}
