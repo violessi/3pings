@@ -1,8 +1,22 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import { createATrip, getRack, getAvailableBikes, getUserReservedTrip, deleteTrip, preRentCheck } from "@/service/tripService";
+import {
+  createATrip,
+  getRack,
+  getAvailableBikes,
+  getUserReservedTrip,
+  deleteTrip,
+  preRentCheck,
+} from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
 
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 
 type BikeContextType = {
@@ -13,7 +27,7 @@ type BikeContextType = {
   setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
   showLoadingModal: boolean;
   updateRackId: (newRackId: string) => void;
-  rentABike: () => Promise<Bike | null>;
+  rentABike: () => Promise<number | null>;
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
   cancelReservation: (tripId: string) => void;
   payForTrip: (tripId: string) => void;
@@ -44,7 +58,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
   async function checkAvailableBikes(): Promise<Bike[]> {
     try {
-      // server also checks for reservations that have expired 
+      // server also checks for reservations that have expired
       // when getting available bikes
       const res = await getAvailableBikes(rackId);
       return res;
@@ -67,7 +81,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       const payload = {
         userId,
         rackId,
-      }
+      };
       const reservedTrip = await getUserReservedTrip(payload);
       return reservedTrip;
     } catch (err) {
@@ -76,9 +90,18 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  async function cancelTrip(payload: { bikeId: string; userId: string; tripId: string }) {
+  async function cancelTrip(payload: {
+    bikeId: string;
+    userId: string;
+    tripId: string;
+  }) {
     try {
-      console.log("Cancel params:", payload.bikeId, payload.userId, payload.tripId);
+      console.log(
+        "Cancel params:",
+        payload.bikeId,
+        payload.userId,
+        payload.tripId
+      );
       const res = await deleteTrip(payload); // tripService function
       return res;
     } catch (err) {
@@ -127,7 +150,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // check if rackId is valid
       const validRackId = await checkRackId();
       console.log("[CHECK Rent] Rack valid?", validRackId);
-      
+
       if (Boolean(validRackId.message) === false) {
         throw new Error("Invalid rack ID");
       }
@@ -136,22 +159,24 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       const result = await doPreRentCheck(userId, rackId);
       if (!result.allowed) {
         alert(result.reason);
-        return;
+        return null;
       }
 
       // check if user has a reservation at this rack
       const reservedTripDoc = await checkReserved(userId, rackId);
       let bikeId: string;
+      let rackSlot: number;
       let reservedTripId: string | undefined;
 
       console.log(reservedTripDoc);
-      
+
       // IF user has a reserved trip at that rack, take bikeId of already assigned bike
-        // ADD check if reservation is at that rack
+      // ADD check if reservation is at that rack
       // Include reservedTripId in payload for CreateTrip
       if (reservedTripDoc && reservedTripDoc.status === "reserved") {
         bikeId = reservedTripDoc.bikeId;
         reservedTripId = reservedTripDoc.id;
+        rackSlot = reservedTripDoc.rackSlot;
 
         console.log("[APP] User has reserved: " + reservedTripId);
         console.log("[RENT] Using reserved bike:", bikeId);
@@ -168,6 +193,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         const randomIndex = Math.floor(Math.random() * availableBikes.length);
         const bike = availableBikes[randomIndex];
         bikeId = bike.id;
+        rackSlot = bike.rackSlot;
       }
 
       // CreateTrip handles creating new trip or updating reserved trip
@@ -185,13 +211,13 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         startRack: rackId,
         endRack: "",
       };
-      
+
       await initializeTrip(payload);
 
       setShowLoadingModal(false);
       setShowSuccessModal(true);
       updateRackId("");
-      
+
       // shared logic after trip is created
       // listen for changes in bike status.
       // while bike status is not "rented", keep showing the success modal
@@ -203,7 +229,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         }
       });
 
-      return bikeId;
+      return rackSlot;
     } catch (err: any) {
       setShowLoadingModal(false);
       setShowErrorModal(true);
@@ -253,7 +279,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-// ============ FULL CANCEL A BIKE FUNCTION ============
+  // ============ FULL CANCEL A BIKE FUNCTION ============
   async function cancelReservation(tripId: string) {
     setShowLoadingModal(true);
 
@@ -288,7 +314,6 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       setShowLoadingModal(false);
       setShowSuccessModal(true);
       updateRackId("");
-
     } catch (err: any) {
       setShowLoadingModal(false);
       throw new Error(`Cancellation failed: ${err.message}`);
@@ -305,7 +330,6 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // call function from tripService
       // that will handle server posts/functions
       // await and store response, return response as success
-
     } catch (err: any) {
       setShowLoadingModal(false);
       throw new Error(`Payment failed: ${err.message}`);
@@ -333,9 +357,6 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     </BikeContext.Provider>
   );
 };
-
-
-
 
 export const useBike = () => {
   const context = useContext(BikeContext);

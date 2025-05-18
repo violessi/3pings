@@ -27,12 +27,13 @@ router.post("/getReservedTrip", async (req, res) => {
 
       const bikeData = bikeSnap.data();
       if (bikeData.rackId === rackId) {
-        return res.status(200).json({ id: tripDoc.id, ...tripData });
+        return res
+          .status(200)
+          .json({ id: tripDoc.id, ...tripData, rackSlot: bikeData.rackSlot });
       }
     }
     // If none of the reserved trips are at the given rack
     return res.status(403).json({ message: "No reserved trip at this rack" });
-
   } catch (err) {
     console.error("Error fetching reserved trip:", err);
     return res.status(500).json({ error: "Failed to fetch reserved trip" });
@@ -45,12 +46,14 @@ router.post("/deleteReservedTrip", async (req, res) => {
     const { bikeId, userId, tripId } = req.body;
 
     if (!bikeId || !userId || !tripId) {
-      return res.status(400).json({ error: "Missing bikeId, userId or tripId" });
+      return res
+        .status(400)
+        .json({ error: "Missing bikeId, userId or tripId" });
     }
 
     // get trip by params
-    const tripRef   = db.collection("trips").doc(tripId);
-    const tripSnap  = await tripRef.get();
+    const tripRef = db.collection("trips").doc(tripId);
+    const tripSnap = await tripRef.get();
 
     if (!tripSnap.exists || tripSnap.data().status !== "reserved") {
       return res.status(404).json({ error: "Reserved trip not found" });
@@ -65,12 +68,12 @@ router.post("/deleteReservedTrip", async (req, res) => {
       status: "available",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
-    
+
     await userRef.update({
       currentTrip: "",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
-    
+
     // delete trip
     await tripRef.delete();
 
