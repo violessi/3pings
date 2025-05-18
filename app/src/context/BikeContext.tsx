@@ -6,6 +6,7 @@ import {
   getUserReservedTrip,
   deleteTrip,
   preRentCheck,
+  handleReturn,
 } from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
 
@@ -18,17 +19,21 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
+import { set } from "zod";
 
 type BikeContextType = {
   rackId: string;
   showSuccessModal: boolean;
   showErrorModal: boolean;
+  showReturnModal: boolean;
+  errorMessage: string;
   setShowErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
   showLoadingModal: boolean;
   updateRackId: (newRackId: string) => void;
   rentABike: () => Promise<number | null>;
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
+  returnABike: (userId: string) => Promise<void>;
   cancelReservation: (tripId: string) => void;
   payForTrip: (tripId: string) => void;
   getRackNameById: (rackId: string) => Promise<string>;
@@ -39,9 +44,13 @@ export const BikeContext = createContext<BikeContextType | null>(null);
 // PROVIDER COMPONENT
 export const BikeProvider = ({ children }: { children: ReactNode }) => {
   const [rackId, setRackId] = useState("");
+
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   function updateRackId(newRackId: string) {
     setRackId(newRackId);
@@ -165,7 +174,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // check if user has a reservation at this rack
       const reservedTripDoc = await checkReserved(userId, rackId);
       let bikeId: string;
-      let rackSlot: number;
+      let rackSlot: any;
       let reservedTripId: string | undefined;
 
       console.log(reservedTripDoc);
@@ -231,9 +240,39 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
       return rackSlot;
     } catch (err: any) {
+      console.error(`Error in rentABike: ${err.message}`);
       setShowLoadingModal(false);
       setShowErrorModal(true);
       return null;
+    }
+  }
+
+  // ============ FULL RETURN A BIKE FUNCTION ============
+  async function returnABike(userId: string) {
+    setShowLoadingModal(true);
+    try {
+      const bikeId = await handleReturn({ rackId, userId: "user123" }); // PLACEHOLDER
+
+      setShowLoadingModal(false);
+      setShowReturnModal(true);
+      // updateRackId("");
+
+      let unsub: () => void;
+
+      const handleStatusChange = (status: string) => {
+        if (status.toLowerCase() === "available") {
+          unsub(); // safe to call here because unsub is defined above
+          setShowReturnModal(false);
+          setShowSuccessModal(true);
+        }
+      };
+
+      unsub = listenToBikeStatus(bikeId, handleStatusChange);
+    } catch (err: any) {
+      console.error(`Error in returnABike: ${err.message}`);
+      setShowLoadingModal(false);
+      setErrorMessage(err.message);
+      setShowErrorModal(true);
     }
   }
 
@@ -342,12 +381,15 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         rackId,
         showSuccessModal,
         showErrorModal,
+        showReturnModal,
+        errorMessage,
         setShowErrorModal,
         setShowSuccessModal,
         showLoadingModal,
         updateRackId,
         rentABike,
         reserveABike,
+        returnABike,
         cancelReservation,
         payForTrip,
         getRackNameById,
