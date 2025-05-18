@@ -21,6 +21,7 @@ export default function Rent() {
     showLoadingModal,
     updateRackId,
     rentABike,
+    errorMessage,
   } = useBike();
 
   const [rackSlot, setRackSlot] = useState<number | null>(null);
@@ -41,12 +42,17 @@ export default function Rent() {
 
   const handleBack = () => {
     updateRackId("");
-    router.replace("/(tabs)/action");
+    router.back();
   };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Header title="Rent a bike" subtitle="Select a bike to rent" hasBack />
+      <Header
+        title="Rent a bike"
+        subtitle="Select a bike to rent"
+        hasBack
+        prevCallback={handleBack}
+      />
       <View className="flex-1 justify-start gap-4 p-5">
         <Text className="text-secondary text-3xl font-semibold">
           Easily rent a bike by entering the bike rack code.
@@ -67,7 +73,7 @@ export default function Rent() {
       />
       <ErrorModal
         title="Error"
-        description="An error occurred while processing your request. Please try again."
+        description={errorMessage}
         showErrorModal={showErrorModal}
         onClose={() => setShowErrorModal(false)}
       />

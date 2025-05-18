@@ -1,13 +1,14 @@
 ReturnABike(rackId, userId)
 1. checkRackId(rackId) -> boolean
 2. hasAvailableSlots(rackId, rackThreshold) -> boolean
-3. pingHardware() -> boolean
-4. unlockSlot(bikeId) -> void
-5. waitUntilReturned(bikeId) -> boolean
-6. updateTrip(userId, endTime, finalFee, status) -> void
+3. getBikeRented(userId) -> bike
+4. pingHardware() -> boolean
+5. unlockSlot(bikeId) -> void
+6. waitUntilReturned(bikeId) -> boolean
+7. updateTrip(userId, endTime, finalFee, status) -> void
     computeFee(startTime, baseRate, addtlCharges) -> number
-7. updateBike(bikeId, status) -> void
-8. updateUser(balance, currentTrip) -> void
+8. updateBike(bikeId, status) -> void
+9. updateUser(balance, currentTrip) -> void
 
 ----
 
@@ -22,7 +23,16 @@ CLIENT TO DB
         - table: bikes
         - filter: status==available, rackId
     - return true if list of available bikes on a rack is less than threshold 
-3. updateTrip(userId, endTime, finalFee, status) -> void
+3. getBikeRented(userId) -> bike
+    - GET
+        - table: users
+        - filter: userId
+    - return tripId
+    - GET
+        - table: trips
+        - filter: tripId
+    - return bikeId
+4. updateTrip(userId, endTime, finalFee, status) -> void
     - computeFee(startTime, baseRate, addtlCharges) -> number
         - GET
             - table: trips
@@ -31,11 +41,11 @@ CLIENT TO DB
     - UPDATE
         - table: trips
         - payload: { endTime: currentTime, finalFee, status: "completed" }
-4. updateBike(bikeId, status) -> void
+5. updateBike(bikeId, status) -> void
     - UPDATE
         - table: bikes 
         - payload: { status: "available" }
-5. updateUser(balance, currentTrip) -> void
+6. updateUser(balance, currentTrip) -> void
     - UPDATE
         - table: users
         - payload: { balance: balance + finalFee, currentTrip: null }

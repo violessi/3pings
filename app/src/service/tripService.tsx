@@ -160,26 +160,30 @@ export const deleteTrip = async (payload: {
 
 // ======================RETURN=============================
 
-// export const returnABike = async () => {
-//   try {
-//     const res = await fetch(
-//       `http://${IP_ADDRESS}:3000/api/bikeActions/return`,
-//       {
-//         method: "POST", // post to server to handle return request
-//       }
-//     );
+export const handleReturn = async (payload: {
+  rackId: string;
+  userId: string;
+}) => {
+  try {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/return/request`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-//     if (res.ok) {
-//       Alert.alert("Bike returned!");
-//       router.replace("/trips");
-//     } else {
-//       const { error } = await res.json();
-//       Alert.alert(error || "Error returning bike");
-//     }
-//   } catch (err) {
-//     console.error("Error:", err);
-//   }
-// };
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to return bike");
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error("Error returning bike:", err);
+    throw err;
+  }
+};
 
 // ======================PAY FOR A TRIP======================
 export const payTrip = async (tripId: string) => {

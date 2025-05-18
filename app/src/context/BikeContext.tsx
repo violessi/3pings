@@ -6,6 +6,7 @@ import {
   getUserReservedTrip,
   deleteTrip,
   preRentCheck,
+  handleReturn,
 } from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
 
@@ -18,17 +19,21 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
+import { set } from "zod";
 
 type BikeContextType = {
   rackId: string;
   showSuccessModal: boolean;
   showErrorModal: boolean;
+  showReturnModal: boolean;
+  errorMessage: string;
   setShowErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
   showLoadingModal: boolean;
   updateRackId: (newRackId: string) => void;
   rentABike: () => Promise<number | null>;
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
+  returnABike: (userId: string) => Promise<void>;
   cancelReservation: (tripId: string) => void;
   payForTrip: (tripId: string) => void;
   getRackNameById: (rackId: string) => Promise<string>;
@@ -39,9 +44,13 @@ export const BikeContext = createContext<BikeContextType | null>(null);
 // PROVIDER COMPONENT
 export const BikeProvider = ({ children }: { children: ReactNode }) => {
   const [rackId, setRackId] = useState("");
+
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   function updateRackId(newRackId: string) {
     setRackId(newRackId);
@@ -158,14 +167,13 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // handle prechecking before renting
       const result = await doPreRentCheck(userId, rackId);
       if (!result.allowed) {
-        alert(result.reason);
-        return null;
+        throw new Error(result.reason);
       }
 
       // check if user has a reservation at this rack
       const reservedTripDoc = await checkReserved(userId, rackId);
       let bikeId: string;
-      let rackSlot: number;
+      let rackSlot: any;
       let reservedTripId: string | undefined;
 
       console.log(reservedTripDoc);
@@ -215,7 +223,9 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       await initializeTrip(payload);
 
       setShowLoadingModal(false);
-      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(true);
+      }, 500);
       updateRackId("");
 
       // shared logic after trip is created
@@ -232,8 +242,42 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       return rackSlot;
     } catch (err: any) {
       setShowLoadingModal(false);
-      setShowErrorModal(true);
+      setTimeout(() => {
+        setErrorMessage(err.message);
+        setShowErrorModal(true);
+      }, 500);
       return null;
+    }
+  }
+
+  // ============ FULL RETURN A BIKE FUNCTION ============
+  async function returnABike(userId: string) {
+    setShowLoadingModal(true);
+    try {
+      const res = await handleReturn({ rackId, userId: "user123" }); // PLACEHOLDER
+
+      setShowLoadingModal(false);
+      setTimeout(() => {
+        setShowReturnModal(true);
+      }, 500);
+      updateRackId("");
+
+      const unsub = listenToBikeStatus(res.bikeId, (status) => {
+        if (status.toLowerCase() === "available") {
+          unsub(); // stop listening when status is "available"
+          setShowReturnModal(false);
+          setTimeout(() => {
+            setShowSuccessModal(true);
+          }, 500);
+        }
+      });
+    } catch (err: any) {
+      // console.error(`Error in returnABike: ${err.message}`);
+      setShowLoadingModal(false);
+      setTimeout(() => {
+        setErrorMessage(err.message);
+        setShowErrorModal(true);
+      }, 500);
     }
   }
 
@@ -342,12 +386,15 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         rackId,
         showSuccessModal,
         showErrorModal,
+        showReturnModal,
+        errorMessage,
         setShowErrorModal,
         setShowSuccessModal,
         showLoadingModal,
         updateRackId,
         rentABike,
         reserveABike,
+        returnABike,
         cancelReservation,
         payForTrip,
         getRackNameById,
