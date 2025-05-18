@@ -5,11 +5,15 @@ const router = express.Router();
 router.use(express.json());
 
 router.post("/payTrip", async (req, res) => {
-  const { tripId } = req.body;
+  const { tripId, minusBalance, minusCredits } = req.body;
   console.log(`[SERVER] Updating balance`);
 
   try {
     // trip payment logic here
+    // update user balance and user credits
+      // check if balance/credits are enough
+    
+    // update trip paid bool
 
     res.status(200).json({ message: "Payment successful" });
   } catch (err) {

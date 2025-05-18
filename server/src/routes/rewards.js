@@ -22,8 +22,8 @@ router.post("/verify", async (req, res) => {
     }
 
     const rewardData = rewardSnap.data();
-    const { reqs, timeLowerReq, timeUpperReq, targetRack } = rewardData;
-    const targetDay = reqs[1];
+    const { reqs, timeLowerReq, timeUpperReq, targetRack, prize} = rewardData;
+    const targetDay = reqs[1]; 
 
     // Get user doc to access rewardTrips
     const userRef = db.collection("users").doc(userId);
@@ -78,10 +78,14 @@ router.post("/verify", async (req, res) => {
         .status(403)
         .json({ error: "No eligible trips to claim reward" });
     }
+
     // update user log
+    console.log("New credits:", userData.credits + prize);
+
     await userRef.update({
       rewards: admin.firestore.FieldValue.arrayUnion(rewardId),
       rewardTrips: admin.firestore.FieldValue.arrayUnion(...claimedTripIds),
+      credits: userData.credits + prize,
     });
 
     res.status(200).json({ message: "Reward claimed" });
