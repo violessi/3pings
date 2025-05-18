@@ -19,12 +19,12 @@ export default function Rent() {
     showLoadingModal,
   } = useBike();
 
-    const handlePay = (tripId: string) => {
+  const handlePay = (tripId: string) => {
     router.push({           
         pathname: "/payment/pay",
         params: { tripId },   // becomes /payment/pay?tripId=abc123
     });
-    };
+  };
 
   const handleBack = () => {
     router.replace("/(tabs)/profile");
