@@ -18,23 +18,23 @@ export default function Return() {
     updateRackId,
     returnABike,
     setShowErrorModal,
+    setShowSuccessModal,
     showErrorModal,
     showLoadingModal,
     showReturnModal,
     showSuccessModal,
     errorMessage,
   } = useBike();
+
   const handleBack = () => {
-    router.replace("/(tabs)/action");
+    updateRackId("");
+    router.back();
   };
+
   return (
     <SafeAreaView className="flex-1">
       <View className="flex-1 bg-background">
-        <Header
-          title="Return a bike"
-          hasBack={true}
-          prevCallback={handleBack}
-        />
+        <Header title="Return a bike" hasBack prevCallback={handleBack} />
         <View className="flex-1 justify-start gap-4 p-5">
           <Text className="text-secondary text-3xl font-semibold">
             Enter your preferred bike rack's code.
@@ -57,8 +57,10 @@ export default function Return() {
       <SuccessModal
         title="Bike returned successfully!"
         description1={`Your bike has been returned. Please take your bike from slot ${rackId}.`}
-        description2="This modal will close automatically once you have returned your bike."
         showSuccessModal={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+        }}
       />
       <ErrorModal
         title="Error"

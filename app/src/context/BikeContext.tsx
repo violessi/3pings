@@ -167,8 +167,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // handle prechecking before renting
       const result = await doPreRentCheck(userId, rackId);
       if (!result.allowed) {
-        alert(result.reason);
-        return null;
+        throw new Error(result.reason);
       }
 
       // check if user has a reservation at this rack
@@ -224,7 +223,9 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       await initializeTrip(payload);
 
       setShowLoadingModal(false);
-      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(true);
+      }, 500);
       updateRackId("");
 
       // shared logic after trip is created
@@ -240,9 +241,11 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
       return rackSlot;
     } catch (err: any) {
-      console.error(`Error in rentABike: ${err.message}`);
       setShowLoadingModal(false);
-      setShowErrorModal(true);
+      setTimeout(() => {
+        setErrorMessage(err.message);
+        setShowErrorModal(true);
+      }, 500);
       return null;
     }
   }
@@ -251,28 +254,30 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   async function returnABike(userId: string) {
     setShowLoadingModal(true);
     try {
-      const bikeId = await handleReturn({ rackId, userId: "user123" }); // PLACEHOLDER
+      const res = await handleReturn({ rackId, userId: "user123" }); // PLACEHOLDER
 
       setShowLoadingModal(false);
-      setShowReturnModal(true);
-      // updateRackId("");
+      setTimeout(() => {
+        setShowReturnModal(true);
+      }, 500);
+      updateRackId("");
 
-      let unsub: () => void;
-
-      const handleStatusChange = (status: string) => {
+      const unsub = listenToBikeStatus(res.bikeId, (status) => {
         if (status.toLowerCase() === "available") {
-          unsub(); // safe to call here because unsub is defined above
+          unsub(); // stop listening when status is "available"
           setShowReturnModal(false);
-          setShowSuccessModal(true);
+          setTimeout(() => {
+            setShowSuccessModal(true);
+          }, 500);
         }
-      };
-
-      unsub = listenToBikeStatus(bikeId, handleStatusChange);
+      });
     } catch (err: any) {
-      console.error(`Error in returnABike: ${err.message}`);
+      // console.error(`Error in returnABike: ${err.message}`);
       setShowLoadingModal(false);
-      setErrorMessage(err.message);
-      setShowErrorModal(true);
+      setTimeout(() => {
+        setErrorMessage(err.message);
+        setShowErrorModal(true);
+      }, 500);
     }
   }
 
