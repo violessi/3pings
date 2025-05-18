@@ -43,7 +43,7 @@ router.post("/preCheck", async (req, res) => {
     const batch = db.batch();
 
     // if not (if res made more than N_MINS ago)
-    // update trip status and make bike available 
+    // update trip status and make bike available
     reservedTripsSnap.forEach((doc) => {
       const trip = doc.data();
       const reservedAt = trip.createdAt?.toDate?.();
@@ -60,7 +60,7 @@ router.post("/preCheck", async (req, res) => {
       await batch.commit();
       console.log(`[CLEANUP] Expired ${reservedTripsSnap.size} reservations`);
     }
-  
+
     // USE USERID check if user has an active trip
     const userRef = db.collection("users").doc(userId);
     const userDoc = await userRef.get();
@@ -71,8 +71,10 @@ router.post("/preCheck", async (req, res) => {
 
     const userData = userDoc.data();
     const activeTripId = userData.currentTrip;
-    if (activeTripId != "") {
-      return res.status(200).json({ allowed: false, reason: "User already has an active trip" });
+    if (activeTripId && activeTripId !== "") {
+      return res
+        .status(200)
+        .json({ allowed: false, reason: "User already has an active trip" });
     }
 
     // USE USERID check if user has too many penalties
@@ -83,14 +85,16 @@ router.post("/preCheck", async (req, res) => {
       .get();
 
     let totalPenalty = 0;
-    penaltySnap.forEach(doc => {
+    penaltySnap.forEach((doc) => {
       const data = doc.data();
       totalPenalty += data.finalFee ?? 0;
     });
 
     const MAX_PENALTY = 50; // MAX PENALTY HARDCODED
     if (totalPenalty >= MAX_PENALTY) {
-      return res.status(200).json({ allowed: false, reason: "Penalty limit exceeded" });
+      return res
+        .status(200)
+        .json({ allowed: false, reason: "Penalty limit exceeded" });
     }
 
     return res.status(200).json({ allowed: true });
@@ -98,8 +102,6 @@ router.post("/preCheck", async (req, res) => {
     console.error("Rental eligibility check failed:", error);
     res.status(500).json({ allowed: false, reason: "Internal server error" });
   }
-
-
 });
 
 router.get("/getAvailableBikes/:rackId", async (req, res) => {
@@ -138,7 +140,16 @@ router.get("/getAvailableBikes/:rackId", async (req, res) => {
 
 router.post("/createTrip", async (req, res) => {
   try {
-    const { bikeId, userId, status, baseRate, startTime, reservedTripId, startRack, endRack } = req.body;
+    const {
+      bikeId,
+      userId,
+      status,
+      baseRate,
+      startTime,
+      reservedTripId,
+      startRack,
+      endRack,
+    } = req.body;
     const isReservation = status === "reserved"; // set if reserving a new trip
 
     // check if bike and user exist
@@ -154,7 +165,7 @@ router.post("/createTrip", async (req, res) => {
       return res.status(404).json({ error: "Bike not found" });
     }
 
-    // IF user has reserved bike at that rack, set bike 
+    // IF user has reserved bike at that rack, set bike
     if (reservedTripId) {
       const reservedTripRef = db.collection("trips").doc(reservedTripId);
       const reservedTripDoc = await reservedTripRef.get();
@@ -182,7 +193,9 @@ router.post("/createTrip", async (req, res) => {
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      return res.status(200).json({ message: "Reserved trip updated to active!" });
+      return res
+        .status(200)
+        .json({ message: "Reserved trip updated to active!" });
     } else {
       // ELSE, make a new trip
       // initialize new trip fields
@@ -200,9 +213,14 @@ router.post("/createTrip", async (req, res) => {
       };
 
       if (isReservation) {
-        if (!startTime) return res.status(400).json({ error: "startTime required for reservation" });
+        if (!startTime)
+          return res
+            .status(400)
+            .json({ error: "startTime required for reservation" });
 
-        const parsedStartTime = admin.firestore.Timestamp.fromDate(new Date(startTime));
+        const parsedStartTime = admin.firestore.Timestamp.fromDate(
+          new Date(startTime)
+        );
         newTripData.startTime = parsedStartTime;
       } else {
         newTripData.startTime = admin.firestore.FieldValue.serverTimestamp();
@@ -211,7 +229,7 @@ router.post("/createTrip", async (req, res) => {
       const newTripRef = await db.collection("trips").add(newTripData);
       await newTripRef.update({ id: newTripRef.id });
 
-      // update bike status 
+      // update bike status
       await bikeRef.update({
         status: isReservation ? "reserved" : "getting",
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -223,8 +241,7 @@ router.post("/createTrip", async (req, res) => {
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
       }
-
-    }    
+    }
 
     res.status(200).json({ message: "Done creating trip!" });
   } catch (err) {
@@ -233,49 +250,29 @@ router.post("/createTrip", async (req, res) => {
   }
 });
 
-// router.get("/getRackId/:tripId", async (req, res) => {
-//   const { tripId } = req.params;
-//   console.log(tripId);
-
-//   try {
-//     // Step 1: Get the trip doc
-//     const tripSnap = await db.collection("trips").doc(tripId).get();
-//     if (!tripSnap.exists) {
-//       console.log(`Trip ${tripId} not found`);
-//       return res.status(404).json({ message: "Trip not found" });
-//     }
-
-//     const tripData = tripSnap.data();
-//     const bikeId = tripData?.bikeId;
-
-//     if (!bikeId) {
-//       return res.status(400).json({ message: "Trip has no bikeId" });
-//     }
-
-//     // Step 2: Get the bike doc
-//     const bikeSnap = await db.collection("bikes").doc(bikeId).get();
-//     if (!bikeSnap.exists) {
-//       return res.status(404).json({ message: "Bike not found" });
-//     }
-
-//     const bikeData = bikeSnap.data();
-//     const rackId = bikeData?.rackId;
-
-//     if (!rackId) {
-//       return res.status(400).json({ message: "Bike has no rackId" });
-//     }
-
-//     return res.status(200).json({ rackId });
-//   } catch (err) {
-//     console.error("Error in getRackFromBike:", err);
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// });
-
-
 // ========================= SERVER TO HARDWARE =========================
 
 router.get("/pingHardware", async (req, res) => {});
 router.post("/unlockBike", async (req, res) => {});
+
+// ========================= HARDWARE TO SERVER =========================
+
+router.post("/bikeRented", async (req, res) => {
+  try {
+    const { bikeId } = req.body;
+
+    // update bike status
+    const bikeRef = db.collection("bikes").doc(bikeId);
+    await bikeRef.update({
+      status: "rented",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    res.status(200).json({ message: "Bike rented successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update bike status" });
+  }
+});
 
 module.exports = router;
