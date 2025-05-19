@@ -256,12 +256,54 @@ router.post("/createTrip", async (req, res) => {
 
 // ========================= SERVER TO HARDWARE =========================
 
-router.get("/pingHardware", async (req, res) => {});
+async function pingHardware() {
+  console.log("[SERVER] Pinging hardware...");
+  try {
+    const res = await fetch("http://10.147.40.142:1234/ping", {
+      method: "GET",
+    });
+    const data = await res.text(); // or .json() if it's JSON
+    console.log(`[SERVER] Pinged hardware: ${data}`);
+    return data;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Hardware ping failed");
+  }
+}
+
+router.get("/test", async (req, res) => {
+  try {
+    const result = await pingHardware();
+    res.status(200).json({ message: "Success", result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+async function unlockBike(req, res) {
+  try {
+    const { bikeId } = req.body;
+    const res = await fetch("", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ bikeId }),
+    });
+    console.log(`[SERVER] Unlocking bike ${bikeId}: ${res}`);
+    res.status(200).json({ message: "Bike unlocked successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to unlock bike" });
+  }
+}
 
 router.post("/unlockBike", async (req, res) => {});
 
 // ========================= HARDWARE TO SERVER =========================
 
+// TO ACCESS, do post request to http://{IP ADDRESS}:{PORT}/api/rent/bikeRented
+// with body { "bikeId": "bikeId" }
 router.post("/bikeRented", async (req, res) => {
   try {
     const { bikeId } = req.body;
@@ -278,11 +320,6 @@ router.post("/bikeRented", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Failed to update bike status" });
   }
-});
-
-router.get("/test", async (req, res) => {
-  console.log(`[SERVER] Received katTest req`);
-  res.status(200).json({ message: "yipee" });
 });
 
 module.exports = router;

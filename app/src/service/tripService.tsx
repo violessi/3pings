@@ -8,11 +8,13 @@ const SERVER_URL =
 
 export const hwToServer = async () => {
   try {
+    console.log("Sending request to server...");
     const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/test`, {
       method: "GET",
     });
     if (res.ok) {
       const data = await res.json();
+      console.log("Data from server:", data);
       return data; // return the response data
     } else {
       throw new Error("Failed to fetch data from server");
