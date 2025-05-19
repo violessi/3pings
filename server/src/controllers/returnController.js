@@ -17,6 +17,7 @@ async function requestBikeReturn(req, res) {
     }
 
     const userData = userSnapshot.data();
+    const currentTrip = userData.currentTrip;
     if (!userData.currentTrip) {
       return res.status(400).json({ error: "No active trip found" });
     }
@@ -58,7 +59,6 @@ async function requestBikeReturn(req, res) {
 
     console.log(`[SERVER] Bike ${tripData.bikeId} marked as returning`);
 
-    // TODO: send command to terminal with payload { bikeId }
     // // check if ESP32 is reachable
     // const pingResponse = await fetch(`${ESP32_BASE_URL}/ping`, {
     //   method: "GET",
@@ -90,6 +90,7 @@ async function requestBikeReturn(req, res) {
     res.status(200).json({
       message: "Bike return initiated successfully",
       bikeId: tripData.bikeId,
+      tripId: currentTrip,
     });
   } catch (err) {
     console.error("[ERROR] requestBikeReturn:", err);
@@ -124,13 +125,22 @@ async function completeBikeReturn(req, res) {
     const tripData = tripSnapshot.data();
     const startTime = tripData.startTime.toDate();
     const endTime = new Date();
+    console.log("End time:", endTime.toISOString());
+
+    // Check if endTime is later than 10 PM
+    const tenPM = new Date(endTime);
+    tenPM.setUTCHours(14, 0, 0, 0);
+    const endedAfter10PM = endTime > tenPM;
+
+    const addtlFee = endedAfter10PM ? 350 : 0; // Additional fee if returned after 10 PM
     const durationMinutes = Math.ceil((endTime - startTime) / (1000 * 60));
     const finalFee =
-      Math.ceil(durationMinutes / RATE_INTERVAL) * tripData.baseRate;
+      Math.ceil(durationMinutes / RATE_INTERVAL) * tripData.baseRate + addtlFee;
 
     // Update trip
     await tripRef.update({
       status: "completed",
+      addtlFee,
       finalFee,
       endRack: rackId,
       endTime: admin.firestore.FieldValue.serverTimestamp(),
@@ -142,7 +152,7 @@ async function completeBikeReturn(req, res) {
     await bikeRef.update({
       status: "available",
       rackId,
-      rackSlot,
+      rackSlot: parseInt(rackSlot),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
@@ -154,7 +164,12 @@ async function completeBikeReturn(req, res) {
     });
 
     console.log(`[SERVER] Bike ${tripData.bikeId} returned successfully`);
-    res.status(200).json({ message: "Bike returned successfully", finalFee });
+
+    res.status(200).json({
+      message: "Bike returned successfully",
+      finalFee,
+      endedAfter10PM,
+    });
   } catch (err) {
     console.error("[ERROR] completeBikeReturn:", err);
     res.status(500).json({ error: "Failed to complete return" });

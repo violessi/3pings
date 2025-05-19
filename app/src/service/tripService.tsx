@@ -205,8 +205,8 @@ export const handleReturn = async (payload: {
   userId: string;
 }) => {
   try {
-    // const res = await fetch(`http://${IP_ADDRESS}:3000/api/return/request`, {
-    const res = await fetch(`${SERVER_URL}api/return/request`, {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/return/request`, {
+      // const res = await fetch(`${SERVER_URL}api/return/request`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
