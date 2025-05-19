@@ -167,7 +167,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("Invalid rack ID");
       }
 
-      // handle prechecking before renting
+      // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
       const result = await doPreRentCheck(userId, rackId);
       if (!result.allowed) {
         throw new Error(result.reason);
@@ -308,7 +308,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
       const availableBikes = await checkAvailableBikes();
       if (!availableBikes || availableBikes.length === 0) {
-        throw new Error("No available bikes");
+        throw new Error("No available bikes"); // here
       }
 
       const randomIndex = Math.floor(Math.random() * availableBikes.length);

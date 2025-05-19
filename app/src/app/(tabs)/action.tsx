@@ -20,11 +20,29 @@ import React, { useState, useEffect } from "react";
 import TripCard from "@/src/components/TripCard";
 import { Trip } from "@/src/components/types";
 import globalStyles from "@/src/assets/styles";
+import { preRentCheck } from "@/src/service/tripService";
 
 export default function ActionPage() {
   const router = useRouter();
-
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
+  const userId = "user123";
+  const rackId = "rack123";
+
+  const handleButtonPress = async () => {
+    try {
+      // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
+      const result = await preRentCheck(userId, rackId);
+      if (!result.allowed) {
+        throw new Error(result.reason);
+      } else {
+        //router.navigate
+        router.navigate("/rent");
+      }
+    } catch (err: any) {
+      Alert.alert("Error!", err.message); // temporary; replace with modal
+    }
+  };
+
 
   useEffect(() => {
     const fetchTrips = async () => {

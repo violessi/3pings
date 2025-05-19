@@ -24,12 +24,13 @@ export default function Rent() {
     errorMessage,
   } = useBike();
 
-  const [rackSlot, setRackSlot] = useState<number | null>(null);
+  const [rackSlot, setRackSlot] = useState<any | null>(null);
   const [assignedBike, setAssignedBike] = useState<Bike | null>(null);
 
   const handleButtonPress = async () => {
     try {
       const res = await rentABike();
+      console.log("Slot:", res);
       setRackSlot(res);
     } catch (err: any) {
       Alert.alert("Error!", err.message); // temporary; replace with modal
@@ -43,7 +44,7 @@ export default function Rent() {
 
   const handleBack = () => {
     updateRackId("");
-    router.back();
+    router.canGoBack() ? router.replace("/action") : router.replace("/");
   };
 
   return (

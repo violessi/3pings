@@ -35,6 +35,9 @@ export const BikeSchema = z.object({
   id: z.string(),
   rackId: z.string(),
   rackSlot: z.number(),
+  // rackSlot: z.any().transform((val) => {
+  //   parseInt(val.toString());
+  // }),
   status: BikeStatusSchema,
   createdAt: z.string(),
   updatedAt: z.string(),

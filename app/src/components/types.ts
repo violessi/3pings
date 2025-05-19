@@ -20,6 +20,7 @@ export type Rack = {
   available: number;
   reserved: number;
   empty: number;
+  rackSlot: any;
 };
 
 export type Reward = {
