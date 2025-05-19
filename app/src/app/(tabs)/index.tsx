@@ -27,7 +27,7 @@ export default function Index() {
 
   return (
     <SafeAreaView className="flex-1">
-      <Header title="Map" subtitle="Check the bike racks near you!" />
+      <Header title="Racks" subtitle="Check the bike racks near you!" />
 
       {/* add rack buttons/map here, send rackID (mathces db doc name) to handleSelectRack*/}
       <ScrollView showsVerticalScrollIndicator={false}>

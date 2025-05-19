@@ -29,11 +29,11 @@ export function RackOption({
 }: RackOptionProps) {
   return (
     <TouchableOpacity onPress={() => onSelect(rackId.toLowerCase())}>
-      <View className="flex-row items-center gap-4 p-5 bg-white rounded-xl">
+      <View className="flex-row items-center gap-4 p-5 bg-white rounded-xl shadow-sm">
         <Image source={images[image]} style={styles.image} />
-        <View>
-          <Text className="text-xl font-semibold">{rackId}</Text>
-          <Text className="text-base">{department}</Text>
+        <View className="flex-1">
+          <Text className="text-xl text-secondary font-semibold">{rackId}</Text>
+          <Text className="text-base text-secondary">{department}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 10,
-    borderColor: "black",
+    borderColor: "#7E7E7E",
     borderWidth: 2,
     opacity: 0.8,
     resizeMode: "cover",
