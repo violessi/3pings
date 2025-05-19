@@ -311,6 +311,8 @@ router.post("/bikeRented", async (req, res) => {
     await bikeRef.update({
       status: "rented",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      rackId: null,
+      rackSlot: null,
     });
 
     res.status(200).json({ message: "Bike rented successfully!" });
