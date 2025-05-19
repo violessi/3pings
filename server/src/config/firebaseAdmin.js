@@ -3,7 +3,7 @@ const path = require("path");
 
 let serviceAccount;
 
-// Allow for using Heroku config variables for deployment
+// Allow for using Heroku config variables for the json
 if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
   serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
 } else {
