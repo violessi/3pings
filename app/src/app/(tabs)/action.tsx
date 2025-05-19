@@ -59,7 +59,7 @@ export default function ActionPage() {
         isHomepage={true}
       />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="flex-1 justify-start gap-1 p-5">
+        <View className="flex-1 justify-start gap-2 p-5">
           <Option
             title="Rent"
             description="Rent a bike"
