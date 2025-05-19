@@ -42,8 +42,8 @@ export function RackOption({
 
 const styles = StyleSheet.create({
   image: {
-    width: 200,
-    height: 150,
+    width: 100,
+    height: 100,
     borderRadius: 10,
     borderColor: "black",
     borderWidth: 2,
