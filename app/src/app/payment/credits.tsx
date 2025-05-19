@@ -10,7 +10,7 @@ import LoadingModal from "@/components/LoadingModal";
 import SuccessModal from "@/components/SuccessModal";
 import ErrorModal from "@/components/ErrorModal";
 
-export default function Rent() {
+export default function Credits() {
   const { tripId } = useLocalSearchParams<{ tripId: string }>();
   const router = useRouter();
   const {
@@ -19,16 +19,8 @@ export default function Rent() {
     setShowErrorModal,
     setShowSuccessModal,
     showLoadingModal,
-    payForTrip,
+    // payForTrip,
   } = useBike();
-
-  const handleButtonPress = async () => {
-    try {
-      const res = await payForTrip(tripId); // payForTrip in BikeContext.tsx; calls handler for server calls in TripService.tsx
-    } catch (err: any) {
-      Alert.alert("Error!", err.message); // temporary; replace with modal
-    }
-  };
 
   const handleCloseSuccessModal = () => {
     setShowSuccessModal(false);

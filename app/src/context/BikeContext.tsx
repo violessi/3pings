@@ -1,13 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import {
-  createATrip,
-  getRack,
-  getAvailableBikes,
-  getUserReservedTrip,
-  deleteTrip,
-  preRentCheck,
-  handleReturn,
-} from "@/service/tripService";
+import { createATrip, getRack, getAvailableBikes, getUserReservedTrip, deleteTrip, preRentCheck, payTrip, handleReturn } from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
 
 import {
@@ -35,7 +27,7 @@ type BikeContextType = {
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
   returnABike: (userId: string) => Promise<void>;
   cancelReservation: (tripId: string) => void;
-  payForTrip: (tripId: string) => void;
+  // payForTrip: (tripId: string, minusCredits: number, minusBalance: number) => void;
   getRackNameById: (rackId: string) => Promise<string>;
 };
 
@@ -365,15 +357,18 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   }
 
   // ============ FULL PAY FUNCTION ============
-  async function payForTrip(tripId: string) {
+  async function payForTrip(payload: {tripId: string, minusCredits: number, minusBalance: number}) {
     setShowLoadingModal(true);
 
     try {
-      console.log("Paying for", tripId);
+      console.log("Paying for", payload.tripId);
       // set parameters/payload (tripid, minusbalance, minuscredits)
       // call function from tripService
       // that will handle server posts/functions
       // await and store response, return response as success
+
+      console.log("Payment successful:", response);
+
     } catch (err: any) {
       setShowLoadingModal(false);
       throw new Error(`Payment failed: ${err.message}`);
@@ -398,7 +393,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         reserveABike,
         returnABike,
         cancelReservation,
-        payForTrip,
+        // payForTrip,
         getRackNameById,
       }}
     >

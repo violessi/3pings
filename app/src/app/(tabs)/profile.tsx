@@ -154,6 +154,7 @@ export default function ProfileScreen() {
       {/* 'see more' -> clicking goes to a full page to view */}
       <Text style={globalStyles.title}> Spin Credits </Text>
       {/* add total credits (not necessarily same as total of rewards), so outside card */}
+      <Text className="text-base w-full ml-5 mb-2 font-semibold text-gray-800">Total Credits: ₱{totalCredits}</Text>
       <Card onPress={() => router.push("../payment/credits")} style={{backgroundColor: "#fff"}}>
         <View className="mt-2">
           {rewardsData.map((reward) => (
