@@ -12,6 +12,7 @@ export type Trip = {
   paid: boolean;
   startRack: string;
   endRack: string;
+  finalFee: number;
 };
 
 export type Rack = {

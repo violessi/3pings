@@ -241,7 +241,7 @@ export const handleReturn = async (payload: {
 };
 
 // ======================PAY FOR A TRIP======================
-export const payTrip = async (tripId: string) => {
+export const payTrip = async (payload: {tripId: string, minusCredits: number, minusBalance: number }) => {
   try {
     // const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/payTrip`, {
     const res = await fetch(`${SERVER_URL}api/reserve/payTrip`, {
@@ -249,7 +249,7 @@ export const payTrip = async (tripId: string) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(tripId),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
