@@ -1,9 +1,17 @@
 import { useRouter } from "expo-router";
-import { SafeAreaView, Text, View, TouchableOpacity } from "react-native";
+import {
+  SafeAreaView,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
 
 import globalStyles from "@/src/assets/styles";
 import Header from "@/src/components/Header";
 import Button from "@/src/components/Button";
+import { RackOption } from "@/src/components/RackOptions";
 
 import { hwToServer } from "@/src/service/tripService";
 
@@ -22,17 +30,36 @@ export default function Index() {
       <Header title="Map" subtitle="Check the bike racks near you!" />
 
       {/* add rack buttons/map here, send rackID (mathces db doc name) to handleSelectRack*/}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="flex-col gap-2 p-5 ">
+          <RackOption
+            rackId="Rack123"
+            department="Department of Computer Science"
+            onSelect={handleSelectRack}
+            image="dcs"
+          />
+          <RackOption
+            rackId="Rack456"
+            department="Institute of Mathematics"
+            onSelect={handleSelectRack}
+            image="im"
+          />
+          <RackOption
+            rackId="Rack789"
+            department="College of Arts and Letters"
+            onSelect={handleSelectRack}
+            image="cal"
+          />
+          <RackOption
+            rackId="RackABC"
+            department="Vinzons Hall"
+            onSelect={handleSelectRack}
+            image="vh"
+          />
+        </View>
+      </ScrollView>
 
-      <Text>Select a Rack:</Text>
-      <TouchableOpacity onPress={() => handleSelectRack("rack123")}>
-        <Text>Rack 123</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => handleSelectRack("rack456")}>
-        <Text>Rack 456</Text>
-      </TouchableOpacity>
-
-      <Button label="KAT BUTTON" onPress={() => hwToServer()} />
+      {/* <Button label="KAT BUTTON" onPress={() => hwToServer()} /> */}
     </SafeAreaView>
   );
 }
