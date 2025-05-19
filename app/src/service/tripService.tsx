@@ -1,7 +1,26 @@
 import { BikeSchema, RackSchema } from "@/types/schema";
 
-// const IP_ADDRESS = "172.20.10.7"; // change to your laptop's/server's IP
-const SERVER_URL = "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
+const IP_ADDRESS = "10.147.40.131"; // change to your laptop's/server's IP
+const SERVER_URL =
+  "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
+
+// ========================KAT TRIAL========================
+
+export const hwToServer = async () => {
+  try {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/test`, {
+      method: "GET",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data; // return the response data
+    } else {
+      throw new Error("Failed to fetch data from server");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+  }
+};
 
 // ========================RENT=============================
 
@@ -27,10 +46,9 @@ export const createATrip = async (payload: CreateTrip) => {
 export const getRack = async (rackId: string) => {
   try {
     // const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/getRack/${rackId}`,{
-    const res = await fetch(`${SERVER_URL}api/rent/getRack/${rackId}`,{
-        method: "GET",
-      }
-    );
+    const res = await fetch(`${SERVER_URL}api/rent/getRack/${rackId}`, {
+      method: "GET",
+    });
 
     if (res.ok) {
       return res.json(); // SHOULD RETURN BOOLEAN
@@ -46,10 +64,9 @@ export const getRack = async (rackId: string) => {
 export const getBike = async (bikeId: string) => {
   try {
     // const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/getBike/${bikeId}`, {
-    const res = await fetch(`${SERVER_URL}api/rent/getBike/${bikeId}`,{
-        method: "GET",
-      }
-    );
+    const res = await fetch(`${SERVER_URL}api/rent/getBike/${bikeId}`, {
+      method: "GET",
+    });
 
     if (res.ok) {
       return res.json(); // SHOULD RETURN BIKE
@@ -79,7 +96,9 @@ export const preRentCheck = async (userId: string, rackId: string) => {
 export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
   try {
     // const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/getAvailableBikes/${rackId}`, {
-    const res = await fetch(`${SERVER_URL}api/rent/getAvailableBikes/${rackId}`, {
+    const res = await fetch(
+      `${SERVER_URL}api/rent/getAvailableBikes/${rackId}`,
+      {
         method: "GET",
       }
     );
@@ -107,7 +126,10 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
 
 // ======================RESERVE=============================
 
-export const getUserReservedTrip = async (payload: { userId: string; rackId: string }) => {
+export const getUserReservedTrip = async (payload: {
+  userId: string;
+  rackId: string;
+}) => {
   // const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/getReservedTrip`, {
   const res = await fetch(`${SERVER_URL}api/reserve/getReservedTrip`, {
     method: "POST",

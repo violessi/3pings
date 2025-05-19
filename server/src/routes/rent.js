@@ -280,4 +280,9 @@ router.post("/bikeRented", async (req, res) => {
   }
 });
 
+router.get("/test", async (req, res) => {
+  console.log(`[SERVER] Received katTest req`);
+  res.status(200).json({ message: "yipee" });
+});
+
 module.exports = router;

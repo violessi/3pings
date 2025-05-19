@@ -3,6 +3,9 @@ import { SafeAreaView, Text, View, TouchableOpacity } from "react-native";
 
 import globalStyles from "@/src/assets/styles";
 import Header from "@/src/components/Header";
+import Button from "@/src/components/Button";
+
+import { hwToServer } from "@/src/service/tripService";
 
 export default function Index() {
   const router = useRouter();
@@ -28,7 +31,8 @@ export default function Index() {
       <TouchableOpacity onPress={() => handleSelectRack("rack456")}>
         <Text>Rack 456</Text>
       </TouchableOpacity>
-     
+
+      <Button label="KAT BUTTON" onPress={() => hwToServer()} />
     </SafeAreaView>
   );
 }
