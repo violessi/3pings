@@ -257,6 +257,7 @@ router.post("/createTrip", async (req, res) => {
 // ========================= SERVER TO HARDWARE =========================
 
 router.get("/pingHardware", async (req, res) => {});
+
 router.post("/unlockBike", async (req, res) => {});
 
 // ========================= HARDWARE TO SERVER =========================

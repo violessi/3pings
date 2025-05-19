@@ -25,6 +25,7 @@ export default function Rent() {
   } = useBike();
 
   const [rackSlot, setRackSlot] = useState<number | null>(null);
+  const [assignedBike, setAssignedBike] = useState<Bike | null>(null);
 
   const handleButtonPress = async () => {
     try {
@@ -47,12 +48,7 @@ export default function Rent() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Header
-        title="Rent a bike"
-        subtitle="Select a bike to rent"
-        hasBack
-        prevCallback={handleBack}
-      />
+      <Header title="Rent a bike" subtitle="Select a bike to rent" hasBack />
       <View className="flex-1 justify-start gap-4 p-5">
         <Text className="text-secondary text-3xl font-semibold">
           Easily rent a bike by entering the bike rack code.

@@ -1,7 +1,8 @@
 import { BikeSchema } from "@/types/schema";
 import RewardsCard from "@/src/components/RewardsCard";
 
-const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
+// const IP_ADDRESS = "172.20.10.7"; // change to your laptop's/server's IP
+const SERVER_URL = "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
 // ========================CLAIM=============================
 
@@ -11,7 +12,8 @@ export const verifyReward = async (
   onUpdate?: () => void
 ) => {
   try {
-    const res = await fetch(`http://${IP_ADDRESS}:3000/api/rewards/verify`, {
+    // const res = await fetch(`http://${IP_ADDRESS}:3000/api/rewards/verify`, {
+    const res = await fetch(`${SERVER_URL}api/rewards/verify`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
