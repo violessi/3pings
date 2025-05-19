@@ -1,6 +1,6 @@
 import { BikeSchema, RackSchema } from "@/types/schema";
 
-const IP_ADDRESS = "10.147.40.131"; // change to your laptop's/server's IP
+const IP_ADDRESS = "192.168.68.114"; // change to your laptop's/server's IP
 const SERVER_URL =
   "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
@@ -123,6 +123,29 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
     return parsed.data;
   } catch (err: any) {
     return []; // temporary solution
+  }
+};
+
+export const hardwareRequest = async (payload: { bikeId: string }) => {
+  try {
+    const res = await fetch(
+      `http://${IP_ADDRESS}:3000/api/rent/hardwareRequest`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to send hardware request");
+    }
+    return await res.json(); // return server response
+  } catch (err) {
+    console.error("Error:", err);
+    throw err;
   }
 };
 

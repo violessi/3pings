@@ -7,6 +7,7 @@ import {
   deleteTrip,
   preRentCheck,
   handleReturn,
+  hardwareRequest,
 } from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
 
@@ -221,6 +222,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       };
 
       await initializeTrip(payload);
+
+      // await hardwareRequest({ bikeId });
 
       setShowLoadingModal(false);
       setTimeout(() => {

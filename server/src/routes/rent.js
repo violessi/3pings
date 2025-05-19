@@ -256,54 +256,52 @@ router.post("/createTrip", async (req, res) => {
 
 // ========================= SERVER TO HARDWARE =========================
 
-async function pingHardware() {
-  console.log("[SERVER] Pinging hardware...");
-  try {
-    const res = await fetch("http://10.147.40.142:1234/ping", {
-      method: "GET",
-    });
-    const data = await res.text(); // or .json() if it's JSON
-    console.log(`[SERVER] Pinged hardware: ${data}`);
-    return data;
-  } catch (err) {
-    console.error(err);
-    throw new Error("Hardware ping failed");
-  }
-}
-
-router.get("/test", async (req, res) => {
-  try {
-    const result = await pingHardware();
-    res.status(200).json({ message: "Success", result });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-async function unlockBike(req, res) {
+router.post("/hardwareRequest/", async (req, res) => {
   try {
     const { bikeId } = req.body;
-    const res = await fetch("", {
+    console.log(`[SERVER] Pinging ESP32 for bike ${bikeId}...`);
+
+    // check if esp32 is reachable
+    const pingResponse = await fetch(`${ESP32_BASE_URL}/ping`, {
+      method: "GET",
+    });
+
+    const pingResult = await pingResponse.json();
+    console.log(`[SERVER] ESP32 ping response: ${pingResult}`);
+
+    if (!pingResponse.ok) {
+      return res.status(404).json({ error: "Hardware unreachable" });
+    }
+
+    // if reachable, proceed to unlock the bike
+    const unlockResponse = await fetch(`${ESP32_BASE_URL}/rent`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ bikeId }),
     });
-    console.log(`[SERVER] Unlocking bike ${bikeId}: ${res}`);
-    res.status(200).json({ message: "Bike unlocked successfully!" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to unlock bike" });
-  }
-}
 
-router.post("/unlockBike", async (req, res) => {});
+    const unlockResult = await unlockResponse.json();
+    console.log(`[SERVER] Unlock response from ESP32: ${unlockResult}`);
+
+    if (!unlockResponse.ok) {
+      return res.status(400).json({ error: "Unlock unsuccessful" });
+    }
+
+    res.status(200).json({
+      message: "Bike pinged and unlock request sent to ESP32",
+      pingResult,
+      unlockResult,
+    });
+  } catch (err) {
+    console.error("[SERVER] Error during hardwareRequest:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ========================= HARDWARE TO SERVER =========================
 
-// TO ACCESS, do post request to http://{IP ADDRESS}:{PORT}/api/rent/bikeRented
-// with body { "bikeId": "bikeId" }
 router.post("/bikeRented", async (req, res) => {
   try {
     const { bikeId } = req.body;

@@ -59,6 +59,33 @@ async function requestBikeReturn(req, res) {
     console.log(`[SERVER] Bike ${tripData.bikeId} marked as returning`);
 
     // TODO: send command to terminal with payload { bikeId }
+    // // check if ESP32 is reachable
+    // const pingResponse = await fetch(`${ESP32_BASE_URL}/ping`, {
+    //   method: "GET",
+    // });
+
+    // const pingResult = await pingResponse.json();
+    // console.log(`[SERVER] ESP32 ping response: ${pingResult}`);
+
+    // if (!pingResponse.ok) {
+    //   return res.status(404).json({ error: "Hardware unreachable" });
+    // }
+
+    // // if reachable, proceed to unlock the bike
+    // const lockResponse = await fetch(`${ESP32_BASE_URL}/return`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ bikeId }),
+    // });
+
+    // const unlockResult = await lockResponse.json();
+    // console.log(`[SERVER] Unlock response from ESP32: ${unlockResult}`);
+
+    // if (!lockResponse.ok) {
+    //   return res.status(400).json({ error: "Unlock unsuccessful" });
+    // }
 
     res.status(200).json({
       message: "Bike return initiated successfully",
