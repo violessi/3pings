@@ -1,0 +1,10 @@
+# Client-side files
+app/.firebase
+app/.expo
+app/firebase.json
+app/node_modules
+
+# Server-side files
+server/node_modules
+server/serviceAccountKey.json
+server/src/.env
