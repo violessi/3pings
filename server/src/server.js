@@ -33,5 +33,6 @@ app.use((err, req, res, next) => {
 // Port Config
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+  const HOST = process.env.HOST || "localhost";
+  console.log(`🚀 Server is running on ${HOST}:${PORT}`);
 });
