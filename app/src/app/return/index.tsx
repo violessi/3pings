@@ -28,7 +28,7 @@ export default function Return() {
 
   const handleBack = () => {
     updateRackId("");
-    router.back();
+    router.canGoBack() ? router.replace("/action") : router.replace("/");
   };
 
   return (

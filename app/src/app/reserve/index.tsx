@@ -44,6 +44,7 @@ export default function Reserve() {
 
     const fetchRackInfo = async () => {
       try {
+        console.log("Getting rack:", rackID);
         const rackDoc = await getDoc(doc(db, "racks", rackID));
         if (!rackDoc.exists()) {
           console.error("[APP] Rack not found"); // PLACEHOLDER; modal/go back
@@ -57,14 +58,15 @@ export default function Reserve() {
 
         const availableCount = bikes.filter((b) => b.status === "available").length;
         const reservedCount = bikes.filter((b) => b.status === "reserved").length;
-        const emptySlots = 5 - bikes.length; // PLACEHOLDER; HARDCODED
+        const emptySlots = 5 - availableCount - reservedCount;
 
         setRackData({
-          name: rackData.rack_name,
+          name: rackData.rackName,
           location: rackData.location,
           available: availableCount,
           reserved: reservedCount,
           empty: emptySlots,
+          rackSlot: rackData.rackSlot,
         });
       } catch (err) {
         console.error(err);
@@ -90,7 +92,7 @@ export default function Reserve() {
 
   const handleBack = () => {
     updateRackId("");
-    router.canGoBack() ? router.back() : router.replace("/");
+    router.canGoBack() ? router.replace("/action") : router.replace("/");
   };
 
   return (
@@ -108,13 +110,13 @@ export default function Reserve() {
         <ReserveForm onReserve={handleReserve} />
 
         <LoadingModal showLoadingModal={showLoadingModal} />
-        <SuccessModal
+        { rackData && <SuccessModal
           title="Bike reserved successfully!"
-          description1={`Please make sure to claim your bike from slot ${assignedBike?.rackSlot}.`}
+          description1={`Please make sure to claim your bike from slot ${rackData.rackSlot}.`}
           description2="Reservation holds for 15 mins."
           showSuccessModal={showSuccessModal}
           onClose={handleCloseSuccessModal}
-        />
+        />}
       </ScrollView>
     </SafeAreaView>
   );
