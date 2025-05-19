@@ -20,4 +20,56 @@ router.post("/getIP", async (req, res) => {
   }
 });
 
+router.post("/reset", async (req, res) => {
+  try {
+    // set all bikes to available; allow space for rent-return-reserve
+    const bikesSnapshot = await db.collection("bikes").get();
+    const bikeBatch = db.batch();
+    bikesSnapshot.forEach((doc) => {
+      bikeBatch.update(doc.ref, { status: "available" });
+    });
+    await bikeBatch.commit();
+
+    // clear/delete active trips
+    const tripsSnapshot = await db.collection("trips").get();
+    const tripBatch = db.batch();
+    tripsSnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.status === "active") {
+        tripBatch.delete(doc.ref);
+      }
+    });
+    await tripBatch.commit();
+
+    // clear user.currentTrip
+    // remove user rewards and rewardTrips EXCEPT demotrip1 and reward 1
+      // so we can show what it looks like when they have a verified reward vs claiming a new one
+    const usersSnapshot = await db.collection("users").get();
+    const userBatch = db.batch();
+    usersSnapshot.forEach((doc) => {
+      userBatch.update(doc.ref, { currentTrip: "" });
+      userBatch.update(doc.ref, { rewards: ["reward1"] });
+      userBatch.update(doc.ref, { rewardTrips: ["demotrip1"] });
+    });
+    await userBatch.commit();
+
+    // CONSIDER: clear/delete completed trips EXCEPT trips named demotripX ?
+        // so we have hardcoded trips na for showing ui/cerifying rewards
+        // everything else is for user testing
+
+    // reset credits to 5
+    const usersSnapshot3 = await db.collection("users").get();
+    const batch2 = db.batch();
+    usersSnapshot3.forEach((doc) => {
+      batch2.update(doc.ref, { credits: 5 });
+    });
+    await batch2.commit();
+
+    res.status(200).json({ message: "Database reset, ready for demo" });
+  } catch (err) {
+    console.error("Error resetting:", err);
+    res.status(500).json({ error: "Failed to reset" });
+  }
+});
+
 module.exports = router;
