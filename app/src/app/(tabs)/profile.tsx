@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 import { collection, getDocs , doc, getDoc, query, where } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { Card } from "@/src/components/Card";
+import { resetDatabase } from "@/service/admin";
 
 
 export default function ProfileScreen() {
@@ -18,6 +19,14 @@ export default function ProfileScreen() {
   const [trips, setTrips] = useState<any[]>([]);
   const [totalCredits, setTotalCredits] = useState(0);
   const [pendingFees, setPendingFees] = useState(0);
+
+  const handleReset = async () => {
+    try {
+      const res = await resetDatabase();
+    } catch (err: any) {
+      console.log("Error!", err.message); // temporary; replace with modal
+    }
+  };
 
   // fetch user profile + reward details for rewards summary
   useEffect(() => {
@@ -155,6 +164,9 @@ export default function ProfileScreen() {
         </View>
         <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>See all rewards</Text>
       </Card>
+      <TouchableOpacity onPress={() => handleReset()}>
+        <Text>Reset Demo</Text>
+      </TouchableOpacity>
 
 
       </ScrollView>
