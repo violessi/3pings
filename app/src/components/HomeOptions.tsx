@@ -16,14 +16,14 @@ export default function Option({
 }: OptionProps) {
   return (
     <TouchableOpacity
-      className="bg-primary rounded-lg"
+      className="bg-primary rounded-2xl"
       onPress={() => onPress()}
     >
-      <View className="flex-row p-4 gap-4 items-center">
+      <View className="flex-row p-6 gap-4 items-center">
         <Icon source={icon} size={24} color="white" />
         <View>
-          <Text className="text-white text-lg font-semibold">{title}</Text>
-          <Text className="text-sm text-white">{description}</Text>
+          <Text className="text-white text-xl font-semibold">{title}</Text>
+          <Text className="text-base text-white">{description}</Text>
         </View>
       </View>
     </TouchableOpacity>
