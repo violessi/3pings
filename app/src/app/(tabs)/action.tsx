@@ -21,17 +21,21 @@ import TripCard from "@/src/components/TripCard";
 import { Trip } from "@/src/components/types";
 import globalStyles from "@/src/assets/styles";
 import { preRentCheck } from "@/src/service/tripService";
+import { useBike } from "@/context/BikeContext";
+import ErrorModal from "@/src/components/ErrorModal";
 
 export default function ActionPage() {
   const router = useRouter();
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
   const userId = "user123";
   const rackId = "rack123";
+  const { setErrorMessage, setShowErrorModal } = useBike();
+
 
   const handleButtonPress = async () => {
     try {
       // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
-      const result = await preRentCheck(userId, rackId);
+      const result = await preRentCheck(userId);
       if (!result.allowed) {
         throw new Error(result.reason);
       } else {
@@ -82,7 +86,7 @@ export default function ActionPage() {
             title="Rent"
             description="Rent a bike"
             icon="bike"
-            onPress={() => router.navigate("/rent")}
+            onPress={handleButtonPress}
           />
           <Option
             title="Return"

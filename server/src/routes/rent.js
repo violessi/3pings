@@ -27,10 +27,10 @@ router.get("/getRack/:rackId", async (req, res) => {
 
 router.post("/preCheck", async (req, res) => {
   try {
-    const { userId, rackId } = req.body;
+    const { userId } = req.body;
 
     // USE RACKID to check reservations in that rack
-    // check if current reservations are still valid
+    // check if current reservations ACROSS ALL RACKS AND USERS are still valid
     // set cutoff for valid reservations (expiry = N_MINS ago)
     const now = Date.now();
     const N_MINUTES = 3;
@@ -39,8 +39,6 @@ router.post("/preCheck", async (req, res) => {
     const reservedTripsRef = db
       .collection("trips")
       .where("status", "==", "reserved")
-      .where("startRack", "==", rackId);
-
     const reservedTripsSnap = await reservedTripsRef.get();
     const batch = db.batch();
 

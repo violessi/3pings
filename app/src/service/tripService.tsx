@@ -83,14 +83,14 @@ export const getBike = async (bikeId: string) => {
   }
 };
 
-export const preRentCheck = async (userId: string, rackId: string) => {
+export const preRentCheck = async (userId: string) => {
   const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/preCheck`, {
   // const res = await fetch(`${SERVER_URL}api/rent/preCheck`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ userId, rackId }),
+    body: JSON.stringify({userId}),
   });
 
   const data = await res.json();
