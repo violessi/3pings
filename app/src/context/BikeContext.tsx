@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { createATrip, getRack, getAvailableBikes, getUserReservedTrip, deleteTrip, preRentCheck, payTrip, handleReturn } from "@/service/tripService";
 import { listenToBikeStatus } from "@/service/listeners";
+import ErrorModal from "../components/ErrorModal";
 
 import {
   collection,
@@ -32,6 +33,8 @@ type BikeContextType = {
 };
 
 export const BikeContext = createContext<BikeContextType | null>(null);
+const [showErrorModal, setShowErrorModal] = useState(false);
+const [errorMessage, setErrorMessage] = useState("");
 
 // PROVIDER COMPONENT
 export const BikeProvider = ({ children }: { children: ReactNode }) => {
@@ -132,9 +135,9 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  async function doPreRentCheck(userId: string, rackId: string) {
+  async function doPreRentCheck(userId: string) {
     try {
-      const data = await preRentCheck(userId, rackId);
+      const data = await preRentCheck(userId);
       return data;
     } catch (err) {
       console.error("Error in checkReserved:", err);
@@ -157,7 +160,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
-      const result = await doPreRentCheck(userId, rackId);
+      const result = await doPreRentCheck(userId);
       if (!result.allowed) {
         throw new Error(result.reason);
       }
@@ -400,6 +403,12 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
+    <ErrorModal
+      title="Error"
+      description={errorMessage}
+      showErrorModal={showErrorModal}
+      onClose={() => setShowErrorModal(false)}
+    />
     </BikeContext.Provider>
   );
 };
