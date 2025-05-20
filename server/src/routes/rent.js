@@ -4,6 +4,8 @@ const { admin, db } = require("../config/firebaseAdmin");
 const router = express.Router();
 router.use(express.json());
 
+const ESP32_IP = "http://10.147.40.142:1234";
+
 // ========================= SERVER TO DB =========================
 
 router.get("/getRack/:rackId", async (req, res) => {
@@ -256,9 +258,57 @@ router.post("/createTrip", async (req, res) => {
 
 // ========================= SERVER TO HARDWARE =========================
 
-router.get("/pingHardware", async (req, res) => {});
+router.post("/hardwareRequest", async (req, res) => {
+  try {
+    const { bikeId } = req.body;
+    console.log(`[SERVER] Pinging ESP32 for bike ${bikeId}...`);
 
-router.post("/unlockBike", async (req, res) => {});
+    // check if esp32 is reachable
+    const pingResponse = await fetch(`${ESP32_IP}/ping`, {
+      method: "GET",
+    });
+
+    const pingResult = await pingResponse.text();
+    console.log(`[SERVER] ESP32 ping response: ${pingResult}`);
+
+    if (!pingResponse.ok) {
+      return res.status(404).json({ error: "Hardware unreachable" });
+    }
+
+    // if reachable, proceed to unlock the bike
+    const unlockResponse = await fetch(`${ESP32_IP}/rent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "plain/text",
+      },
+      body: bikeId,
+    });
+
+    const unlockResult = await unlockResponse.text();
+    console.log(`[SERVER] Unlock response from ESP32: ${unlockResult}`);
+
+    if (!unlockResponse.ok) {
+      return res.status(400).json({ error: "Unlock unsuccessful" });
+    }
+
+    const bikeRef = db.collection("bikes").doc(bikeId);
+    await bikeRef.update({
+      status: "rented",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      rackId: null,
+      rackSlot: null,
+    });
+
+    res.status(200).json({
+      message: "Bike pinged and unlock request sent to ESP32",
+      // pingResult,
+      // unlockResult,
+    });
+  } catch (err) {
+    console.error("[SERVER] Error during hardwareRequest:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ========================= HARDWARE TO SERVER =========================
 
@@ -271,6 +321,8 @@ router.post("/bikeRented", async (req, res) => {
     await bikeRef.update({
       status: "rented",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      rackId: null,
+      rackSlot: null,
     });
 
     res.status(200).json({ message: "Bike rented successfully!" });
@@ -279,5 +331,35 @@ router.post("/bikeRented", async (req, res) => {
     res.status(500).json({ error: "Failed to update bike status" });
   }
 });
+
+// // Fire off ping request to ESP32
+// router.post("/hardwareRequest", async (req, res) => {
+//   console.log("[SERVER] Sending ping request to ESP32...");
+
+//   try {
+//     const response = await fetch("http://10.147.40.142:1234/ping", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "text/plain", // fixed from "plain/text"
+//       },
+//       body: "ping, hello",
+//     });
+
+//     const data = await response.json(); // Only do this if you know ESP32 sends JSON
+//     console.log("[SERVER] ESP32 ping response:", data);
+
+//     res.status(200).json({ message: "Ping request sent to ESP32.", data });
+//   } catch (err) {
+//     console.error("[SERVER] Error during hardwareRequest:", err.message);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+// router.post("/ping", (req, res) => {
+//   const { ack } = req.body;
+
+//   console.log(`[SERVER] Received ack from ESP32: ${ack}`);
+//   res.status(200).json({ message: "Ping acknowledged by ESP32" });
+// });
 
 module.exports = router;

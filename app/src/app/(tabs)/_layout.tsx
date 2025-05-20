@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import AntDesign from '@expo/vector-icons/AntDesign';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function TabLayout() {
   return (
@@ -35,9 +35,7 @@ export default function TabLayout() {
           title: "Rewards",
           tabBarIcon: ({ color, focused }) => (
             <AntDesign
-              name={
-                focused ? "star" : "staro"
-              }
+              name={focused ? "star" : "staro"}
               color={color}
               size={24}
             />
@@ -47,12 +45,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Maps",
+          title: "Racks",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={
-                focused ? "map" : "map-outline"
-              }
+              name={focused ? "map" : "map-outline"}
               color={color}
               size={24}
             />
@@ -65,9 +61,7 @@ export default function TabLayout() {
           title: "Trips",
           tabBarIcon: ({ color, focused }) => (
             <MaterialIcons
-              name={
-                focused ? "pedal-bike" : "pedal-bike"
-              }
+              name={focused ? "pedal-bike" : "pedal-bike"}
               color={color}
               size={24}
             />
@@ -80,9 +74,7 @@ export default function TabLayout() {
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
             <AntDesign
-              name={
-                focused ? "smile-circle" : "smileo"
-              }
+              name={focused ? "smile-circle" : "smileo"}
               color={color}
               size={22}
             />

@@ -7,8 +7,9 @@ import {
   deleteTrip,
   preRentCheck,
   handleReturn,
+  hardwareRequest,
 } from "@/service/tripService";
-import { listenToBikeStatus } from "@/service/listeners";
+import { listenToBikeStatus, listenToTrip } from "@/service/listeners";
 
 import {
   collection,
@@ -24,6 +25,7 @@ import { set } from "zod";
 type BikeContextType = {
   rackId: string;
   showSuccessModal: boolean;
+  isLate: boolean;
   showErrorModal: boolean;
   showReturnModal: boolean;
   errorMessage: string;
@@ -51,6 +53,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isLate, setIsLate] = useState(false);
 
   function updateRackId(newRackId: string) {
     setRackId(newRackId);
@@ -228,6 +231,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       }, 500);
       updateRackId("");
 
+      await hardwareRequest({ bikeId });
+
       // shared logic after trip is created
       // listen for changes in bike status.
       // while bike status is not "rented", keep showing the success modal
@@ -253,6 +258,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   // ============ FULL RETURN A BIKE FUNCTION ============
   async function returnABike(userId: string) {
     setShowLoadingModal(true);
+
     try {
       const res = await handleReturn({ rackId, userId: "user123" }); // PLACEHOLDER
 
@@ -261,10 +267,22 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         setShowReturnModal(true);
       }, 500);
       updateRackId("");
+      console.log("Return response:", res);
+
+      if (res.tripId) {
+        const tripUnsub = listenToTrip(res.tripId, (tripData) => {
+          if (tripData?.addtlFee !== undefined) {
+            console.log("Additional fee detected:", tripData.addtlFee);
+            setIsLate(tripData.addtlFee > 0);
+            tripUnsub();
+          }
+        });
+      }
 
       const unsub = listenToBikeStatus(res.bikeId, (status) => {
         if (status.toLowerCase() === "available") {
           unsub(); // stop listening when status is "available"
+
           setShowReturnModal(false);
           setTimeout(() => {
             setShowSuccessModal(true);
@@ -272,7 +290,6 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         }
       });
     } catch (err: any) {
-      // console.error(`Error in returnABike: ${err.message}`);
       setShowLoadingModal(false);
       setTimeout(() => {
         setErrorMessage(err.message);
@@ -388,6 +405,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         rackId,
         showSuccessModal,
         showErrorModal,
+        isLate,
         showReturnModal,
         errorMessage,
         setShowErrorModal,

@@ -15,6 +15,7 @@ export default function Return() {
   const router = useRouter();
   const {
     rackId,
+    isLate,
     updateRackId,
     returnABike,
     setShowErrorModal,
@@ -56,7 +57,12 @@ export default function Return() {
       />
       <SuccessModal
         title="Bike returned successfully!"
-        description1={`Your bike has been returned. Please take your bike from slot ${rackId}.`}
+        description1={`Your bike has been returned. Thank you for using our service!`}
+        description2={
+          isLate
+            ? "Please note that you have incurred a late fee due to returning the bike after 10 PM."
+            : "We appreciate your timely return!"
+        }
         showSuccessModal={showSuccessModal}
         onClose={() => {
           setShowSuccessModal(false);
