@@ -1,6 +1,6 @@
 import { BikeSchema, RackSchema } from "@/types/schema";
 
-const IP_ADDRESS = "192.168.254.180"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.80.97.193"; // change to your laptop's/server's IP
 const SERVER_URL = "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
 // ========================RENT=============================

@@ -162,6 +162,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
       const result = await doPreRentCheck(userId);
       if (!result.allowed) {
+        console.log(result.allowed);
         throw new Error(result.reason);
       }
 
