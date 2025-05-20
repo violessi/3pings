@@ -225,13 +225,13 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
       await initializeTrip(payload);
 
-      // await hardwareRequest({ bikeId });
-
       setShowLoadingModal(false);
       setTimeout(() => {
         setShowSuccessModal(true);
       }, 500);
       updateRackId("");
+
+      await hardwareRequest({ bikeId });
 
       // shared logic after trip is created
       // listen for changes in bike status.
