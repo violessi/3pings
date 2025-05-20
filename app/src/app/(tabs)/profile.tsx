@@ -169,10 +169,6 @@ export default function ProfileScreen() {
         <Text>Reset Demo</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => handleReset()}>
-      <Text>Reset Demo</Text>
-      </TouchableOpacity>
-
       </ScrollView>
     </SafeAreaView>
   );

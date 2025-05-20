@@ -27,7 +27,7 @@ type BikeContextType = {
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
   returnABike: (userId: string) => Promise<void>;
   cancelReservation: (tripId: string) => void;
-  // payForTrip: (tripId: string, minusCredits: number, minusBalance: number) => void;
+  payForTrip: (tripId: string, minusCredits: number, minusBalance: number) => Promise<void>;
   getRackNameById: (rackId: string) => Promise<string>;
 };
 
@@ -357,17 +357,19 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   }
 
   // ============ FULL PAY FUNCTION ============
-  async function payForTrip(payload: {tripId: string, minusCredits: number, minusBalance: number}) {
+  async function payForTrip(tripId: string, minusCredits: number, minusBalance: number) {
     setShowLoadingModal(true);
 
     try {
-      console.log("Paying for", payload.tripId);
+      console.log("Paying for", tripId);
       // set parameters/payload (tripid, minusbalance, minuscredits)
       // call function from tripService
+      const res = await payTrip(tripId, minusCredits, minusBalance);
       // that will handle server posts/functions
       // await and store response, return response as success
-
-      console.log("Payment successful:", response);
+      setShowLoadingModal(false);
+      return res;
+      console.log("Payment successful:", res);
 
     } catch (err: any) {
       setShowLoadingModal(false);
@@ -393,7 +395,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         reserveABike,
         returnABike,
         cancelReservation,
-        // payForTrip,
+        payForTrip,
         getRackNameById,
       }}
     >
