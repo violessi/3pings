@@ -159,6 +159,49 @@ async function completeBikeReturn(req, res) {
     if (!userData.currentTrip) {
       return res.status(400).json({ error: "No active trip found" });
     }
+
+    const tripRef = db.collection("trips").doc(userData.currentTrip);
+    const tripSnapshot = await tripRef.get();
+
+    if (!tripSnapshot.exists) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
+
+    const tripData = tripSnapshot.data();
+    const startTime = tripData.startTime.toDate();
+    const endTime = new Date();
+    const durationMinutes = Math.ceil((endTime - startTime) / (1000 * 60));
+    const finalFee =
+      Math.ceil(durationMinutes / RATE_INTERVAL) * tripData.baseRate;
+
+    // Update trip
+    await tripRef.update({
+      status: "completed",
+      finalFee,
+      endRack: rackId,
+      endTime: admin.firestore.FieldValue.serverTimestamp(),
+      rateInterval : RATE_INTERVAL,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Update bike
+    const bikeRef = db.collection("bikes").doc(tripData.bikeId);
+    await bikeRef.update({
+      status: "available",
+      rackId,
+      rackSlot,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Update user
+    await userRef.update({
+      balance: admin.firestore.FieldValue.increment(finalFee),
+      currentTrip: null,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    console.log(`[SERVER] Bike ${tripData.bikeId} returned successfully`);
+    res.status(200).json({ message: "Bike returned successfully", finalFee });
   } catch (err) {
     console.error("[ERROR] completeBikeReturn:", err);
     res.status(500).json({ error: "Failed to complete return" });

@@ -92,6 +92,7 @@ export default function RewardsScreen() {
             userId={currentUserId}
           />
         ))}
+        
         <Text style={globalStyles.title}> Completed </Text>
         {claimedRewards.map((reward, index) => (
           <RewardsCard

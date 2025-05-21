@@ -28,6 +28,7 @@ declare global {
     | "createdAt"
     | "updatedAt"
     | "addtlCharge"
+    | "rateInterval"
     | "finalFee"
   >;
 

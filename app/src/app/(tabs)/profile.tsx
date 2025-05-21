@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import { collection, getDocs , doc, getDoc, query, where } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { Card } from "@/src/components/Card";
-import { resetDatabase } from "@/service/admin";
+import { resetDatabase, unpayDemotrip3} from "@/service/admin";
 import LoadingModal from "@/src/components/LoadingModal";
 import SuccessModal from "@/src/components/SuccessModal";
 import { useBike } from "@/src/context/BikeContext";
@@ -36,6 +36,14 @@ export default function ProfileScreen() {
       setRefreshTripsFlag((prev) => !prev);
     } catch (err: any) {
       setShowLoadingModal(false);
+      console.log("Error!", err.message); // temporary; replace with modal
+    }
+  };
+
+    const handleUnpay3 = async () => {
+    try {
+      const res = await unpayDemotrip3();
+    } catch (err: any) {
       console.log("Error!", err.message); // temporary; replace with modal
     }
   };
@@ -136,7 +144,7 @@ export default function ProfileScreen() {
       >
       
       {/* see user information; no functions yet */}
-      <Text style={globalStyles.title}> Profile </Text>
+      {/*<Text style={globalStyles.title}> Profile </Text>*/}
       <Card style={{backgroundColor: "#362C5F"}} activeOpacity={1}>
         {userData && (
             <View key={userData.id} className="pr-2 pb-2">
@@ -144,6 +152,7 @@ export default function ProfileScreen() {
               <Text className="text-sm text-white">  Username: {userData.username}</Text>
               <Text className="text-sm text-white">  Student Number: {userData.id}</Text>
               <Text className="text-sm text-white">  Email: {userData.email}</Text>
+              <Text className="text-lg font-semibold text-white">Balance: {userData.balance}</Text>
             </View>
         )}
       </Card>
@@ -165,8 +174,9 @@ export default function ProfileScreen() {
 
       {/* show total credits* and list preview rewards */}
       {/* 'see more' -> clicking goes to a full page to view */}
-      <Text style={globalStyles.title}> Spin Credits </Text>
       {/* add total credits (not necessarily same as total of rewards), so outside card */}
+      {/*
+      <Text style={globalStyles.title}> Spin Credits </Text>
       <Text className="text-base w-full ml-5 mb-2 font-semibold text-gray-800">Total Credits: ₱{totalCredits}</Text>
       <Card onPress={() => router.push("../payment/credits")} style={{backgroundColor: "#fff"}}>
         <View className="mt-2">
@@ -177,21 +187,12 @@ export default function ProfileScreen() {
           ))}
         </View>
         <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>See all claimed rewards</Text>
-      </Card>
+      </Card> 
+      */}
+      <Text style={globalStyles.title}> Demo Functions </Text>
       <TouchableOpacity onPress={() => handleReset()}>
         <Text>Reset Demo</Text>
       </TouchableOpacity>
-      
-      <LoadingModal showLoadingModal={showLoadingModal} />
-      <SuccessModal
-        title="Reset successful!"
-        description1="You're ready for a demo."
-        showSuccessModal={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          router.replace("/action"); // or use push/pop if needed
-        }}
-      />
 
       </ScrollView>
     </SafeAreaView>

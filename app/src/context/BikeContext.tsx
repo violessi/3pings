@@ -38,7 +38,7 @@ type BikeContextType = {
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
   returnABike: (userId: string) => Promise<void>;
   cancelReservation: (tripId: string) => void;
-  payForTrip: (tripId: string, minusCredits: number, minusBalance: number) => Promise<void>;
+  payForTrip: (tripId: string, minusBalance: number) => Promise<void>;
   getRackNameById: (rackId: string) => Promise<string>;
   refreshTripsFlag: boolean;
   setRefreshTripsFlag: React.Dispatch<React.SetStateAction<boolean>>;
@@ -390,14 +390,14 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   }
 
   // ============ FULL PAY FUNCTION ============
-  async function payForTrip(tripId: string, minusCredits: number, minusBalance: number) {
+  async function payForTrip(tripId: string, minusBalance: number) {
     setShowLoadingModal(true);
 
     try {
       console.log("Paying for", tripId);
-      // set parameters/payload (tripid, minusbalance, minuscredits)
+      // set parameters/payload (tripid, minusbalance)
       // call function from tripService
-      // const res = await payTrip(tripId, minusCredits, minusBalance);
+      const res = await payTrip(tripId, minusBalance);
       // that will handle server posts/functions
       // await and store response, return response as success
       // console.log("Payment successful:", response);

@@ -1,4 +1,4 @@
-const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.80.105.189"; // change to your laptop's/server's IP
 const SERVER_URL = "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
 export const resetDatabase = async () => {
@@ -19,3 +19,21 @@ export const resetDatabase = async () => {
   }
 };
 
+
+export const unpayDemotrip3= async () => {
+  try {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/admin/unpay3`, {
+    // const res = await fetch(`${SERVER_URL}api/admin/reset`, {
+      method: "POST",
+    });
+
+    if (res.ok) {
+      console.log("[APP] demotrip3 set to unpaid");
+    } else {
+      const { error } = await res.json();
+      console.error("[APP] Failed to unpay demotrip3:", error);
+    }
+  } catch (err) {
+    console.error("[APP] Error unpaying:", err);
+  }
+};

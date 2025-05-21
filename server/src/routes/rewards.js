@@ -80,12 +80,12 @@ router.post("/verify", async (req, res) => {
     }
 
     // update user log
-    console.log("New credits:", userData.credits + prize);
+    console.log("New balance:", userData.balance + prize);
 
     await userRef.update({
       rewards: admin.firestore.FieldValue.arrayUnion(rewardId),
       rewardTrips: admin.firestore.FieldValue.arrayUnion(...claimedTripIds),
-      credits: userData.credits + prize,
+      balance: userData.balance + prize,
     });
 
     res.status(200).json({ message: "Reward claimed" });

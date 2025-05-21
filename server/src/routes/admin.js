@@ -74,4 +74,10 @@ router.post("/reset", async (req, res) => {
   }
 });
 
+router.post("/unpay3", async (req, res) => {
+  const demotrip3Ref = db.collection("trips").doc("demotrip3");
+  demotrip3Ref.update({paid:false});
+  res.status(200).json({ message: "demotrip3 unpaid" });
+});
+
 module.exports = router;

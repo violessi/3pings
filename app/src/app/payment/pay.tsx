@@ -19,6 +19,7 @@ import LoadingModal from "@/components/LoadingModal";
 import SuccessModal from "@/components/SuccessModal";
 import ErrorModal from "@/components/ErrorModal";
 import globalStyles from "@/src/assets/styles";
+import { formatDate } from "@/src/service/tripService";
 
 export default function Pay() {
   const { tripId } = useLocalSearchParams<{ tripId: string }>();
@@ -32,29 +33,72 @@ export default function Pay() {
     payForTrip,
   } = useBike();
 
-  const [finalFee, setFinalFee] = useState(0);
-  const [totalCredits, setTotalCred] = useState(0); // pull from user doc if needed
-  const [creditInput, setCreditInput] = useState("");
+  const [startString, setStartString]  = useState("");
+  const [endString, setEndString]  = useState("");
+  const [feeString, setFeeString]  = useState("");
+  const [feeAddtlString, setAddtlString]  = useState("");
+  const [finalFee, setFinalFee]       = useState(0);
+  const [currentBalance, setBalance]  = useState(0);
+  const [newBalance, setNewBalance]  = useState(0);
 
-  const [minusCredits, setMinusCredits] = useState(0);
-  const [minusBalance, setMinusBalance] = useState(0);
+  const [errorString, setErrorString]  = useState("");
 
-  const handleCreditChange = (text: string) => {
-    const parsed = parseFloat(text) || 0;
-    // maximum allowable credits to use is the min of input, total credits, or the finalfee
-    const useCredits = Math.min(parsed, totalCredits, finalFee);
-    setMinusCredits(useCredits);
-    setMinusBalance(finalFee - useCredits);
-    setCreditInput(text);
-  };
+  useEffect(() => {
+    if (!tripId) return;
+
+    (async () => {
+      // Trip
+      const snap = await getDoc(doc(db, "trips", tripId));
+      if (snap.exists()){
+        const trip = snap.data();
+        
+        const startSnap = await getDoc(doc(db, "racks", trip.startRack));
+        if(startSnap.exists()){
+          const startName = startSnap.data().rackName;
+          const startTime = formatDate(trip.startTime.toDate().toLocaleString());
+          setStartString(`${startName}\n${startTime}\n`);
+        }
+        const endSnap = await getDoc(doc(db, "racks", trip.endRack));
+        if(endSnap.exists()){
+          const endName = endSnap.data().rackName;
+          const endTime = formatDate(trip.endTime.toDate().toLocaleString());
+          setEndString(`${endName}\n${endTime}`);
+        }
+
+        const durationMinutes = Math.ceil((trip.endTime.toDate() - trip.startTime.toDate()) / (1000 * 60));
+        const baseFee = Math.ceil(durationMinutes / trip.rateInterval) * trip.baseRate;
+        const feeString = `₱${trip.baseRate} / ${trip.rateInterval} mins x ${durationMinutes} mins = ₱${baseFee}`;
+        setFinalFee(trip.finalFee ?? 0);
+        setFeeString(feeString);
+
+        if (trip.addtlCharge){
+          setAddtlString(`LATE ₱${trip.addtlCharge}`);
+        }
+        else {
+          setAddtlString(`NO LATE FEES`);
+        }
+        
+      }
+      // User balance 
+      const userSnap = await getDoc(doc(db, "users", "user123"));
+      if (userSnap.exists()){
+        const user = userSnap.data();
+        setBalance(user.balance ?? 0);
+        setNewBalance(user.balance - finalFee);
+      }
+    })();
+  }, [tripId]);
 
   const handleButtonPress = async () => {
     try {
       // payForTrip in BikeContext.tsx
       // calls handler for server calls in TripService.tsx
-      await payForTrip(tripId, minusCredits, minusBalance);
+      const res = await payForTrip(tripId, finalFee);
+      console.log(res);
       setShowSuccessModal(true);
     } catch (err: any) {
+      setErrorString(err.error);
+      setShowErrorModal(true);
       Alert.alert("Error!", err.message); // temporary; replace with modal
     }
   };
@@ -94,36 +138,33 @@ export default function Pay() {
       {/* show trip details */}
       <View className="px-4 py-2">
         <Text className="text-lg font-semibold mb-1">Trip Summary:</Text>
-        <Text>Total Fee: ₱{finalFee.toFixed(2)}</Text>
-        <Text>Available Spin Credits: {totalCredits}</Text>
+        <View className="px-4 py-2">
+          <Text>Start :</Text>
+          <Text>{startString}</Text>
+        </View>
+        <View className="px-4 py-2">
+          <Text>End :</Text>
+          <Text>{endString}</Text>
+        </View>
       </View>
 
       {/* way to pay for trip, use credits, etc */}
       {/* set amount of credits to use, max allowable = total credits OR finalFee*/}
       {/* i think need to set minusCredits and minusBalance on button press... but also go to payForTrip() with payload*/}
       {/* set minusCredits = amount set by user; set minusBalance = diff of finalFee and minusCredits*/}
-      <View className="px-4 mt-2">
-        <Text className="mb-1">Enter credits to use:</Text>
-        <TextInput
-          value={creditInput}
-          onChangeText={handleCreditChange}
-          mode="outlined"
-          keyboardType="numeric"
-          placeholder="e.g., 5"
-          textColor="black"
-          outlineColor="#7E7E7E"
-          activeOutlineColor="#7E7E7E"
-          style={{ backgroundColor: "white" }}
-        />
-      </View>
+      
       <View className="px-4 mt-4">
         <Text className="font-medium">Payment Breakdown:</Text>
-        <Text>Using Credits: {minusCredits}</Text>
-        <Text>Balance Deduction: ₱{finalFee - minusCredits}</Text>
-        <Text style={globalStyles.note}>
-          You can avail up to either you total credits
-        </Text>
+        <Text>{feeString}</Text>
+        <Text>{feeAddtlString}</Text>
+        <Text>Total Fee: ₱{finalFee}</Text>
       </View>
+
+      <View className="px-4 py-2">
+        <Text >Current Balance: {currentBalance}</Text>
+        <Text >New Balance: {newBalance}</Text>
+      </View>
+
       <View className="px-4 mt-4">
         <TouchableOpacity onPress={handleButtonPress} style={styles.payButton}>
           <Text style={styles.payText}>Pay</Text>
@@ -131,9 +172,9 @@ export default function Pay() {
       </View>
 
       {/* loading, success, and error modal */}
-      {/* <LoadingModal visible={showLoadingModal} />
-      <SuccessModal visible={showSuccessModal} onClose={handleCloseSuccessModal} />
-      <ErrorModal visible={showErrorModal} onClose={() => setShowErrorModal(false)} /> */}
+      <LoadingModal showLoadingModal={showLoadingModal} />
+      <SuccessModal title="Payment Successful" showSuccessModal={showSuccessModal} onClose={handleCloseSuccessModal} />
+      <ErrorModal title="Error" description={errorString} showErrorModal={showErrorModal} onClose={() => setShowErrorModal(false)} /> 
     </SafeAreaView>
   );
 }
