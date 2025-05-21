@@ -41,6 +41,8 @@ export default function Pay() {
   const [currentBalance, setBalance]  = useState(0);
   const [newBalance, setNewBalance]  = useState(0);
 
+  const [errorString, setErrorString]  = useState("");
+
   useEffect(() => {
     if (!tripId) return;
 
@@ -65,8 +67,8 @@ export default function Pay() {
 
         const durationMinutes = Math.ceil((trip.endTime.toDate() - trip.startTime.toDate()) / (1000 * 60));
         const baseFee = Math.ceil(durationMinutes / trip.rateInterval) * trip.baseRate;
-        setFinalFee(trip.finalFee ?? 0);
         const feeString = `₱${trip.baseRate} / ${trip.rateInterval} mins x ${durationMinutes} mins = ₱${baseFee}`;
+        setFinalFee(trip.finalFee ?? 0);
         setFeeString(feeString);
 
         if (trip.addtlCharge){
@@ -91,9 +93,12 @@ export default function Pay() {
     try {
       // payForTrip in BikeContext.tsx
       // calls handler for server calls in TripService.tsx
-      await payForTrip(tripId, finalFee);
+      const res = await payForTrip(tripId, finalFee);
+      console.log(res);
       setShowSuccessModal(true);
     } catch (err: any) {
+      setErrorString(err.error);
+      setShowErrorModal(true);
       Alert.alert("Error!", err.message); // temporary; replace with modal
     }
   };
@@ -168,8 +173,8 @@ export default function Pay() {
 
       {/* loading, success, and error modal */}
       <LoadingModal showLoadingModal={showLoadingModal} />
-      <SuccessModal title="Successful Payment" showSuccessModal={showSuccessModal} onClose={handleCloseSuccessModal} />
-      <ErrorModal title="Error" showErrorModal={showErrorModal} onClose={() => setShowErrorModal(false)} /> 
+      <SuccessModal title="Payment Successful" showSuccessModal={showSuccessModal} onClose={handleCloseSuccessModal} />
+      <ErrorModal title="Error" description={errorString} showErrorModal={showErrorModal} onClose={() => setShowErrorModal(false)} /> 
     </SafeAreaView>
   );
 }
