@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
 import { useRouter } from "expo-router";
 import { useBike } from "@/context/BikeContext";
+import LoadingModal from "./LoadingModal";
 
 // fields and style of trip card 
 // displayed in trips page
@@ -45,7 +46,6 @@ export default function TripCard({
     showErrorModal,
     setShowErrorModal,
     setShowSuccessModal,
-    showLoadingModal,
     updateRackId,
     rentABike,
     reserveABike,
@@ -53,12 +53,15 @@ export default function TripCard({
     getRackNameById
   } = useBike();
 
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  
   const handleCancel = async () => {
     try {
       if (!tripID){
         console.error("No tripId passed to TripCard!");
         return;
       }
+      setShowLoadingModal(true);
       const res = await cancelReservation(tripID);
       updateRackId("");
       console.log("Cancelled.");
@@ -66,6 +69,8 @@ export default function TripCard({
     } catch (err: any) {
       console.log("Error!", err.message); // PLACEHOLDER; replace with modal
       onCancelError?.("Failed to cancel reservation. Please try again.");
+    } finally {
+      setShowLoadingModal(false);
     }
   };
 
@@ -89,16 +94,16 @@ export default function TripCard({
       <View style={globalStyles.row}>
         {/*Left*/}
         <View style={globalStyles.column}>
-          <Text style={tripStyles.label}>Trip Start: </Text>
+          <Text style={tripStyles.label}>Start: </Text>
           <Text style={tripStyles.detail}>{tripStart}</Text>
-          <Text style={tripStyles.label}>Trip End: </Text>
+          <Text style={tripStyles.label}>End: </Text>
           <Text style={tripStyles.detail}>{tripEnd}</Text>
         </View>
 
         {/*Right*/}
         <View style={globalStyles.column}>
           <Text style={tripStyles.label}> From: </Text>
-          <Text style={tripStyles.detail}>{startRackName}</Text>
+          <Text style={tripStyles.detail}>{startRackName}{rackId}</Text>
           <Text style={tripStyles.label}> To: </Text>
           <Text style={tripStyles.detail}>{endRackName}</Text>
         </View>
@@ -151,6 +156,8 @@ export default function TripCard({
           )}
         </View>
       </View>
+      <LoadingModal showLoadingModal={showLoadingModal} />
+      
     </View>
   );
 }

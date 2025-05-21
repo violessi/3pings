@@ -77,6 +77,12 @@ export default function Reserve() {
     fetchRackInfo();
   }, [rackID]);
 
+  useEffect(() => {
+    // prevent modal from reappearing if already set from a previous page
+    setShowSuccessModal(false);
+  }, []);
+
+
   const handleReserve = async () => {
     try {
       const res = await reserveABike(selectedDate);

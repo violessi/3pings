@@ -1,10 +1,11 @@
-import React from 'react';
+import React , { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
 import { useRouter } from "expo-router";
 
 import { Reward } from "@/src/components/types";
 import { verifyReward } from "@/src/service/rewardService";
+import LoadingModal from "@/src/components/LoadingModal";
 
 // props and style of rewards card 
 // displayed in rewards page
@@ -31,14 +32,19 @@ export default function RewardsCard({
   onUpdate,
 }: RewardsCardProps) {
   const router = useRouter();  
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
 
   // handlers
   const handleButtonPress = async () => {
+    setShowLoadingModal(true);
+
     try {
         console.log("[REWARDS] Button press, claim:", userId, rewardId);
         await verifyReward(userId, rewardId, onUpdate);
     } catch (err: any) {
         console.log("[CHECK] Error!", err.message);
+    } finally {
+      setShowLoadingModal(false);
     }
   };
   
@@ -75,7 +81,7 @@ export default function RewardsCard({
         </TouchableOpacity>
       )}
       </View>
-    
+    <LoadingModal showLoadingModal={showLoadingModal} />
     </View>
   );
 }

@@ -8,6 +8,8 @@ import { collection, getDocs , doc, getDoc, query, where } from "firebase/firest
 import { db } from "@/firebaseConfig";
 import { Card } from "@/src/components/Card";
 import { resetDatabase } from "@/service/admin";
+import LoadingModal from "@/src/components/LoadingModal";
+import SuccessModal from "@/src/components/SuccessModal";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -18,11 +20,19 @@ export default function ProfileScreen() {
   const [trips, setTrips] = useState<any[]>([]);
   const [totalCredits, setTotalCredits] = useState(0);
   const [pendingFees, setPendingFees] = useState(0);
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
 
   const handleReset = async () => {
+    setShowLoadingModal(true);
+
     try {
       const res = await resetDatabase();
+      setShowLoadingModal(false); 
+      setShowSuccessModal(true);
     } catch (err: any) {
+      setShowLoadingModal(false);
       console.log("Error!", err.message); // temporary; replace with modal
     }
   };
@@ -168,6 +178,17 @@ export default function ProfileScreen() {
       <TouchableOpacity onPress={() => handleReset()}>
         <Text>Reset Demo</Text>
       </TouchableOpacity>
+      
+      <LoadingModal showLoadingModal={showLoadingModal} />
+      <SuccessModal
+        title="Reset successful!"
+        description1="You're ready for a demo."
+        showSuccessModal={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          router.replace("/action"); // or use push/pop if needed
+        }}
+      />
 
       </ScrollView>
     </SafeAreaView>

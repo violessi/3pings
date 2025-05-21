@@ -74,7 +74,11 @@ export default function Pay() {
   // .push() used to /pay
   // go back to page based on callstack
   const handleBack = () => {
-    router.canGoBack() ? router.replace("/payment") : router.replace("/");
+    try {
+      router.back();
+    } catch (error) {
+      router.replace("/payment");
+    }
   };
 
   return (
