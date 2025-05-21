@@ -45,6 +45,8 @@ type BikeContextType = {
 };
 
 export const BikeContext = createContext<BikeContextType | null>(null);
+const [showErrorModal, setShowErrorModal] = useState(false);
+const [errorMessage, setErrorMessage] = useState("");
 
 // PROVIDER COMPONENT
 export const BikeProvider = ({ children }: { children: ReactNode }) => {
