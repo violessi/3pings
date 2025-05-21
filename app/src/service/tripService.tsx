@@ -1,7 +1,28 @@
 import { BikeSchema, RackSchema } from "@/types/schema";
 
-const IP_ADDRESS = "10.80.105.189"; // change to your laptop's/server's IP
-const SERVER_URL = "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
+const IP_ADDRESS = "10.147.40.133"; // change to your laptop's/server's IP
+const SERVER_URL =
+  "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
+
+// ========================KAT TRIAL========================
+
+export const hwToServer = async () => {
+  try {
+    console.log("Sending request to server...");
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/test`, {
+      method: "GET",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      console.log("Data from server:", data);
+      return data; // return the response data
+    } else {
+      throw new Error("Failed to fetch data from server");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+  }
+};
 
 // ========================RENT=============================
 

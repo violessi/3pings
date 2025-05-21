@@ -1,7 +1,7 @@
 import { BikeSchema } from "@/types/schema";
 import RewardsCard from "@/src/components/RewardsCard";
 
-const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.147.40.133"; // change to your laptop's/server's IP
 const SERVER_URL = "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
 // ========================CLAIM=============================

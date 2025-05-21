@@ -34,7 +34,6 @@ export default function RewardsCard({
   const router = useRouter();  
   const [showLoadingModal, setShowLoadingModal] = useState(false);
 
-  // handlers
   const handleButtonPress = async () => {
     setShowLoadingModal(true);
 

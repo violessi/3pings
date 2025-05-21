@@ -146,7 +146,6 @@ export default function Reserve() {
       />
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Text style={globalStyles.title}>{rackData?.name}</Text>
-
         <View style={{ marginBottom: 25 }}>
           {rackID && rackImages[rackID] && (
             <Image

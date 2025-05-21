@@ -65,7 +65,11 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 4,
   },
-
+  label: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#29243F',
+  },
   valueContainerGreen: {
     backgroundColor: '#2C452B',
     borderRadius: 8,

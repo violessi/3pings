@@ -173,12 +173,11 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("Invalid rack ID");
       }
 
-      // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
-      const result = await doPreRentCheck(userId);
-      if (!result.allowed) {
-        console.log(result.allowed);
-        throw new Error(result.reason);
-      }
+      // // handle prechecking before renting
+      // const result = await doPreRentCheck(userId, rackId);
+      // if (!result.allowed) {
+      //   throw new Error(result.reason);
+      // }
 
       // check if user has a reservation at this rack
       const reservedTripDoc = await checkReserved(userId, rackId);
