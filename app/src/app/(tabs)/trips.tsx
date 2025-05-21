@@ -10,11 +10,13 @@ import Header from "@/src/components/Header";
 import { Trip } from "@/src/components/types";
 import TripCard from "@/src/components/TripCard";
 import { formatDate } from "@/src/service/tripService";
+import { useBike } from "@/src/context/BikeContext";
 
 
 export default function TripScreen() {
   const [completedTrips, setCompletedTrips] = useState<Trip[]>([]);
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
+  const { refreshTripsFlag } = useBike();
 
   const fetchTrips = async () => {
     try {
@@ -31,7 +33,7 @@ export default function TripScreen() {
       );
 
       const completed = allTrips.filter(trip =>
-        trip.status === "completed" || trip.status === "cancelled"
+        trip.status === "completed"
       );
 
       setActiveTrips(active);
@@ -47,6 +49,21 @@ export default function TripScreen() {
   useEffect(() => {
     fetchTrips();
   }, []);
+
+  useEffect(() => {
+  const fetchTrips = async () => {
+    const tripsCollection = collection(db, "trips");
+    const tripSnapshot = await getDocs(tripsCollection);
+    const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
+      ...(doc.data() as Trip),
+      id: doc.id,
+    }));
+    const active = allTrips.filter((trip) => trip.status === "active");
+    setActiveTrips(active);
+  };
+
+  fetchTrips();
+}, [refreshTripsFlag]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">

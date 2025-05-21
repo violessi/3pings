@@ -10,6 +10,7 @@ import { Card } from "@/src/components/Card";
 import { resetDatabase } from "@/service/admin";
 import LoadingModal from "@/src/components/LoadingModal";
 import SuccessModal from "@/src/components/SuccessModal";
+import { useBike } from "@/src/context/BikeContext";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function ProfileScreen() {
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  const { setRefreshTripsFlag } = useBike();
 
   const handleReset = async () => {
     setShowLoadingModal(true);
@@ -31,6 +33,7 @@ export default function ProfileScreen() {
       const res = await resetDatabase();
       setShowLoadingModal(false); 
       setShowSuccessModal(true);
+      setRefreshTripsFlag((prev) => !prev);
     } catch (err: any) {
       setShowLoadingModal(false);
       console.log("Error!", err.message); // temporary; replace with modal

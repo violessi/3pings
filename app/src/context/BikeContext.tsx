@@ -40,11 +40,11 @@ type BikeContextType = {
   cancelReservation: (tripId: string) => void;
   payForTrip: (tripId: string, minusCredits: number, minusBalance: number) => Promise<void>;
   getRackNameById: (rackId: string) => Promise<string>;
+  refreshTripsFlag: boolean;
+  setRefreshTripsFlag: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const BikeContext = createContext<BikeContextType | null>(null);
-const [showErrorModal, setShowErrorModal] = useState(false);
-const [errorMessage, setErrorMessage] = useState("");
 
 // PROVIDER COMPONENT
 export const BikeProvider = ({ children }: { children: ReactNode }) => {
@@ -57,6 +57,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLate, setIsLate] = useState(false);
+  const [refreshTripsFlag, setRefreshTripsFlag] = useState(false);
+
 
   function updateRackId(newRackId: string) {
     setRackId(newRackId);
@@ -425,6 +427,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         cancelReservation,
         payForTrip,
         getRackNameById,
+        refreshTripsFlag,
+        setRefreshTripsFlag,
       }}
     >
     {children}

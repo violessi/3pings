@@ -21,7 +21,6 @@ import TripCard from "@/src/components/TripCard";
 import { Trip } from "@/src/components/types";
 import globalStyles from "@/src/assets/styles";
 import { preRentCheck } from "@/src/service/tripService";
-import { useBike } from "@/context/BikeContext";
 import ErrorModal from "@/src/components/ErrorModal";
 import SuccessModal from "@/src/components/SuccessModal";
 import { formatDate } from "@/src/service/tripService";
@@ -48,7 +47,6 @@ export default function ActionPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
 
   const handleButtonPress = async () => {
     try {
