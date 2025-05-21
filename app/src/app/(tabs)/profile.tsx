@@ -175,13 +175,10 @@ export default function ProfileScreen() {
       {/* 'see more' -> clicking goes to a full page to view */}
       {/* add total credits (not necessarily same as total of rewards), so outside card */}
 
-      <Text style={globalStyles.title}> Demo Functions </Text>
       <TouchableOpacity onPress={() => handleReset()}>
         <Text>Reset Demo</Text>
       </TouchableOpacity>
-      
-      <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>See all rewards</Text>
-      
+            
       <LoadingModal showLoadingModal={showLoadingModal} />
       <SuccessModal
         title="Reset successful!"
