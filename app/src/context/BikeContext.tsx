@@ -217,6 +217,16 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // CreateTrip handles creating new trip or updating reserved trip
       console.log(rackId);
       const now = new Date();
+
+      setShowLoadingModal(false);
+      setTimeout(() => {
+        setShowSuccessModal(true);
+      }, 500);
+
+      await hardwareRequest({ bikeId });
+
+      updateRackId("");
+
       const payload: CreateTrip = {
         bikeId: bikeId,
         userId: "user123", // PLACEHOLDER
@@ -229,31 +239,18 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         startRack: rackId,
         endRack: "",
       };
-
       await initializeTrip(payload);
-
-      setShowLoadingModal(false);
-      setTimeout(() => {
-        setShowSuccessModal(true);
-      }, 500);
-      updateRackId("");
-
-      await hardwareRequest({ bikeId });
 
       // shared logic after trip is created
       // listen for changes in bike status.
       // while bike status is not "rented", keep showing the success modal
       // if bike status is "rented", close the modal and navigate to the action page
-      const unsub = listenToBikeStatus(bikeId, (status) => {
-        if (status.toLowerCase() === "rented") {
-          unsub(); // stop listening when status is "rented"
-          setShowSuccessModal(false);
-        }
-      });
 
+      setShowSuccessModal(false);
       return rackSlot;
     } catch (err: any) {
       setShowLoadingModal(false);
+      setShowSuccessModal(false);
       setTimeout(() => {
         setErrorMessage(err.message);
         setShowErrorModal(true);
@@ -267,13 +264,12 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     setShowLoadingModal(true);
 
     try {
-      const res = await handleReturn({ rackId, userId: "user123" }); // PLACEHOLDER
-
       setShowLoadingModal(false);
       setTimeout(() => {
         setShowReturnModal(true);
       }, 500);
       updateRackId("");
+      const res = await handleReturn({ rackId, userId: "user123" }); // PLACEHOLDER
       console.log("Return response:", res);
 
       if (res.tripId) {
@@ -297,11 +293,15 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         }
       });
     } catch (err: any) {
-      setShowLoadingModal(false);
+      setTimeout(() => {
+        setShowLoadingModal(false);
+        setShowReturnModal(false);
+      }, 500);
+
       setTimeout(() => {
         setErrorMessage(err.message);
         setShowErrorModal(true);
-      }, 500);
+      }, 1000);
     }
   }
 

@@ -51,7 +51,7 @@ export default function Return() {
       <LoadingModal showLoadingModal={showLoadingModal} />
       <SuccessModal
         title="Waiting for bike return..."
-        description1={`We have opened a bike slot for you. Please return your bike.`}
+        description1={`We will open a bike slot for you. Please return your bike once the slot has opened.`}
         description2="This modal will close automatically once you have returned your bike."
         showSuccessModal={showReturnModal}
       />

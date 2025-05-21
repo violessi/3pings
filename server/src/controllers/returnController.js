@@ -180,7 +180,7 @@ async function completeBikeReturn(req, res) {
       finalFee,
       endRack: rackId,
       endTime: admin.firestore.FieldValue.serverTimestamp(),
-      rateInterval : RATE_INTERVAL,
+      rateInterval: RATE_INTERVAL,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 

@@ -64,7 +64,7 @@ export default function Rent() {
       <LoadingModal showLoadingModal={showLoadingModal} />
       <SuccessModal
         title="Bike rented successfully!"
-        description1={`Your bike is ready for use. Please get your bike in slot ${rackSlot}.`}
+        description1={`We will open the slot ${rackSlot} for your bike. Please wait a moment...`}
         description2="This modal will close automatically once you have removed your bike."
         showSuccessModal={showSuccessModal}
       />

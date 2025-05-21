@@ -5,13 +5,13 @@ const router = express.Router();
 router.use(express.json());
 
 router.post("/getIP", async (req, res) => {
-  const { rackId, rackIPAdd } = req.body;
+  const { IPAddr } = req.body;
   console.log(`[SERVER] Received get IP req`);
 
   try {
-    const rackRef = db.collection("racks").doc(rackId);
+    const rackRef = db.collection("racks").doc("rack123");
     await rackRef.update({
-      rackIP: rackIPAdd,
+      rackIP: IPAddr,
     });
 
     res.status(200).json({ message: "Rack ID received" });
@@ -31,15 +31,17 @@ router.post("/reset", async (req, res) => {
     await bikeBatch.commit();
 
     // clear/delete trips not demotrips
-    // CONSIDER: clear/delete completed trips EXCEPT trips named demotripX 
-      // so we have hardcoded trips na for showing ui/cerifying rewards
-      // everything else is for user testing
+    // CONSIDER: clear/delete completed trips EXCEPT trips named demotripX
+    // so we have hardcoded trips na for showing ui/cerifying rewards
+    // everything else is for user testing
     const tripsSnapshot = await db.collection("trips").get();
     const tripBatch = db.batch();
     tripsSnapshot.forEach((doc) => {
       const data = doc.data();
       const isDemoTrip = doc.id.includes("demotrip");
-      const shouldDelete = (data.status === "active" || data.status === "completed") && !isDemoTrip;
+      const shouldDelete =
+        (data.status === "active" || data.status === "completed") &&
+        !isDemoTrip;
 
       if (shouldDelete) {
         tripBatch.delete(doc.ref);
@@ -49,7 +51,7 @@ router.post("/reset", async (req, res) => {
 
     // clear user.currentTrip
     // remove user rewards and rewardTrips EXCEPT demotrip1 and reward 1
-      // so we can show what it looks like when they have a verified reward vs claiming a new one
+    // so we can show what it looks like when they have a verified reward vs claiming a new one
     const usersSnapshot = await db.collection("users").get();
     const userBatch = db.batch();
     usersSnapshot.forEach((doc) => {
@@ -76,8 +78,14 @@ router.post("/reset", async (req, res) => {
 
 router.post("/unpay3", async (req, res) => {
   const demotrip3Ref = db.collection("trips").doc("demotrip3");
-  demotrip3Ref.update({paid:false});
+  demotrip3Ref.update({ paid: false });
   res.status(200).json({ message: "demotrip3 unpaid" });
+});
+
+router.post("/log", (req, res) => {
+  const text = req.body;
+  console.log(`[SERVER] LOG FROM HW: ${text}`);
+  res.status(200).json({ message: "Log received" });
 });
 
 module.exports = router;
