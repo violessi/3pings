@@ -110,6 +110,7 @@ async function requestBikeReturn(req, res) {
       endRack: rackId,
       endTime: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      paid: false,
     });
 
     // Update bike

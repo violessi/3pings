@@ -71,7 +71,7 @@ export default function RewardsCard({
           onPress={() => handleButtonPress()}
           activeOpacity={0.8}
           >
-          <Text>Claim Reward</Text>
+          <Text>Check Trips</Text>
         </TouchableOpacity>
       )}
       </View>

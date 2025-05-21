@@ -33,25 +33,25 @@ export default function Index() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="flex-col gap-2 p-5 ">
           <RackOption
-            rackId="Rack123"
+            rackId="rack123"
             department="Department of Computer Science"
             onSelect={handleSelectRack}
             image="dcs"
           />
           <RackOption
-            rackId="Rack456"
+            rackId="rack456"
             department="Institute of Mathematics"
             onSelect={handleSelectRack}
             image="im"
           />
           <RackOption
-            rackId="Rack789"
+            rackId="rack789"
             department="College of Arts and Letters"
             onSelect={handleSelectRack}
             image="cal"
           />
           <RackOption
-            rackId="RackABC"
+            rackId="rackABC"
             department="Vinzons Hall"
             onSelect={handleSelectRack}
             image="vh"

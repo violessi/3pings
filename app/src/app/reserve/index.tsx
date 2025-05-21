@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, Text, View, Image } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { getDoc, doc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
@@ -36,6 +36,7 @@ export default function Reserve() {
 
   // reserves from current time
   const selectedDate = new Date();
+  const [expiryTimeStr, setExpiryTimeStr] = useState<string>("");
 
   // fetch rack info to display in card
   useEffect(() => {
@@ -80,6 +81,11 @@ export default function Reserve() {
     try {
       const res = await reserveABike(selectedDate);
       setAssignedBike(res);
+      const now = new Date();
+      const expiry = new Date(now.getTime() + 15 * 60 * 1000);
+
+      const formattedExpiry = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setExpiryTimeStr(formattedExpiry);
     } catch (err: any) {
       console.log("Reserve error:", err.message);
     }
@@ -92,7 +98,20 @@ export default function Reserve() {
 
   const handleBack = () => {
     updateRackId("");
-    router.canGoBack() ? router.replace("/action") : router.replace("/");
+    router.replace("/"); // go back to index 
+  };
+
+  // define images mapping
+  const dcs = require("@/src/assets/images/dcs.jpg");
+  const cal = require("@/src/assets/images/cal.jpg");
+  const im = require("@/src/assets/images/im.png");
+  const vh = require("@/src/assets/images/vinzons.jpg");
+
+  const rackImages: Record<string, any> = {
+    rack123: dcs,
+    rack456: im,
+    rack789: cal,
+    rackABC: vh,
   };
 
   return (
@@ -100,8 +119,11 @@ export default function Reserve() {
       <Header title="Reserve" subtitle="Reserve a bike from this rack!" hasBack={true} prevCallback={handleBack} />
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Text style={globalStyles.title}>{rackData?.name}</Text>
-        <View style={{ marginBottom: 10 }}>
-          <Text style={globalStyles.detail}>Map Photo</Text>
+
+        <View style={{ marginBottom: 25 }}>
+          {rackID && rackImages[rackID] && (
+            <Image source={rackImages[rackID]} style={{ width: '100%', height: 200, borderRadius: 10 }} resizeMode="cover" />
+          )}
         </View>
 
         <Text style={globalStyles.subtitle}>Rack Status</Text>
@@ -112,8 +134,8 @@ export default function Reserve() {
         <LoadingModal showLoadingModal={showLoadingModal} />
         { rackData && <SuccessModal
           title="Bike reserved successfully!"
-          description1={`Please make sure to claim your bike from slot ${rackData.rackSlot}.`}
-          description2="Reservation holds for 15 mins."
+          description1={`Please make sure to claim your bike from the ${rackData.location}.`}
+          description2={`Reservation holds until ${expiryTimeStr}.`}
           showSuccessModal={showSuccessModal}
           onClose={handleCloseSuccessModal}
         />}

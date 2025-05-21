@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
 import { useRouter } from "expo-router";
 import { useBike } from "@/context/BikeContext";
-import { formatDate } from '../service/tripService';
 
 // fields and style of trip card 
 // displayed in trips page
@@ -19,6 +18,8 @@ type TripCardProps = {
   startRack: string;
   endRack: string;
   paid?: boolean;
+  onTripCancelled?: () => void;
+  onCancelError?: (message: string) => void;
 };
 
 export default function TripCard({
@@ -32,8 +33,10 @@ export default function TripCard({
   startRack,
   endRack,
   paid,
+  onTripCancelled,
+  onCancelError,
 }: TripCardProps) {
-  const statusStyles = getStatusStyles(remarks, finalFee); // remarks = status string
+  const statusStyles = getStatusStyles(remarks, finalFee, paid); // remarks = status string
   const router = useRouter(); 
   
   const {
@@ -59,8 +62,10 @@ export default function TripCard({
       const res = await cancelReservation(tripID);
       updateRackId("");
       console.log("Cancelled.");
+      onTripCancelled?.();
     } catch (err: any) {
       console.log("Error!", err.message); // PLACEHOLDER; replace with modal
+      onCancelError?.("Failed to cancel reservation. Please try again.");
     }
   };
 
@@ -85,9 +90,9 @@ export default function TripCard({
         {/*Left*/}
         <View style={globalStyles.column}>
           <Text style={tripStyles.label}>Trip Start: </Text>
-          <Text style={tripStyles.detail}>{formatDate(tripStart)}</Text>
+          <Text style={tripStyles.detail}>{tripStart}</Text>
           <Text style={tripStyles.label}>Trip End: </Text>
-          <Text style={tripStyles.detail}>{formatDate(tripEnd)}</Text>
+          <Text style={tripStyles.detail}>{tripEnd}</Text>
         </View>
 
         {/*Right*/}
@@ -102,10 +107,14 @@ export default function TripCard({
       <View style={globalStyles.row}>
         {/*Left*/}
         <View style={[globalStyles.column, { alignItems: 'flex-start' }]}>
-          { (remarks != 'reserved') && (!paid) && ( // display status if not reserved
+          { (remarks != 'reserved') && ( // display status if not reserved
             <View style={[globalStyles.statusBox, statusStyles.container]}>
               <Text style={[{ fontWeight: '600' }, {textTransform: 'capitalize'}, statusStyles.text]}>
-                {finalFee && finalFee > 0 ? 'Balance: Php ' + finalFee : remarks} 
+                { paid
+                ? 'Paid'
+                : (finalFee && finalFee > 0 
+                ? 'Balance: Php ' + finalFee 
+                : remarks)} 
               </Text>
             </View>
           )}
@@ -119,7 +128,7 @@ export default function TripCard({
               onPress={() => router.push('/payment/pay')} // go to profile
               activeOpacity={0.8}
               >
-              <Text>Penalty payment</Text>
+              <Text>Pay</Text>
             </TouchableOpacity>
           )}
           { remarks === 'active' && ( // nearest rack to me 
@@ -137,7 +146,7 @@ export default function TripCard({
               onPress={() => {handleCancel();}} // handle cancel reservation
               activeOpacity={0.8}
               >
-              <Text>Cancel reservation</Text>
+              <Text>Cancel</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -167,8 +176,8 @@ const tripStyles = StyleSheet.create({
 });
 
 // diff colored status boxes
-const getStatusStyles = (status: string, addtlCharge?: number) => {
- if (addtlCharge && addtlCharge > 0) {
+const getStatusStyles = (status: string, addtlCharge?: number, paid?: boolean) => {
+  if ((addtlCharge && addtlCharge > 0) && !paid ) {
     return { //case: overdue
       container: {
         backgroundColor: '#f8d7da',
@@ -204,7 +213,7 @@ const getStatusStyles = (status: string, addtlCharge?: number) => {
     default:
       return {
         container: {
-          backgroundColor: '#e2e3e5',
+          backgroundColor: '#fff',
           borderColor: '#6c757d',
         },
         text: {

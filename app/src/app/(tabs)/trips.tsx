@@ -9,6 +9,7 @@ import Header from "@/src/components/Header";
 // trips
 import { Trip } from "@/src/components/types";
 import TripCard from "@/src/components/TripCard";
+import { formatDate } from "@/src/service/tripService";
 
 
 export default function TripScreen() {
@@ -56,7 +57,7 @@ export default function TripScreen() {
       >
         <Text style={globalStyles.title}> Active </Text>
         { activeTrips.length === 0 ? (
-          <Text style={[globalStyles.detail, {fontSize: 20}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
+          <Text style={[globalStyles.detail, {fontSize: 18}, {marginBottom: 30}]}>No trips to show.</Text>
         ) : (  
           activeTrips.map((trip, index) => (
             <TripCard
@@ -64,10 +65,8 @@ export default function TripScreen() {
               tripID={trip.id}
               title={`Trip from`}
               bikeID={`${trip.bikeId}`}
-              tripStart={`${trip.startTime.toDate().toLocaleString()}`}
-              tripEnd={trip.endTime
-                ? trip.endTime.toDate().toLocaleString()
-                : ""}
+              tripStart={formatDate(trip.startTime.toDate())}  
+              tripEnd={trip.endTime ? formatDate(trip.endTime.toDate()) : ""}
               remarks={`${trip.status}`}
               finalFee={trip.finalFee}
               startRack={trip.startRack}
@@ -78,7 +77,7 @@ export default function TripScreen() {
         )}
         <Text style={globalStyles.title}> Completed </Text>
         { completedTrips.length === 0 ? (
-          <Text style={[globalStyles.detail, {fontSize: 20}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
+          <Text style={[globalStyles.detail, {fontSize: 18},{marginBottom: 30}]}>No trips to show.</Text>
         ) : ( 
           completedTrips.map((trip, index) => (
             <TripCard
@@ -86,10 +85,8 @@ export default function TripScreen() {
               tripID={trip.id}
               title={`Trip from`}
               bikeID={`${trip.bikeId}`}
-              tripStart={`${trip.startTime.toDate().toLocaleString()}`}
-              tripEnd={trip.endTime
-                ? trip.endTime.toDate().toLocaleString()
-                : ""}
+              tripStart={formatDate(trip.startTime.toDate())}  
+              tripEnd={trip.endTime ? formatDate(trip.endTime.toDate()) : ""}
               remarks={`${trip.status}`}
               finalFee={trip.finalFee}
               startRack={trip.startRack}

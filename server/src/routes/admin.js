@@ -30,12 +30,18 @@ router.post("/reset", async (req, res) => {
     });
     await bikeBatch.commit();
 
-    // clear/delete active trips
+    // clear/delete trips not demotrips
+    // CONSIDER: clear/delete completed trips EXCEPT trips named demotripX 
+      // so we have hardcoded trips na for showing ui/cerifying rewards
+      // everything else is for user testing
     const tripsSnapshot = await db.collection("trips").get();
     const tripBatch = db.batch();
     tripsSnapshot.forEach((doc) => {
       const data = doc.data();
-      if (data.status === "active") {
+      const isDemoTrip = doc.id.includes("demotrip");
+      const shouldDelete = (data.status === "active" || data.status === "completed") && !isDemoTrip;
+
+      if (shouldDelete) {
         tripBatch.delete(doc.ref);
       }
     });
@@ -53,17 +59,13 @@ router.post("/reset", async (req, res) => {
     });
     await userBatch.commit();
 
-    // CONSIDER: clear/delete completed trips EXCEPT trips named demotripX ?
-        // so we have hardcoded trips na for showing ui/cerifying rewards
-        // everything else is for user testing
-
     // reset credits to 5
-    const usersSnapshot3 = await db.collection("users").get();
-    const batch2 = db.batch();
-    usersSnapshot3.forEach((doc) => {
-      batch2.update(doc.ref, { credits: 5 });
-    });
-    await batch2.commit();
+    // const usersSnapshot3 = await db.collection("users").get();
+    // const batch2 = db.batch();
+    // usersSnapshot3.forEach((doc) => {
+    //   batch2.update(doc.ref, { credits: 5 });
+    // });
+    // await batch2.commit();
 
     res.status(200).json({ message: "Database reset, ready for demo" });
   } catch (err) {

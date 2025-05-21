@@ -23,6 +23,8 @@ import globalStyles from "@/src/assets/styles";
 import { preRentCheck } from "@/src/service/tripService";
 import { useBike } from "@/context/BikeContext";
 import ErrorModal from "@/src/components/ErrorModal";
+import SuccessModal from "@/src/components/SuccessModal";
+import { formatDate } from "@/src/service/tripService";
 
 type BikeContextType = {
   rackId: string;
@@ -42,6 +44,8 @@ export default function ActionPage() {
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
   const userId = "user123";
   const rackId = "rack123";
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -64,28 +68,27 @@ export default function ActionPage() {
     }
   };
 
+  const fetchTrips = async () => {
+    try {
+      const tripsCollection = collection(db, "trips");
+      const tripSnapshot = await getDocs(tripsCollection);
+
+      const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
+        ...(doc.data() as Trip),
+        id: doc.id,
+      }));
+
+      const active = allTrips.filter((trip) => trip.status === "reserved");
+
+      setActiveTrips(active);
+
+      console.log("[APP] Reserved Trips:", active);
+    } catch (error) {
+      console.error("Error fetching trips:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const tripsCollection = collection(db, "trips");
-        const tripSnapshot = await getDocs(tripsCollection);
-
-        const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
-          ...(doc.data() as Trip),
-          id: doc.id,
-        }));
-
-        const active = allTrips.filter((trip) => trip.status === "reserved");
-
-        setActiveTrips(active);
-
-        console.log("[APP] Reserved Trips:", active);
-      } catch (error) {
-        console.error("Error fetching trips:", error);
-      }
-    };
-
     fetchTrips();
   }, []);
 
@@ -128,7 +131,7 @@ export default function ActionPage() {
         </View>
         <View style={{ marginHorizontal: 20 }}>
           { activeTrips.length === 0 ? (
-            <Text style={[globalStyles.detail, {fontSize: 20}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
+            <Text style={[globalStyles.detail, {fontSize: 18}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
           ) : ( 
             activeTrips.map((trip, index) => (
               <TripCard
@@ -136,15 +139,30 @@ export default function ActionPage() {
                 key={index}
                 title={`Reservation from`}
                 bikeID={`${trip.bikeId}`}
-                tripStart={`${trip.startTime.toDate().toLocaleString()}`}
+                tripStart={formatDate(trip.startTime.toDate())}
                 tripEnd=""
                 remarks={`${trip.status}`}
                 startRack={trip.startRack}
                 endRack=""
+                onTripCancelled={() => {
+                  setSuccessMessage("Reservation cancelled.");
+                  setShowSuccessModal(true);
+                  fetchTrips();
+                }}
+                onCancelError={(message) => {
+                  setErrorMessage(message);
+                  setShowErrorModal(true);
+                }}
               />
             ))
           )}
         </View>
+        <SuccessModal
+          title="Success"
+          description1={successMessage}
+          showSuccessModal={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+        />
         <ErrorModal
           title="Error"
           description={errorMessage}

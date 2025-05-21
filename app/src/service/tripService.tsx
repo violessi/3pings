@@ -1,6 +1,6 @@
 import { BikeSchema, RackSchema } from "@/types/schema";
 
-const IP_ADDRESS = "10.147.40.131"; // change to your laptop's/server's IP
+const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
 const SERVER_URL =
   "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
@@ -243,23 +243,24 @@ export const payTrip = async (tripId: string, minusCredits: number, minusBalance
 };
 
 // ======================FORMAT DATE/TIME======================
-export const formatDate = (dateString: string): string => {
-  if (dateString) {
-    const date = new Date(dateString);
+export const formatDate = (input: string | Date): string => {
+  if (!input) return "";
 
-    const options: Intl.DateTimeFormatOptions = {
-      month: "short",
-      day: "numeric",
-    };
+  const date = typeof input === "string" ? new Date(input) : input;
 
-    const datePart = date.toLocaleDateString("en-US", options);
-    const timePart = date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
+  if (isNaN(date.getTime())) return "Invalid Date";
 
-    return `${datePart} (${timePart})`;
-  }
-  return "";
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
+
+  const datePart = date.toLocaleDateString("en-US", options);
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${datePart} (${timePart})`;
 };

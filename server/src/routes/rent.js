@@ -153,6 +153,7 @@ router.post("/createTrip", async (req, res) => {
       reservedTripId,
       startRack,
       endRack,
+      paid,
     } = req.body;
     const isReservation = status === "reserved"; // set if reserving a new trip
 
