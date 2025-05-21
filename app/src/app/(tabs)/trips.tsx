@@ -12,7 +12,6 @@ import TripCard from "@/src/components/TripCard";
 import { formatDate } from "@/src/service/tripService";
 import { useBike } from "@/src/context/BikeContext";
 
-
 export default function TripScreen() {
   const [completedTrips, setCompletedTrips] = useState<Trip[]>([]);
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
@@ -28,13 +27,9 @@ export default function TripScreen() {
         id: doc.id,
       }));
 
-      const active = allTrips.filter(trip =>
-        trip.status === "active"
-      );
+      const active = allTrips.filter((trip) => trip.status === "active");
 
-      const completed = allTrips.filter(trip =>
-        trip.status === "completed"
-      );
+      const completed = allTrips.filter((trip) => trip.status === "completed");
 
       setActiveTrips(active);
       setCompletedTrips(completed);
@@ -51,19 +46,19 @@ export default function TripScreen() {
   }, []);
 
   useEffect(() => {
-  const fetchTrips = async () => {
-    const tripsCollection = collection(db, "trips");
-    const tripSnapshot = await getDocs(tripsCollection);
-    const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
-      ...(doc.data() as Trip),
-      id: doc.id,
-    }));
-    const active = allTrips.filter((trip) => trip.status === "active");
-    setActiveTrips(active);
-  };
+    const fetchTrips = async () => {
+      const tripsCollection = collection(db, "trips");
+      const tripSnapshot = await getDocs(tripsCollection);
+      const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
+        ...(doc.data() as Trip),
+        id: doc.id,
+      }));
+      const active = allTrips.filter((trip) => trip.status === "active");
+      setActiveTrips(active);
+    };
 
-  fetchTrips();
-}, [refreshTripsFlag]);
+    fetchTrips();
+  }, [refreshTripsFlag]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -73,16 +68,24 @@ export default function TripScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={globalStyles.title}> Active </Text>
-        { activeTrips.length === 0 ? (
-          <Text style={[globalStyles.detail, {fontSize: 18}, {marginBottom: 30}]}>No trips to show.</Text>
-        ) : (  
+        {activeTrips.length === 0 ? (
+          <Text
+            style={[
+              globalStyles.detail,
+              { fontSize: 18 },
+              { marginBottom: 30 },
+            ]}
+          >
+            No trips to show.
+          </Text>
+        ) : (
           activeTrips.map((trip, index) => (
             <TripCard
               key={index}
               tripID={trip.id}
               title={`Trip from`}
               bikeID={`${trip.bikeId}`}
-              tripStart={formatDate(trip.startTime.toDate())}  
+              tripStart={formatDate(trip.startTime.toDate())}
               tripEnd={trip.endTime ? formatDate(trip.endTime.toDate()) : ""}
               remarks={`${trip.status}`}
               finalFee={trip.finalFee}
@@ -93,16 +96,24 @@ export default function TripScreen() {
           ))
         )}
         <Text style={globalStyles.title}> Completed </Text>
-        { completedTrips.length === 0 ? (
-          <Text style={[globalStyles.detail, {fontSize: 18},{marginBottom: 30}]}>No trips to show.</Text>
-        ) : ( 
+        {completedTrips.length === 0 ? (
+          <Text
+            style={[
+              globalStyles.detail,
+              { fontSize: 18 },
+              { marginBottom: 30 },
+            ]}
+          >
+            No trips to show.
+          </Text>
+        ) : (
           completedTrips.map((trip, index) => (
             <TripCard
               key={index}
               tripID={trip.id}
               title={`Trip from`}
               bikeID={`${trip.bikeId}`}
-              tripStart={formatDate(trip.startTime.toDate())}  
+              tripStart={formatDate(trip.startTime.toDate())}
               tripEnd={trip.endTime ? formatDate(trip.endTime.toDate()) : ""}
               remarks={`${trip.status}`}
               finalFee={trip.finalFee}

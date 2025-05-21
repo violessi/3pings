@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, Text, View, Image } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { getDoc, doc, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  getDoc,
+  doc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 
 import globalStyles from "@/src/assets/styles";
@@ -39,6 +46,47 @@ export default function Reserve() {
   const [expiryTimeStr, setExpiryTimeStr] = useState<string>("");
 
   // fetch rack info to display in card
+
+  const handleReserve = async () => {
+    try {
+      const res = await reserveABike(selectedDate);
+      setAssignedBike(res);
+      const now = new Date();
+      const expiry = new Date(now.getTime() + 15 * 60 * 1000);
+
+      const formattedExpiry = expiry.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      setExpiryTimeStr(formattedExpiry);
+    } catch (err: any) {
+      console.log("Reserve error:", err.message);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    router.replace("/(tabs)/action");
+  };
+
+  const handleBack = () => {
+    updateRackId("");
+    router.replace("/"); // go back to index
+  };
+
+  // define images mapping
+  const dcs = require("@/src/assets/images/dcs.jpg");
+  const cal = require("@/src/assets/images/cal.jpg");
+  const im = require("@/src/assets/images/im.png");
+  const vh = require("@/src/assets/images/vinzons.jpg");
+
+  const rackImages: Record<string, any> = {
+    rack123: dcs,
+    rack456: im,
+    rack789: cal,
+    rackABC: vh,
+  };
+
   useEffect(() => {
     updateRackId(rackID); // raising a problem, but works
     if (!rackID || typeof rackID !== "string") return;
@@ -53,12 +101,19 @@ export default function Reserve() {
         }
 
         const rackData = rackDoc.data();
-        const bikesQuery = query(collection(db, "bikes"), where("rackId", "==", rackID));
+        const bikesQuery = query(
+          collection(db, "bikes"),
+          where("rackId", "==", rackID)
+        );
         const bikesSnapshot = await getDocs(bikesQuery);
         const bikes = bikesSnapshot.docs.map((doc) => doc.data());
 
-        const availableCount = bikes.filter((b) => b.status === "available").length;
-        const reservedCount = bikes.filter((b) => b.status === "reserved").length;
+        const availableCount = bikes.filter(
+          (b) => b.status === "available"
+        ).length;
+        const reservedCount = bikes.filter(
+          (b) => b.status === "reserved"
+        ).length;
         const emptySlots = 5 - availableCount - reservedCount;
 
         setRackData({
@@ -81,54 +136,24 @@ export default function Reserve() {
     // prevent modal from reappearing if already set from a previous page
     setShowSuccessModal(false);
   }, []);
-
-
-  const handleReserve = async () => {
-    try {
-      const res = await reserveABike(selectedDate);
-      setAssignedBike(res);
-      const now = new Date();
-      const expiry = new Date(now.getTime() + 15 * 60 * 1000);
-
-      const formattedExpiry = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setExpiryTimeStr(formattedExpiry);
-    } catch (err: any) {
-      console.log("Reserve error:", err.message);
-    }
-  };
-
-  const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false);
-    router.replace("/(tabs)/action");
-  };
-
-  const handleBack = () => {
-    updateRackId("");
-    router.replace("/"); // go back to index 
-  };
-
-  // define images mapping
-  const dcs = require("@/src/assets/images/dcs.jpg");
-  const cal = require("@/src/assets/images/cal.jpg");
-  const im = require("@/src/assets/images/im.png");
-  const vh = require("@/src/assets/images/vinzons.jpg");
-
-  const rackImages: Record<string, any> = {
-    rack123: dcs,
-    rack456: im,
-    rack789: cal,
-    rackABC: vh,
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Header title="Reserve" subtitle="Reserve a bike from this rack!" hasBack={true} prevCallback={handleBack} />
+      <Header
+        title="Reserve"
+        subtitle="Reserve a bike from this rack!"
+        hasBack={true}
+        prevCallback={handleBack}
+      />
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Text style={globalStyles.title}>{rackData?.name}</Text>
 
         <View style={{ marginBottom: 25 }}>
           {rackID && rackImages[rackID] && (
-            <Image source={rackImages[rackID]} style={{ width: '100%', height: 200, borderRadius: 10 }} resizeMode="cover" />
+            <Image
+              source={rackImages[rackID]}
+              style={{ width: "100%", height: 200, borderRadius: 10 }}
+              resizeMode="cover"
+            />
           )}
         </View>
 
@@ -138,13 +163,15 @@ export default function Reserve() {
         <ReserveForm onReserve={handleReserve} />
 
         <LoadingModal showLoadingModal={showLoadingModal} />
-        { rackData && <SuccessModal
-          title="Bike reserved successfully!"
-          description1={`Please make sure to claim your bike from the ${rackData.location}.`}
-          description2={`Reservation holds until ${expiryTimeStr}.`}
-          showSuccessModal={showSuccessModal}
-          onClose={handleCloseSuccessModal}
-        />}
+        {rackData && (
+          <SuccessModal
+            title="Bike reserved successfully!"
+            description1={`Please make sure to claim your bike from the ${rackData.location}.`}
+            description2={`Reservation holds until ${expiryTimeStr}.`}
+            showSuccessModal={showSuccessModal}
+            onClose={handleCloseSuccessModal}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

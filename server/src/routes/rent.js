@@ -4,7 +4,7 @@ const { admin, db } = require("../config/firebaseAdmin");
 const router = express.Router();
 router.use(express.json());
 
-const ESP32_IP = "http://10.147.40.142:1234";
+const ESP32_IP = "http://10.147.40.116:1234";
 
 // ========================= SERVER TO DB =========================
 
@@ -38,7 +38,7 @@ router.post("/preCheck", async (req, res) => {
 
     const reservedTripsRef = db
       .collection("trips")
-      .where("status", "==", "reserved")
+      .where("status", "==", "reserved");
     const reservedTripsSnap = await reservedTripsRef.get();
     const batch = db.batch();
 

@@ -1,6 +1,6 @@
 import { BikeSchema, RackSchema } from "@/types/schema";
 
-const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.147.40.131"; // change to your laptop's/server's IP
 const SERVER_URL =
   "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
@@ -47,8 +47,10 @@ export const createATrip = async (payload: CreateTrip) => {
 
 export const getRack = async (rackId: string) => {
   try {
-    const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/getRack/${rackId}`,{
-    // const res = await fetch(`${SERVER_URL}api/rent/getRack/${rackId}`,{
+    const res = await fetch(
+      `http://${IP_ADDRESS}:3000/api/rent/getRack/${rackId}`,
+      {
+        // const res = await fetch(`${SERVER_URL}api/rent/getRack/${rackId}`,{
         method: "GET",
       }
     );
@@ -66,8 +68,10 @@ export const getRack = async (rackId: string) => {
 
 export const getBike = async (bikeId: string) => {
   try {
-    const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/getBike/${bikeId}`, {
-    // const res = await fetch(`${SERVER_URL}api/rent/getBike/${bikeId}`,{
+    const res = await fetch(
+      `http://${IP_ADDRESS}:3000/api/rent/getBike/${bikeId}`,
+      {
+        // const res = await fetch(`${SERVER_URL}api/rent/getBike/${bikeId}`,{
         method: "GET",
       }
     );
@@ -85,12 +89,12 @@ export const getBike = async (bikeId: string) => {
 
 export const preRentCheck = async (userId: string) => {
   const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/preCheck`, {
-  // const res = await fetch(`${SERVER_URL}api/rent/preCheck`, {
+    // const res = await fetch(`${SERVER_URL}api/rent/preCheck`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({userId}),
+    body: JSON.stringify({ userId }),
   });
 
   const data = await res.json();
@@ -99,8 +103,10 @@ export const preRentCheck = async (userId: string) => {
 
 export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
   try {
-    const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/getAvailableBikes/${rackId}`, {
-    // const res = await fetch(`${SERVER_URL}api/rent/getAvailableBikes/${rackId}`, {
+    const res = await fetch(
+      `http://${IP_ADDRESS}:3000/api/rent/getAvailableBikes/${rackId}`,
+      {
+        // const res = await fetch(`${SERVER_URL}api/rent/getAvailableBikes/${rackId}`, {
         method: "GET",
       }
     );
@@ -151,15 +157,21 @@ export const hardwareRequest = async (payload: { bikeId: string }) => {
 
 // ======================RESERVE=============================
 
-export const getUserReservedTrip = async (payload: { userId: string; rackId: string }) => {
-  const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/getReservedTrip`, {
-  // const res = await fetch(`${SERVER_URL}api/reserve/getReservedTrip`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+export const getUserReservedTrip = async (payload: {
+  userId: string;
+  rackId: string;
+}) => {
+  const res = await fetch(
+    `http://${IP_ADDRESS}:3000/api/reserve/getReservedTrip`,
+    {
+      // const res = await fetch(`${SERVER_URL}api/reserve/getReservedTrip`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (!res.ok) {
     throw new Error("Failed to fetch reserved trip");
@@ -174,14 +186,17 @@ export const deleteTrip = async (payload: {
   tripId: string;
 }) => {
   try {
-    const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/deleteReservedTrip`, {
-    // const res = await fetch(`${SERVER_URL}api/reserve/deleteReservedTrip`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(
+      `http://${IP_ADDRESS}:3000/api/reserve/deleteReservedTrip`,
+      {
+        // const res = await fetch(`${SERVER_URL}api/reserve/deleteReservedTrip`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     if (!res.ok) {
       const errorData = await res.json();
@@ -203,7 +218,7 @@ export const handleReturn = async (payload: {
 }) => {
   try {
     const res = await fetch(`http://${IP_ADDRESS}:3000/api/return/request`, {
-    // const res = await fetch(`${SERVER_URL}api/return/request`, {
+      // const res = await fetch(`${SERVER_URL}api/return/request`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -224,15 +239,19 @@ export const handleReturn = async (payload: {
 };
 
 // ======================PAY FOR A TRIP======================
-export const payTrip = async (tripId: string, minusCredits: number, minusBalance: number) => {
+export const payTrip = async (
+  tripId: string,
+  minusCredits: number,
+  minusBalance: number
+) => {
   try {
     const res = await fetch(`http://${IP_ADDRESS}:3000/api/pay/payTrip`, {
-    // const res = await fetch(`${SERVER_URL}api/pay/payTrip`, {
+      // const res = await fetch(`${SERVER_URL}api/pay/payTrip`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({tripId, minusCredits, minusBalance})
+      body: JSON.stringify({ tripId, minusCredits, minusBalance }),
     });
 
     return await res.json(); // return server response

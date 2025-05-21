@@ -2,7 +2,7 @@ const { admin, db } = require("../config/firebaseAdmin");
 
 const RACK_THRESHOLD = 5; // Max bikes per rack
 const RATE_INTERVAL = 15; // Billing interval in minutes
-const ESP32_BASE_URL = "http://10.147.40.142:1234";
+const ESP32_BASE_URL = "http://10.147.40.116:1234";
 
 // Handle initial return request
 async function requestBikeReturn(req, res) {
