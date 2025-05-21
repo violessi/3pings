@@ -61,14 +61,6 @@ router.post("/reset", async (req, res) => {
     });
     await userBatch.commit();
 
-    // reset credits to 5
-    // const usersSnapshot3 = await db.collection("users").get();
-    // const batch2 = db.batch();
-    // usersSnapshot3.forEach((doc) => {
-    //   batch2.update(doc.ref, { credits: 5 });
-    // });
-    // await batch2.commit();
-
     res.status(200).json({ message: "Database reset, ready for demo" });
   } catch (err) {
     console.error("Error resetting:", err);

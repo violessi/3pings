@@ -23,7 +23,6 @@ export default function ProfileScreen() {
   const [pendingFees, setPendingFees] = useState(0);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
   const { setRefreshTripsFlag } = useBike();
 
   const handleReset = async () => {
@@ -175,24 +174,25 @@ export default function ProfileScreen() {
       {/* show total credits* and list preview rewards */}
       {/* 'see more' -> clicking goes to a full page to view */}
       {/* add total credits (not necessarily same as total of rewards), so outside card */}
-      {/*
-      <Text style={globalStyles.title}> Spin Credits </Text>
-      <Text className="text-base w-full ml-5 mb-2 font-semibold text-gray-800">Total Credits: ₱{totalCredits}</Text>
-      <Card onPress={() => router.push("../payment/credits")} style={{backgroundColor: "#fff"}}>
-        <View className="mt-2">
-          {rewardsData.map((reward) => (
-            <View key={reward.id} className="text-sm text-gray-600">
-              <Text className="text-sm text-gray-600">⭐ {reward.reqs[2]} - ₱{reward.prize}</Text>
-            </View>
-          ))}
-        </View>
-        <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>See all claimed rewards</Text>
-      </Card> 
-      */}
+
       <Text style={globalStyles.title}> Demo Functions </Text>
       <TouchableOpacity onPress={() => handleReset()}>
         <Text>Reset Demo</Text>
       </TouchableOpacity>
+      
+      <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>See all rewards</Text>
+      
+      <LoadingModal showLoadingModal={showLoadingModal} />
+      <SuccessModal
+        title="Reset successful!"
+        description1="You're ready for a demo."
+        showSuccessModal={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          router.replace("/action"); // or use push/pop if needed
+        }}
+      />
+
 
       </ScrollView>
     </SafeAreaView>
