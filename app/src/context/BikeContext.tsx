@@ -8,6 +8,7 @@ import {
   preRentCheck,
   handleReturn,
   hardwareRequest,
+  payTrip,
 } from "@/service/tripService";
 import { listenToBikeStatus, listenToTrip } from "@/service/listeners";
 
@@ -57,10 +58,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [isLate, setIsLate] = useState(false);
   const [refreshTripsFlag, setRefreshTripsFlag] = useState(false);
-
 
   function updateRackId(newRackId: string) {
     setRackId(newRackId);
@@ -398,15 +397,13 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // set parameters/payload (tripid, minusbalance)
       // call function from tripService
       const res = await payTrip(tripId, minusBalance);
+      setShowLoadingModal(false);
       // that will handle server posts/functions
       // await and store response, return response as success
       // console.log("Payment successful:", response);
-
     } catch (err: any) {
       setShowLoadingModal(false);
       throw new Error(`Payment failed: ${err.message}`);
-      setShowErrorModal(true);
-      return null;
     }
   }
 
@@ -433,13 +430,13 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         setRefreshTripsFlag,
       }}
     >
-    {children}
-    <ErrorModal
-      title="Error"
-      description={errorMessage}
-      showErrorModal={showErrorModal}
-      onClose={() => setShowErrorModal(false)}
-    />
+      {children}
+      <ErrorModal
+        title="Error"
+        description={errorMessage}
+        showErrorModal={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+      />
     </BikeContext.Provider>
   );
 };

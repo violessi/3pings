@@ -33,61 +33,15 @@ export default function Pay() {
     payForTrip,
   } = useBike();
 
-  const [startString, setStartString]  = useState("");
-  const [endString, setEndString]  = useState("");
-  const [feeString, setFeeString]  = useState("");
-  const [feeAddtlString, setAddtlString]  = useState("");
-  const [finalFee, setFinalFee]       = useState(0);
-  const [currentBalance, setBalance]  = useState(0);
-  const [newBalance, setNewBalance]  = useState(0);
+  const [startString, setStartString] = useState("");
+  const [endString, setEndString] = useState("");
+  const [feeString, setFeeString] = useState("");
+  const [feeAddtlString, setAddtlString] = useState("");
+  const [finalFee, setFinalFee] = useState(0);
+  const [currentBalance, setBalance] = useState(0);
+  const [newBalance, setNewBalance] = useState(0);
 
-  const [errorString, setErrorString]  = useState("");
-
-  useEffect(() => {
-    if (!tripId) return;
-
-    (async () => {
-      // Trip
-      const snap = await getDoc(doc(db, "trips", tripId));
-      if (snap.exists()){
-        const trip = snap.data();
-        
-        const startSnap = await getDoc(doc(db, "racks", trip.startRack));
-        if(startSnap.exists()){
-          const startName = startSnap.data().rackName;
-          const startTime = formatDate(trip.startTime.toDate().toLocaleString());
-          setStartString(`${startName}\n${startTime}\n`);
-        }
-        const endSnap = await getDoc(doc(db, "racks", trip.endRack));
-        if(endSnap.exists()){
-          const endName = endSnap.data().rackName;
-          const endTime = formatDate(trip.endTime.toDate().toLocaleString());
-          setEndString(`${endName}\n${endTime}`);
-        }
-
-        const durationMinutes = Math.ceil((trip.endTime.toDate() - trip.startTime.toDate()) / (1000 * 60));
-        const baseFee = Math.ceil(durationMinutes / trip.rateInterval) * trip.baseRate;
-        const feeString = `₱${trip.baseRate} / ${trip.rateInterval} mins x ${durationMinutes} mins = ₱${baseFee}`;
-        setFinalFee(trip.finalFee ?? 0);
-        setFeeString(feeString);
-
-        if (trip.addtlCharge){
-          setAddtlString(`LATE ₱${trip.addtlCharge}`);
-        }
-        else {
-          setAddtlString(`NO LATE FEES`);
-        }
-        
-      }
-      // User balance 
-      const userSnap = await getDoc(doc(db, "users", "user123"));
-      if (userSnap.exists()){
-        const user = userSnap.data();
-        setBalance(user.balance ?? 0);
-        setNewBalance(user.balance - finalFee);
-      }
-    })();
-  }, [tripId]);
+  const [errorString, setErrorString] = useState("");
 
   const handleButtonPress = async () => {
     try {
@@ -124,11 +78,46 @@ export default function Pay() {
     (async () => {
       // Trip
       const snap = await getDoc(doc(db, "trips", tripId));
-      if (snap.exists()) setFinalFee(snap.data().finalFee ?? 0);
+      if (snap.exists()) {
+        const trip = snap.data();
 
-      // User credits
+        const startSnap = await getDoc(doc(db, "racks", trip.startRack));
+        if (startSnap.exists()) {
+          const startName = startSnap.data().rackName;
+          const startTime = formatDate(
+            trip.startTime.toDate().toLocaleString()
+          );
+          setStartString(`${startName}\n${startTime}\n`);
+        }
+        const endSnap = await getDoc(doc(db, "racks", trip.endRack));
+        if (endSnap.exists()) {
+          const endName = endSnap.data().rackName;
+          const endTime = formatDate(trip.endTime.toDate().toLocaleString());
+          setEndString(`${endName}\n${endTime}`);
+        }
+
+        const durationMinutes = Math.ceil(
+          (trip.endTime.toDate() - trip.startTime.toDate()) / (1000 * 60)
+        );
+        const baseFee =
+          Math.ceil(durationMinutes / trip.rateInterval) * trip.baseRate;
+        const feeString = `₱${trip.baseRate} / ${trip.rateInterval} mins x ${durationMinutes} mins = ₱${baseFee}`;
+        setFinalFee(trip.finalFee ?? 0);
+        setFeeString(feeString);
+
+        if (trip.addtlCharge) {
+          setAddtlString(`LATE ₱${trip.addtlCharge}`);
+        } else {
+          setAddtlString(`NO LATE FEES`);
+        }
+      }
+      // User balance
       const userSnap = await getDoc(doc(db, "users", "user123"));
-      if (userSnap.exists()) setTotalCred(userSnap.data().credits ?? 0);
+      if (userSnap.exists()) {
+        const user = userSnap.data();
+        setBalance(user.balance ?? 0);
+        setNewBalance(user.balance - finalFee);
+      }
     })();
   }, [tripId]);
 
@@ -152,7 +141,7 @@ export default function Pay() {
       {/* set amount of credits to use, max allowable = total credits OR finalFee*/}
       {/* i think need to set minusCredits and minusBalance on button press... but also go to payForTrip() with payload*/}
       {/* set minusCredits = amount set by user; set minusBalance = diff of finalFee and minusCredits*/}
-      
+
       <View className="px-4 mt-4">
         <Text className="font-medium">Payment Breakdown:</Text>
         <Text>{feeString}</Text>
@@ -161,8 +150,8 @@ export default function Pay() {
       </View>
 
       <View className="px-4 py-2">
-        <Text >Current Balance: {currentBalance}</Text>
-        <Text >New Balance: {newBalance}</Text>
+        <Text>Current Balance: {currentBalance}</Text>
+        <Text>New Balance: {newBalance}</Text>
       </View>
 
       <View className="px-4 mt-4">
@@ -173,8 +162,17 @@ export default function Pay() {
 
       {/* loading, success, and error modal */}
       <LoadingModal showLoadingModal={showLoadingModal} />
-      <SuccessModal title="Payment Successful" showSuccessModal={showSuccessModal} onClose={handleCloseSuccessModal} />
-      <ErrorModal title="Error" description={errorString} showErrorModal={showErrorModal} onClose={() => setShowErrorModal(false)} /> 
+      <SuccessModal
+        title="Payment Successful"
+        showSuccessModal={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+      />
+      <ErrorModal
+        title="Error"
+        description={errorString}
+        showErrorModal={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+      />
     </SafeAreaView>
   );
 }
