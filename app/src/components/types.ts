@@ -12,6 +12,7 @@ export type Trip = {
   paid: boolean;
   startRack: string;
   endRack: string;
+  finalFee: number;
 };
 
 export type Rack = {
@@ -20,6 +21,7 @@ export type Rack = {
   available: number;
   reserved: number;
   empty: number;
+  rackSlot: any;
 };
 
 export type Reward = {

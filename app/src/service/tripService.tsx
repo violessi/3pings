@@ -50,7 +50,7 @@ export const getRack = async (rackId: string) => {
     const res = await fetch(
       `http://${IP_ADDRESS}:3000/api/rent/getRack/${rackId}`,
       {
-        // const res = await fetch(`${SERVER_URL}api/rent/getRack/${rackId}`, {
+        // const res = await fetch(`${SERVER_URL}api/rent/getRack/${rackId}`,{
         method: "GET",
       }
     );
@@ -71,7 +71,7 @@ export const getBike = async (bikeId: string) => {
     const res = await fetch(
       `http://${IP_ADDRESS}:3000/api/rent/getBike/${bikeId}`,
       {
-        // const res = await fetch(`${SERVER_URL}api/rent/getBike/${bikeId}`, {
+        // const res = await fetch(`${SERVER_URL}api/rent/getBike/${bikeId}`,{
         method: "GET",
       }
     );
@@ -87,14 +87,14 @@ export const getBike = async (bikeId: string) => {
   }
 };
 
-export const preRentCheck = async (userId: string, rackId: string) => {
+export const preRentCheck = async (userId: string) => {
   const res = await fetch(`http://${IP_ADDRESS}:3000/api/rent/preCheck`, {
     // const res = await fetch(`${SERVER_URL}api/rent/preCheck`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ userId, rackId }),
+    body: JSON.stringify({ userId }),
   });
 
   const data = await res.json();
@@ -106,9 +106,7 @@ export const getAvailableBikes = async (rackId: string): Promise<Bike[]> => {
     const res = await fetch(
       `http://${IP_ADDRESS}:3000/api/rent/getAvailableBikes/${rackId}`,
       {
-        // const res = await fetch(
-        //   `${SERVER_URL}api/rent/getAvailableBikes/${rackId}`,
-        //   {
+        // const res = await fetch(`${SERVER_URL}api/rent/getAvailableBikes/${rackId}`, {
         method: "GET",
       }
     );
@@ -241,21 +239,20 @@ export const handleReturn = async (payload: {
 };
 
 // ======================PAY FOR A TRIP======================
-export const payTrip = async (tripId: string) => {
+export const payTrip = async (
+  tripId: string,
+  minusCredits: number,
+  minusBalance: number
+) => {
   try {
-    // const res = await fetch(`http://${IP_ADDRESS}:3000/api/reserve/payTrip`, {
-    const res = await fetch(`${SERVER_URL}api/reserve/payTrip`, {
+    const res = await fetch(`http://${IP_ADDRESS}:3000/api/pay/payTrip`, {
+      // const res = await fetch(`${SERVER_URL}api/pay/payTrip`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(tripId),
+      body: JSON.stringify({ tripId, minusCredits, minusBalance }),
     });
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.error || "Failed to delete trip");
-    }
 
     return await res.json(); // return server response
   } catch (err) {
@@ -265,23 +262,24 @@ export const payTrip = async (tripId: string) => {
 };
 
 // ======================FORMAT DATE/TIME======================
-export const formatDate = (dateString: string): string => {
-  if (dateString) {
-    const date = new Date(dateString);
+export const formatDate = (input: string | Date): string => {
+  if (!input) return "";
 
-    const options: Intl.DateTimeFormatOptions = {
-      month: "short",
-      day: "numeric",
-    };
+  const date = typeof input === "string" ? new Date(input) : input;
 
-    const datePart = date.toLocaleDateString("en-US", options);
-    const timePart = date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
+  if (isNaN(date.getTime())) return "Invalid Date";
 
-    return `${datePart} (${timePart})`;
-  }
-  return "";
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
+
+  const datePart = date.toLocaleDateString("en-US", options);
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${datePart} (${timePart})`;
 };

@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, Text, View, Image } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { getDoc, doc, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  getDoc,
+  doc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 
 import globalStyles from "@/src/assets/styles";
@@ -36,48 +43,22 @@ export default function Reserve() {
 
   // reserves from current time
   const selectedDate = new Date();
+  const [expiryTimeStr, setExpiryTimeStr] = useState<string>("");
 
   // fetch rack info to display in card
-  useEffect(() => {
-    updateRackId(rackID); // raising a problem, but works
-    if (!rackID || typeof rackID !== "string") return;
-
-    const fetchRackInfo = async () => {
-      try {
-        const rackDoc = await getDoc(doc(db, "racks", rackID));
-        if (!rackDoc.exists()) {
-          console.error("[APP] Rack not found"); // PLACEHOLDER; modal/go back
-          return;
-        }
-
-        const rackData = rackDoc.data();
-        const bikesQuery = query(collection(db, "bikes"), where("rackId", "==", rackID));
-        const bikesSnapshot = await getDocs(bikesQuery);
-        const bikes = bikesSnapshot.docs.map((doc) => doc.data());
-
-        const availableCount = bikes.filter((b) => b.status === "available").length;
-        const reservedCount = bikes.filter((b) => b.status === "reserved").length;
-        const emptySlots = 5 - bikes.length; // PLACEHOLDER; HARDCODED
-
-        setRackData({
-          name: rackData.rack_name,
-          location: rackData.location,
-          available: availableCount,
-          reserved: reservedCount,
-          empty: emptySlots,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchRackInfo();
-  }, [rackID]);
 
   const handleReserve = async () => {
     try {
       const res = await reserveABike(selectedDate);
       setAssignedBike(res);
+      const now = new Date();
+      const expiry = new Date(now.getTime() + 15 * 60 * 1000);
+
+      const formattedExpiry = expiry.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      setExpiryTimeStr(formattedExpiry);
     } catch (err: any) {
       console.log("Reserve error:", err.message);
     }
@@ -90,16 +71,90 @@ export default function Reserve() {
 
   const handleBack = () => {
     updateRackId("");
-    router.canGoBack() ? router.back() : router.replace("/");
+    router.replace("/"); // go back to index
   };
 
+  // define images mapping
+  const dcs = require("@/src/assets/images/dcs.jpg");
+  const cal = require("@/src/assets/images/cal.jpg");
+  const im = require("@/src/assets/images/im.png");
+  const vh = require("@/src/assets/images/vinzons.jpg");
+
+  const rackImages: Record<string, any> = {
+    rack123: dcs,
+    rack456: im,
+    rack789: cal,
+    rackABC: vh,
+  };
+
+  useEffect(() => {
+    updateRackId(rackID); // raising a problem, but works
+    if (!rackID || typeof rackID !== "string") return;
+
+    const fetchRackInfo = async () => {
+      try {
+        console.log("Getting rack:", rackID);
+        const rackDoc = await getDoc(doc(db, "racks", rackID));
+        if (!rackDoc.exists()) {
+          console.error("[APP] Rack not found"); // PLACEHOLDER; modal/go back
+          return;
+        }
+
+        const rackData = rackDoc.data();
+        const bikesQuery = query(
+          collection(db, "bikes"),
+          where("rackId", "==", rackID)
+        );
+        const bikesSnapshot = await getDocs(bikesQuery);
+        const bikes = bikesSnapshot.docs.map((doc) => doc.data());
+
+        const availableCount = bikes.filter(
+          (b) => b.status === "available"
+        ).length;
+        const reservedCount = bikes.filter(
+          (b) => b.status === "reserved"
+        ).length;
+        const emptySlots = 5 - availableCount - reservedCount;
+
+        setRackData({
+          name: rackData.rackName,
+          location: rackData.location,
+          available: availableCount,
+          reserved: reservedCount,
+          empty: emptySlots,
+          rackSlot: rackData.rackSlot,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchRackInfo();
+  }, [rackID]);
+
+  useEffect(() => {
+    // prevent modal from reappearing if already set from a previous page
+    setShowSuccessModal(false);
+  }, []);
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Header title="Reserve" subtitle="Reserve a bike from this rack!" hasBack={true} prevCallback={handleBack} />
+      <Header
+        title="Reserve"
+        subtitle="Reserve a bike from this rack!"
+        hasBack={true}
+        prevCallback={handleBack}
+      />
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Text style={globalStyles.title}>{rackData?.name}</Text>
-        <View style={{ marginBottom: 10 }}>
-          <Text style={globalStyles.detail}>Map Photo</Text>
+
+        <View style={{ marginBottom: 25 }}>
+          {rackID && rackImages[rackID] && (
+            <Image
+              source={rackImages[rackID]}
+              style={{ width: "100%", height: 200, borderRadius: 10 }}
+              resizeMode="cover"
+            />
+          )}
         </View>
 
         <Text style={globalStyles.subtitle}>Rack Status</Text>
@@ -108,13 +163,15 @@ export default function Reserve() {
         <ReserveForm onReserve={handleReserve} />
 
         <LoadingModal showLoadingModal={showLoadingModal} />
-        <SuccessModal
-          title="Bike reserved successfully!"
-          description1={`Please make sure to claim your bike from slot ${assignedBike?.rackSlot}.`}
-          description2="Reservation holds for 15 mins."
-          showSuccessModal={showSuccessModal}
-          onClose={handleCloseSuccessModal}
-        />
+        {rackData && (
+          <SuccessModal
+            title="Bike reserved successfully!"
+            description1={`Please make sure to claim your bike from the ${rackData.location}.`}
+            description2={`Reservation holds until ${expiryTimeStr}.`}
+            showSuccessModal={showSuccessModal}
+            onClose={handleCloseSuccessModal}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

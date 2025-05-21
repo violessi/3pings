@@ -21,6 +21,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { set } from "zod";
+import ErrorModal from "../components/ErrorModal";
 
 type BikeContextType = {
   rackId: string;
@@ -37,11 +38,15 @@ type BikeContextType = {
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
   returnABike: (userId: string) => Promise<void>;
   cancelReservation: (tripId: string) => void;
-  payForTrip: (tripId: string) => void;
+  payForTrip: (tripId: string, minusCredits: number, minusBalance: number) => Promise<void>;
   getRackNameById: (rackId: string) => Promise<string>;
+  refreshTripsFlag: boolean;
+  setRefreshTripsFlag: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const BikeContext = createContext<BikeContextType | null>(null);
+const [showErrorModal, setShowErrorModal] = useState(false);
+const [errorMessage, setErrorMessage] = useState("");
 
 // PROVIDER COMPONENT
 export const BikeProvider = ({ children }: { children: ReactNode }) => {
@@ -54,6 +59,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLate, setIsLate] = useState(false);
+  const [refreshTripsFlag, setRefreshTripsFlag] = useState(false);
+
 
   function updateRackId(newRackId: string) {
     setRackId(newRackId);
@@ -143,9 +150,9 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  async function doPreRentCheck(userId: string, rackId: string) {
+  async function doPreRentCheck(userId: string) {
     try {
-      const data = await preRentCheck(userId, rackId);
+      const data = await preRentCheck(userId);
       return data;
     } catch (err) {
       console.error("Error in checkReserved:", err);
@@ -167,9 +174,10 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("Invalid rack ID");
       }
 
-      // handle prechecking before renting
-      const result = await doPreRentCheck(userId, rackId);
+      // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
+      const result = await doPreRentCheck(userId);
       if (!result.allowed) {
+        console.log(result.allowed);
         throw new Error(result.reason);
       }
 
@@ -308,7 +316,7 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
 
       const availableBikes = await checkAvailableBikes();
       if (!availableBikes || availableBikes.length === 0) {
-        throw new Error("No available bikes");
+        throw new Error("No available bikes"); // here
       }
 
       const randomIndex = Math.floor(Math.random() * availableBikes.length);
@@ -382,15 +390,18 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
   }
 
   // ============ FULL PAY FUNCTION ============
-  async function payForTrip(tripId: string) {
+  async function payForTrip(tripId: string, minusCredits: number, minusBalance: number) {
     setShowLoadingModal(true);
 
     try {
       console.log("Paying for", tripId);
-      // set parameters/payload
+      // set parameters/payload (tripid, minusbalance, minuscredits)
       // call function from tripService
+      // const res = await payTrip(tripId, minusCredits, minusBalance);
       // that will handle server posts/functions
       // await and store response, return response as success
+      // console.log("Payment successful:", response);
+
     } catch (err: any) {
       setShowLoadingModal(false);
       throw new Error(`Payment failed: ${err.message}`);
@@ -418,9 +429,17 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         cancelReservation,
         payForTrip,
         getRackNameById,
+        refreshTripsFlag,
+        setRefreshTripsFlag,
       }}
     >
-      {children}
+    {children}
+    <ErrorModal
+      title="Error"
+      description={errorMessage}
+      showErrorModal={showErrorModal}
+      onClose={() => setShowErrorModal(false)}
+    />
     </BikeContext.Provider>
   );
 };

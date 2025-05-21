@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import globalStyles from "@/src/assets/styles";
 import { useRouter } from "expo-router";
 import { useBike } from "@/context/BikeContext";
-import { formatDate } from '../service/tripService';
+import LoadingModal from "./LoadingModal";
 
 // fields and style of trip card 
 // displayed in trips page
@@ -15,9 +15,12 @@ type TripCardProps = {
   tripStart: string;
   tripEnd: string;
   remarks: string;
-  addtl_charge?: number;
+  finalFee?: number;
   startRack: string;
   endRack: string;
+  paid?: boolean;
+  onTripCancelled?: () => void;
+  onCancelError?: (message: string) => void;
 };
 
 export default function TripCard({
@@ -27,11 +30,14 @@ export default function TripCard({
   tripStart,
   tripEnd,
   remarks,
-  addtl_charge,
+  finalFee,
   startRack,
   endRack,
+  paid,
+  onTripCancelled,
+  onCancelError,
 }: TripCardProps) {
-  const statusStyles = getStatusStyles(remarks, addtl_charge); // remarks = status string
+  const statusStyles = getStatusStyles(remarks, finalFee, paid); // remarks = status string
   const router = useRouter(); 
   
   const {
@@ -40,7 +46,6 @@ export default function TripCard({
     showErrorModal,
     setShowErrorModal,
     setShowSuccessModal,
-    showLoadingModal,
     updateRackId,
     rentABike,
     reserveABike,
@@ -48,17 +53,24 @@ export default function TripCard({
     getRackNameById
   } = useBike();
 
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  
   const handleCancel = async () => {
     try {
       if (!tripID){
         console.error("No tripId passed to TripCard!");
         return;
       }
+      setShowLoadingModal(true);
       const res = await cancelReservation(tripID);
       updateRackId("");
       console.log("Cancelled.");
+      onTripCancelled?.();
     } catch (err: any) {
       console.log("Error!", err.message); // PLACEHOLDER; replace with modal
+      onCancelError?.("Failed to cancel reservation. Please try again.");
+    } finally {
+      setShowLoadingModal(false);
     }
   };
 
@@ -82,16 +94,16 @@ export default function TripCard({
       <View style={globalStyles.row}>
         {/*Left*/}
         <View style={globalStyles.column}>
-          <Text style={tripStyles.label}>Trip Start: </Text>
-          <Text style={tripStyles.detail}>{formatDate(tripStart)}</Text>
-          <Text style={tripStyles.label}>Trip End: </Text>
-          <Text style={tripStyles.detail}>{formatDate(tripEnd)}</Text>
+          <Text style={tripStyles.label}>Start: </Text>
+          <Text style={tripStyles.detail}>{tripStart}</Text>
+          <Text style={tripStyles.label}>End: </Text>
+          <Text style={tripStyles.detail}>{tripEnd}</Text>
         </View>
 
         {/*Right*/}
         <View style={globalStyles.column}>
           <Text style={tripStyles.label}> From: </Text>
-          <Text style={tripStyles.detail}>{startRackName}</Text>
+          <Text style={tripStyles.detail}>{startRackName}{rackId}</Text>
           <Text style={tripStyles.label}> To: </Text>
           <Text style={tripStyles.detail}>{endRackName}</Text>
         </View>
@@ -100,10 +112,14 @@ export default function TripCard({
       <View style={globalStyles.row}>
         {/*Left*/}
         <View style={[globalStyles.column, { alignItems: 'flex-start' }]}>
-          { remarks != 'reserved' && ( // display status if not reserved
+          { (remarks != 'reserved') && ( // display status if not reserved
             <View style={[globalStyles.statusBox, statusStyles.container]}>
               <Text style={[{ fontWeight: '600' }, {textTransform: 'capitalize'}, statusStyles.text]}>
-                {addtl_charge && addtl_charge > 0 ? 'Overdue: Php ' + addtl_charge : remarks}
+                { paid
+                ? 'Paid'
+                : (finalFee && finalFee > 0 
+                ? 'Balance: Php ' + finalFee 
+                : remarks)} 
               </Text>
             </View>
           )}
@@ -111,13 +127,13 @@ export default function TripCard({
 
         {/*Right*/}
         <View style={[globalStyles.column, { alignItems: 'flex-end' }]}> 
-          { addtl_charge && addtl_charge > 0 && ( // penalty information 
+          { !paid && (remarks == "completed") && ( // penalty information
             <TouchableOpacity
               style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
               onPress={() => router.push('/payment/pay')} // go to profile
               activeOpacity={0.8}
               >
-              <Text>Penalty payment</Text>
+              <Text>Pay</Text>
             </TouchableOpacity>
           )}
           { remarks === 'active' && ( // nearest rack to me 
@@ -135,11 +151,13 @@ export default function TripCard({
               onPress={() => {handleCancel();}} // handle cancel reservation
               activeOpacity={0.8}
               >
-              <Text>Cancel reservation</Text>
+              <Text>Cancel</Text>
             </TouchableOpacity>
           )}
         </View>
       </View>
+      <LoadingModal showLoadingModal={showLoadingModal} />
+      
     </View>
   );
 }
@@ -165,8 +183,8 @@ const tripStyles = StyleSheet.create({
 });
 
 // diff colored status boxes
-const getStatusStyles = (status: string, addtlCharge?: number) => {
- if (addtlCharge && addtlCharge > 0) {
+const getStatusStyles = (status: string, addtlCharge?: number, paid?: boolean) => {
+  if ((addtlCharge && addtlCharge > 0) && !paid ) {
     return { //case: overdue
       container: {
         backgroundColor: '#f8d7da',
@@ -202,7 +220,7 @@ const getStatusStyles = (status: string, addtlCharge?: number) => {
     default:
       return {
         container: {
-          backgroundColor: '#e2e3e5',
+          backgroundColor: '#fff',
           borderColor: '#6c757d',
         },
         text: {

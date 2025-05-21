@@ -16,37 +16,77 @@ import Header from "@/src/components/Header";
 import Option from "@/src/components/HomeOptions";
 
 // trips
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , createContext } from "react";
 import TripCard from "@/src/components/TripCard";
 import { Trip } from "@/src/components/types";
 import globalStyles from "@/src/assets/styles";
+import { preRentCheck } from "@/src/service/tripService";
+import ErrorModal from "@/src/components/ErrorModal";
+import SuccessModal from "@/src/components/SuccessModal";
+import { formatDate } from "@/src/service/tripService";
+
+type BikeContextType = {
+  rackId: string;
+  showSuccessModal: boolean;
+  showErrorModal: boolean;
+  showReturnModal: boolean;
+  errorMessage: string;
+  setShowErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
+  showLoadingModal: boolean;
+};
+
+export const BikeContext = createContext<BikeContextType | null>(null);
 
 export default function ActionPage() {
   const router = useRouter();
-
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
+  const userId = "user123";
+  const rackId = "rack123";
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleButtonPress = async () => {
+    try {
+      // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
+      const result = await preRentCheck(userId);
+      if (!result.allowed) {
+        setErrorMessage(result.reason);
+        setShowErrorModal(true);
+        return;
+      } else {
+        router.navigate("/rent");
+      }
+    } catch (err: any) {
+      setErrorMessage("Something went wrong. Please try again.");
+      setShowErrorModal(true);
+      Alert.alert("Error!", err.message); // temporary; replace with modal
+    }
+  };
+
+  const fetchTrips = async () => {
+    try {
+      const tripsCollection = collection(db, "trips");
+      const tripSnapshot = await getDocs(tripsCollection);
+
+      const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
+        ...(doc.data() as Trip),
+        id: doc.id,
+      }));
+
+      const active = allTrips.filter((trip) => trip.status === "reserved");
+
+      setActiveTrips(active);
+
+      console.log("[APP] Reserved Trips:", active);
+    } catch (error) {
+      console.error("Error fetching trips:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const tripsCollection = collection(db, "trips");
-        const tripSnapshot = await getDocs(tripsCollection);
-
-        const allTrips: Trip[] = tripSnapshot.docs.map((doc) => ({
-          ...(doc.data() as Trip),
-          id: doc.id,
-        }));
-
-        const active = allTrips.filter((trip) => trip.status === "reserved");
-
-        setActiveTrips(active);
-
-        console.log("[APP] Reserved Trips:", active);
-      } catch (error) {
-        console.error("Error fetching trips:", error);
-      }
-    };
-
     fetchTrips();
   }, []);
 
@@ -64,7 +104,7 @@ export default function ActionPage() {
             title="Rent"
             description="Rent a bike"
             icon="bike"
-            onPress={() => router.navigate("/rent")}
+            onPress={handleButtonPress}
           />
           <Option
             title="Return"
@@ -88,32 +128,45 @@ export default function ActionPage() {
           />
         </View>
         <View style={{ marginHorizontal: 20 }}>
-          {activeTrips.length === 0 ? (
-            <Text
-              style={[
-                globalStyles.subtitle,
-                { marginLeft: 40 },
-                { marginBottom: 30 },
-              ]}
-            >
-              No trips to show.
-            </Text>
-          ) : (
+          { activeTrips.length === 0 ? (
+            <Text style={[globalStyles.detail, {fontSize: 18}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
+          ) : ( 
             activeTrips.map((trip, index) => (
               <TripCard
                 tripID={trip.id}
                 key={index}
                 title={`Reservation from`}
                 bikeID={`${trip.bikeId}`}
-                tripStart={`${trip.startTime.toDate().toLocaleString()}`}
+                tripStart={formatDate(trip.startTime.toDate())}
                 tripEnd=""
                 remarks={`${trip.status}`}
                 startRack={trip.startRack}
                 endRack=""
+                onTripCancelled={() => {
+                  setSuccessMessage("Reservation cancelled.");
+                  setShowSuccessModal(true);
+                  fetchTrips();
+                }}
+                onCancelError={(message) => {
+                  setErrorMessage(message);
+                  setShowErrorModal(true);
+                }}
               />
             ))
           )}
         </View>
+        <SuccessModal
+          title="Success"
+          description1={successMessage}
+          showSuccessModal={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+        />
+        <ErrorModal
+          title="Error"
+          description={errorMessage}
+          showErrorModal={showErrorModal}
+          onClose={() => setShowErrorModal(false)}
+        />
       </ScrollView>
     </SafeAreaView>
   );

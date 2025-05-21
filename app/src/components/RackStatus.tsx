@@ -20,27 +20,26 @@ export default function RackStatus({
 }: RackStatProps) {
   return (
     <View style={styles.card}>
-
       <View style={globalStyles.row}>
-      <View style={globalStyles.column}>
-        <Text style={styles.detail}>
-            <Text style={styles.availValue}> {available} </Text>
-            Available
-          </Text>
+        <View style={globalStyles.column}>
+          <View style={styles.valueContainerGreen}>
+            <Text style={styles.valueText}>{available}</Text>
+          </View>
+          <Text style={styles.detail}>Available</Text>
         </View>
 
         <View style={globalStyles.column}>
-          <Text style={styles.detail}>
-            <Text style={styles.emptyValue}> {empty} </Text>
-            Empty Slots
-          </Text>
+          <View style={styles.valueContainerGray}>
+            <Text style={styles.valueText}>{empty}</Text>
+          </View>
+          <Text style={styles.detail}>Empty Slots</Text>
         </View>
 
         <View style={globalStyles.column}>
-          <Text style={styles.detail}>
-            <Text style={styles.reservedValue}> {reserved} </Text>
-            Reserved
-          </Text>
+          <View style={styles.valueContainerOrange}>
+            <Text style={styles.valueText}>{reserved}</Text>
+          </View>
+          <Text style={styles.detail}>Reserved</Text>
         </View>
       </View>
     </View>
@@ -54,47 +53,46 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     width: '100%',
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-    elevation: 5,
+    elevation: 5, // Android
+    shadowColor: '#000', // iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
+
   detail: {
     fontSize: 14,
-    fontWeight: 'normal',
     color: '#555',
+    marginTop: 4,
   },
-  label: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#29243F',
-  },
-  availValue: {
+
+  valueContainerGreen: {
     backgroundColor: '#2C452B',
-    borderRadius: 4,
-    padding: 2,
-    marginBottom: 20,
-    marginRight: 6,
-    fontSize: 12,
-    color: '#fff',
-    textAlignVertical: 'center'
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    alignSelf: 'flex-start',
   },
-  reservedValue: {
+
+  valueContainerOrange: {
     backgroundColor: '#CC883A',
-    borderRadius: 4,
-    padding: 2,
-    marginBottom: 20,
-    marginRight: 6,
-    fontSize: 12,
-    color: '#fff',
-    textAlignVertical: 'center'
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    alignSelf: 'flex-start',
   },
-  emptyValue: {
+
+  valueContainerGray: {
     backgroundColor: '#CDCDCD',
-    borderRadius: 4,
-    padding: 2,
-    marginBottom: 20,
-    marginRight: 6,
-    fontSize: 12,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    alignSelf: 'flex-start',
+  },
+
+  valueText: {
     color: '#fff',
-    textAlignVertical: 'center'
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
