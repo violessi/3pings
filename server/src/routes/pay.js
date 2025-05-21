@@ -29,19 +29,18 @@ router.post("/payTrip", async (req, res) => {
     const userSnap = await userRef.get();
     const userData = userSnap.data();
 
-    console.log(tripId, minusCredits, minusBalance, );
+    console.log(tripId, minusBalance, );
 
-    // check if sufficient balance/credits
+    // check if sufficient balance
     // error if not
-    if (credits < minusCredits || balance < minusBalance) {
+    if (balance < minusBalance) {
       return res.status(400).json({
-        error: 'Insufficient credits or balance',
-        credits,
+        error: 'Insufficient balance',
         balance,
       });
     }
 
-    // if enough, update balance/credit values
+    // if enough, update balance values
     // update trip paid bool
     // batch to do multiple updates
     const batch = db.batch();
@@ -51,7 +50,6 @@ router.post("/payTrip", async (req, res) => {
     });
 
     batch.update(userRef, {
-      credits: currentCredits - minusCredits,
       balance: currentBalance - minusBalance,
     });
 

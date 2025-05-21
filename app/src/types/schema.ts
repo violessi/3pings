@@ -61,6 +61,7 @@ export const TripSchema = z.object({
   endTime: z.string().nullable(),
   status: TripStatusSchema,
   baseRate: z.number(),
+  rateInterval: z.number().nullable(),
   addtlCharge: z.number().nullable(),
   finalFee: z.number(),
   createdAt: z.string(),

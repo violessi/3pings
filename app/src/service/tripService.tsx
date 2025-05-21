@@ -1,6 +1,6 @@
 import { BikeSchema, RackSchema } from "@/types/schema";
 
-const IP_ADDRESS = "192.168.254.160"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.80.105.189"; // change to your laptop's/server's IP
 const SERVER_URL = "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
 // ========================RENT=============================
@@ -218,11 +218,7 @@ export const handleReturn = async (payload: {
 };
 
 // ======================PAY FOR A TRIP======================
-export const payTrip = async (
-  tripId: string,
-  minusCredits: number,
-  minusBalance: number
-) => {
+export const payTrip = async (tripId: string, minusBalance: number) => {
   try {
     const res = await fetch(`http://${IP_ADDRESS}:3000/api/pay/payTrip`, {
       // const res = await fetch(`${SERVER_URL}api/pay/payTrip`, {
@@ -230,7 +226,7 @@ export const payTrip = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ tripId, minusCredits, minusBalance }),
+      body: JSON.stringify({tripId, minusBalance})
     });
 
     return await res.json(); // return server response

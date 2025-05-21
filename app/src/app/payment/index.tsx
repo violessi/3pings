@@ -70,7 +70,7 @@ export default function Rent() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <Header
-        title="Fees Summary"
+        title="Pending Fees"
         subtitle="Click to pay for a trip"
         hasBack={true}
         prevCallback={handleBack}

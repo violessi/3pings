@@ -1,4 +1,4 @@
-const IP_ADDRESS = "192.168.1.30"; // change to your laptop's/server's IP
+const IP_ADDRESS = "10.80.105.189"; // change to your laptop's/server's IP
 const SERVER_URL = "https://iotcup-spinrewards-server-ccf03fb41b1c.herokuapp.com/";
 
 export const resetDatabase = async () => {
