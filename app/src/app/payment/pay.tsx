@@ -143,10 +143,6 @@ export default function Pay() {
         </View>
       </View>
 
-      <View className="px-4 py-2">
-        <Text >Current Balance: {currentBalance}</Text>
-      </View>
-
       {/* way to pay for trip, use credits, etc */}
       {/* set amount of credits to use, max allowable = total credits OR finalFee*/}
       {/* i think need to set minusCredits and minusBalance on button press... but also go to payForTrip() with payload*/}
@@ -160,6 +156,7 @@ export default function Pay() {
       </View>
 
       <View className="px-4 py-2">
+        <Text >Current Balance: {currentBalance}</Text>
         <Text >New Balance: {newBalance}</Text>
       </View>
 
@@ -170,9 +167,9 @@ export default function Pay() {
       </View>
 
       {/* loading, success, and error modal */}
-      {/* <LoadingModal visible={showLoadingModal} />
-      <SuccessModal visible={showSuccessModal} onClose={handleCloseSuccessModal} />
-      <ErrorModal visible={showErrorModal} onClose={() => setShowErrorModal(false)} /> */}
+      <LoadingModal showLoadingModal={showLoadingModal} />
+      <SuccessModal title="Successful Payment" showSuccessModal={showSuccessModal} onClose={handleCloseSuccessModal} />
+      <ErrorModal title="Error" showErrorModal={showErrorModal} onClose={() => setShowErrorModal(false)} /> 
     </SafeAreaView>
   );
 }

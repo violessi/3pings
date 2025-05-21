@@ -38,7 +38,7 @@ type BikeContextType = {
   reserveABike: (selectedDate: Date) => Promise<Bike | null>;
   returnABike: (userId: string) => Promise<void>;
   cancelReservation: (tripId: string) => void;
-  payForTrip: (tripId: string, minusCredits: number, minusBalance: number) => Promise<void>;
+  payForTrip: (tripId: string, minusBalance: number) => Promise<void>;
   getRackNameById: (rackId: string) => Promise<string>;
   refreshTripsFlag: boolean;
   setRefreshTripsFlag: React.Dispatch<React.SetStateAction<boolean>>;
