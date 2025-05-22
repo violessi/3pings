@@ -26,13 +26,16 @@ import ErrorModal from "../components/ErrorModal";
 
 type BikeContextType = {
   rackId: string;
+  rackSlot: number | null;
   showSuccessModal: boolean;
   isLate: boolean;
   showErrorModal: boolean;
   showReturnModal: boolean;
+  showRentModal: boolean;
   errorMessage: string;
   setShowErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowRentModal: React.Dispatch<React.SetStateAction<boolean>>;
   showLoadingModal: boolean;
   updateRackId: (newRackId: string) => void;
   rentABike: () => Promise<number | null>;
@@ -52,10 +55,12 @@ const [errorMessage, setErrorMessage] = useState("");
 // PROVIDER COMPONENT
 export const BikeProvider = ({ children }: { children: ReactNode }) => {
   const [rackId, setRackId] = useState("");
+  const [rackSlot, setRackSlot] = useState<number | null>(null);
 
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showRentModal, setShowRentModal] = useState(false);
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLate, setIsLate] = useState(false);
@@ -182,8 +187,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       // check if user has a reservation at this rack
       const reservedTripDoc = await checkReserved(userId, rackId);
       let bikeId: string;
-      let rackSlot: any;
       let reservedTripId: string | undefined;
+      let slotToUse: number | null = null;
 
       console.log(reservedTripDoc);
 
@@ -193,7 +198,8 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       if (reservedTripDoc && reservedTripDoc.status === "reserved") {
         bikeId = reservedTripDoc.bikeId;
         reservedTripId = reservedTripDoc.id;
-        rackSlot = reservedTripDoc.rackSlot;
+        slotToUse = reservedTripDoc.rackSlot;
+        setRackSlot(slotToUse);
 
         console.log("[APP] User has reserved: " + reservedTripId);
         console.log("[RENT] Using reserved bike:", bikeId);
@@ -210,21 +216,19 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         const randomIndex = Math.floor(Math.random() * availableBikes.length);
         const bike = availableBikes[randomIndex];
         bikeId = bike.id;
-        rackSlot = bike.rackSlot;
+        slotToUse = bike.rackSlot;
+        setRackSlot(slotToUse);
       }
 
-      // CreateTrip handles creating new trip or updating reserved trip
-      console.log(rackId);
       const now = new Date();
 
       setShowLoadingModal(false);
       setTimeout(() => {
         setShowSuccessModal(true);
       }, 500);
-
-      await hardwareRequest({ bikeId });
-
       updateRackId("");
+
+      slotToUse = await hardwareRequest({ bikeId });
 
       const payload: CreateTrip = {
         bikeId: bikeId,
@@ -238,15 +242,14 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
         startRack: rackId,
         endRack: "",
       };
+
       await initializeTrip(payload);
 
-      // shared logic after trip is created
-      // listen for changes in bike status.
-      // while bike status is not "rented", keep showing the success modal
-      // if bike status is "rented", close the modal and navigate to the action page
-
       setShowSuccessModal(false);
-      return rackSlot;
+      setTimeout(() => {
+        setShowRentModal(true);
+      }, 500);
+      return slotToUse;
     } catch (err: any) {
       setShowLoadingModal(false);
       setShowSuccessModal(false);
@@ -383,7 +386,10 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
       updateRackId("");
     } catch (err: any) {
       setShowLoadingModal(false);
-      throw new Error(`Cancellation failed: ${err.message}`);
+      setTimeout(() => {
+        setErrorMessage(err.message);
+        setShowErrorModal(true);
+      }, 500);
     }
   }
 
@@ -410,13 +416,16 @@ export const BikeProvider = ({ children }: { children: ReactNode }) => {
     <BikeContext.Provider
       value={{
         rackId,
+        rackSlot,
         showSuccessModal,
         showErrorModal,
         isLate,
         showReturnModal,
+        showRentModal,
         errorMessage,
         setShowErrorModal,
         setShowSuccessModal,
+        setShowRentModal,
         showLoadingModal,
         updateRackId,
         rentABike,

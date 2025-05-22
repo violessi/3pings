@@ -52,7 +52,7 @@ export default function Return() {
       <SuccessModal
         title="Waiting for bike return..."
         description1={`We will open a bike slot for you. Please return your bike once the slot has opened.`}
-        description2="This modal will close automatically once you have returned your bike."
+        description2="This modal will close automatically once you have returned your bike. Please do not close the app."
         showSuccessModal={showReturnModal}
       />
       <SuccessModal

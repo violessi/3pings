@@ -292,6 +292,13 @@ router.post("/hardwareRequest", async (req, res) => {
     }
 
     const bikeRef = db.collection("bikes").doc(bikeId);
+    const bikeDoc = await bikeRef.get();
+
+    if (!bikeDoc.exists) {
+      throw new Error("Bike not found");
+    }
+
+    const currentRackSlot = bikeDoc.data().rackSlot;
     await bikeRef.update({
       status: "rented",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -301,7 +308,7 @@ router.post("/hardwareRequest", async (req, res) => {
 
     res.status(200).json({
       message: "Bike pinged and unlock request sent to ESP32",
-      // pingResult,
+      currentRackSlot,
       // unlockResult,
     });
   } catch (err) {

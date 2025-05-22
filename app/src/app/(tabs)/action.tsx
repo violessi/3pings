@@ -16,7 +16,7 @@ import Header from "@/src/components/Header";
 import Option from "@/src/components/HomeOptions";
 
 // trips
-import React, { useState, useEffect , createContext } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import TripCard from "@/src/components/TripCard";
 import { Trip } from "@/src/components/types";
 import globalStyles from "@/src/assets/styles";
@@ -24,33 +24,50 @@ import { preRentCheck } from "@/src/service/tripService";
 import ErrorModal from "@/src/components/ErrorModal";
 import SuccessModal from "@/src/components/SuccessModal";
 import { formatDate } from "@/src/service/tripService";
-import { useBike } from "@/src/context/BikeContext";
+import LoadingModal from "@/src/components/LoadingModal";
+import { useFocusEffect } from "@react-navigation/native";
+
+type BikeContextType = {
+  rackId: string;
+  showSuccessModal: boolean;
+  showErrorModal: boolean;
+  showReturnModal: boolean;
+  errorMessage: string;
+  setShowErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
+  showLoadingModal: boolean;
+};
+
+export const BikeContext = createContext<BikeContextType | null>(null);
 
 export default function ActionPage() {
-
   const router = useRouter();
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
   const userId = "user123";
-  const rackId = "rack123";
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleButtonPress = async () => {
+    setShowLoadingModal(true);
     try {
+      // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
       const result = await preRentCheck(userId);
       if (!result.allowed) {
-        setErrorMessage(result.reason);
-        setShowErrorModal(true);
-        return;
+        throw new Error(result.reason);
       } else {
+        setShowLoadingModal(false);
         router.navigate("/rent");
       }
     } catch (err: any) {
-      setErrorMessage("Something went wrong. Please try again.");
-      setShowErrorModal(true);
-      Alert.alert("Error!", err.message); // temporary; replace with modal
+      setShowLoadingModal(false);
+      setTimeout(() => {
+        setErrorMessage(err.message);
+        setShowErrorModal(true);
+      }, 500);
+      return;
     }
   };
 
@@ -74,9 +91,11 @@ export default function ActionPage() {
     }
   };
 
-  useEffect(() => {
-    fetchTrips();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchTrips();
+    }, [])
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -116,9 +135,18 @@ export default function ActionPage() {
           />
         </View>
         <View style={{ marginHorizontal: 20 }}>
-          { activeTrips.length === 0 ? (
-            <Text style={[globalStyles.detail, {fontSize: 18}, {marginLeft: 40},{marginBottom: 30}]}>No trips to show.</Text>
-          ) : ( 
+          {activeTrips.length === 0 ? (
+            <Text
+              style={[
+                globalStyles.detail,
+                { fontSize: 18 },
+                { marginLeft: 40 },
+                { marginBottom: 30 },
+              ]}
+            >
+              No trips to show.
+            </Text>
+          ) : (
             activeTrips.map((trip, index) => (
               <TripCard
                 tripID={trip.id}
@@ -155,6 +183,7 @@ export default function ActionPage() {
           showErrorModal={showErrorModal}
           onClose={() => setShowErrorModal(false)}
         />
+        <LoadingModal showLoadingModal={showLoadingModal} />
       </ScrollView>
     </SafeAreaView>
   );

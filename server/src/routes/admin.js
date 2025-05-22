@@ -6,7 +6,7 @@ router.use(express.json());
 
 router.post("/getIP", async (req, res) => {
   const { IPAddr } = req.body;
-  console.log(`[SERVER] Received get IP req`);
+  console.log(`[SERVER] Received get IP req: ${IPAddr}`);
 
   try {
     const rackRef = db.collection("racks").doc("rack123");

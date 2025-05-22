@@ -50,16 +50,6 @@ async function requestBikeReturn(req, res) {
 
     const tripData = tripSnapshot.data();
 
-    // Mark bike as returning
-    const bikeRef = db.collection("bikes").doc(tripData.bikeId);
-    await bikeRef.update({
-      status: "returning",
-      rackId,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    console.log(`[SERVER] Bike ${tripData.bikeId} marked as returning`);
-
     // check if ESP32 is reachable
     const pingResponse = await fetch(`${ESP32_BASE_URL}/ping`, {
       method: "GET",
@@ -71,6 +61,8 @@ async function requestBikeReturn(req, res) {
     if (!pingResponse.ok) {
       return res.status(404).json({ error: "Hardware unreachable" });
     }
+
+    const bikeRef = db.collection("bikes").doc(tripData.bikeId);
 
     // if reachable, proceed to unlock the bike
     const lockResponse = await fetch(`${ESP32_BASE_URL}/return`, {
@@ -103,6 +95,7 @@ async function requestBikeReturn(req, res) {
       Math.ceil(durationMinutes / RATE_INTERVAL) * tripData.baseRate + addtlFee;
 
     // Update trip
+
     await tripRef.update({
       status: "completed",
       addtlFee,

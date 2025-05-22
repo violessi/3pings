@@ -16,22 +16,22 @@ export default function Rent() {
     rackId,
     showSuccessModal,
     showErrorModal,
+    showRentModal,
     setShowErrorModal,
     setShowSuccessModal,
+    setShowRentModal,
     showLoadingModal,
     updateRackId,
     rentABike,
     errorMessage,
   } = useBike();
 
-  const [rackSlot, setRackSlot] = useState<any | null>(null);
-  const [assignedBike, setAssignedBike] = useState<Bike | null>(null);
+  const [slot, setSlot] = useState<number | null>(null);
 
   const handleButtonPress = async () => {
     try {
-      const res = await rentABike();
-      console.log("Slot:", res);
-      setRackSlot(res);
+      const rackSlot = await rentABike();
+      setSlot(rackSlot);
     } catch (err: any) {
       Alert.alert("Error!", err.message); // temporary; replace with modal
     }
@@ -63,10 +63,18 @@ export default function Rent() {
       </View>
       <LoadingModal showLoadingModal={showLoadingModal} />
       <SuccessModal
-        title="Bike rented successfully!"
-        description1={`We will open the slot ${rackSlot} for your bike. Please wait a moment...`}
-        description2="This modal will close automatically once you have removed your bike."
+        title="We have received your rental request!"
+        description1={`We’re opening a slot for your bike—please monitor the rack for the release.`}
+        description2="Please do not close the app."
         showSuccessModal={showSuccessModal}
+      />
+      <SuccessModal
+        title="Bike rented successfully!"
+        description1={`Thank you for using our service!`}
+        showSuccessModal={showRentModal}
+        onClose={() => {
+          setShowRentModal(false);
+        }}
       />
       <ErrorModal
         title="Error"

@@ -1,13 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { Text, ScrollView, View, SafeAreaView, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Text,
+  ScrollView,
+  View,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+
 import Header from "@/src/components/Header";
 import globalStyles from "@/src/assets/styles";
 
 import { useRouter } from "expo-router";
-import { collection, getDocs , doc, getDoc, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { Card } from "@/src/components/Card";
-import { resetDatabase, unpayDemotrip3} from "@/service/admin";
+import { resetDatabase, unpayDemotrip3 } from "@/service/admin";
 import LoadingModal from "@/src/components/LoadingModal";
 import SuccessModal from "@/src/components/SuccessModal";
 import { useBike } from "@/src/context/BikeContext";
@@ -30,7 +47,7 @@ export default function ProfileScreen() {
 
     try {
       const res = await resetDatabase();
-      setShowLoadingModal(false); 
+      setShowLoadingModal(false);
       setShowSuccessModal(true);
       setRefreshTripsFlag((prev) => !prev);
     } catch (err: any) {
@@ -39,7 +56,7 @@ export default function ProfileScreen() {
     }
   };
 
-    const handleUnpay3 = async () => {
+  const handleUnpay3 = async () => {
     try {
       const res = await unpayDemotrip3();
     } catch (err: any) {
@@ -48,49 +65,47 @@ export default function ProfileScreen() {
   };
 
   // fetch user profile + reward details for rewards summary
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!userId) return;
+  useFocusEffect(
+    useCallback(() => {
+      const fetchProfile = async () => {
+        if (!userId) return;
 
-      try {
-        // fetch user data
-        const userRef = doc(db, "users", userId);
-        const userSnap = await getDoc(userRef);
-        if (!userSnap.exists()) return;
+        try {
+          const userRef = doc(db, "users", userId);
+          const userSnap = await getDoc(userRef);
+          if (!userSnap.exists()) return;
 
-        const userInfo = userSnap.data();
-        setUserData(userInfo);
-        setTotalCredits(userInfo.credits || 0); // fallback to 0 if not defined
+          const userInfo = userSnap.data();
+          setUserData(userInfo);
+          setTotalCredits(userInfo.credits || 0);
 
-        // get the 3 most recent claimed rewards
-        const rewardIds = userInfo.rewards || [];
-        const rewardDocs: any[] = [];
+          const rewardIds = userInfo.rewards || [];
+          const rewardDocs: any[] = [];
 
-        for (let id of rewardIds) {
-          const rewardRef = doc(db, "rewards", id);
-          const rewardSnap = await getDoc(rewardRef);
-          if (rewardSnap.exists()) {
-            rewardDocs.push({ id, ...rewardSnap.data() });
+          for (let id of rewardIds) {
+            const rewardRef = doc(db, "rewards", id);
+            const rewardSnap = await getDoc(rewardRef);
+            if (rewardSnap.exists()) {
+              rewardDocs.push({ id, ...rewardSnap.data() });
+            }
           }
+
+          rewardDocs.sort((a, b) => {
+            const aTime = a.createdAt?.toMillis?.() ?? 0;
+            const bTime = b.createdAt?.toMillis?.() ?? 0;
+            return bTime - aTime;
+          });
+
+          const recentRewards = rewardDocs.slice(0, 3);
+          setRewardsData(recentRewards);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
         }
+      };
 
-        // sort and get top 3
-        rewardDocs.sort((a, b) => {
-          const aTime = a.createdAt?.toMillis?.() ?? 0;
-          const bTime = b.createdAt?.toMillis?.() ?? 0;
-          return bTime - aTime;
-        });
-        const recentRewards = rewardDocs.slice(0, 3);
-
-        setRewardsData(recentRewards);
-
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
-
-    fetchProfile();
-  }, [userId]);
+      fetchProfile();
+    }, [])
+  );
 
   // fetch trips for pending fees summary
   useEffect(() => {
@@ -125,7 +140,6 @@ export default function ProfileScreen() {
         const recentTrips = tripsData.slice(0, 3);
 
         setTrips(recentTrips);
-
       } catch (error) {
         console.error("Error fetching trips:", error);
       }
@@ -141,63 +155,86 @@ export default function ProfileScreen() {
         contentContainerStyle={globalStyles.container}
         showsVerticalScrollIndicator={false}
       >
-      
-      {/* see user information; no functions yet */}
-      {/*<Text style={globalStyles.title}> Profile </Text>*/}
-      <Card style={{backgroundColor: "#362C5F"}} activeOpacity={1}>
-        {userData && (
+        {/* see user information; no functions yet */}
+        {/*<Text style={globalStyles.title}> Profile </Text>*/}
+        <Card style={{ backgroundColor: "#362C5F" }} activeOpacity={1}>
+          {userData && (
             <View key={userData.id} className="pr-2 pb-2">
-              <Text className="text-lg font-semibold text-white">User Name</Text>
-              <Text className="text-sm text-white">  Username: {userData.username}</Text>
-              <Text className="text-sm text-white">  Student Number: {userData.id}</Text>
-              <Text className="text-sm text-white">  Email: {userData.email}</Text>
+              <Text className="text-lg font-semibold text-white">
+                User Name
+              </Text>
+              <Text className="text-sm text-white">
+                {" "}
+                Username: {userData.username}
+              </Text>
+              <Text className="text-sm text-white">
+                {" "}
+                Student Number: {userData.id}
+              </Text>
+              <Text className="text-sm text-white">
+                {" "}
+                Email: {userData.email}
+              </Text>
             </View>
-        )}
-      </Card>
+          )}
+        </Card>
 
-      {/* show wallet balance */}
-      <Text style={globalStyles.title}> Wallet Balance </Text>
-      <Card style={{backgroundColor: "#fff"}}>
-        {userData && (
-          <View key ={userData.id} className="pre-2 pb-2">
-            <Text className="text-base font-semibold text-gray-800">Balance: ₱{userData.balance}</Text>
-            <Text className="text-sm mt-2" style={{color: "text-gray-800"}}>⭐ Claimed rewards are automatically added here!</Text>
-            <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>Link your account to your e-wallet</Text>
+        {/* show wallet balance */}
+        <Text style={globalStyles.title}> Wallet Balance </Text>
+        <Card style={{ backgroundColor: "#fff" }}>
+          {userData && (
+            <View key={userData.id} className="pre-2 pb-2">
+              <Text className="text-base font-semibold text-gray-800">
+                Balance: ₱{userData.balance}
+              </Text>
+              <Text className="text-sm mt-2" style={{ color: "text-gray-800" }}>
+                ⭐ Claimed rewards are automatically added here!
+              </Text>
+              <Text className="text-sm mt-4" style={{ color: "#cccfcd" }}>
+                Link your account to your e-wallet
+              </Text>
+            </View>
+          )}
+        </Card>
+
+        {/* show total fees and list view most recent trips */}
+        {/* 'see more' -> clicking goes to a full page to view and pay */}
+        <Text style={globalStyles.title}> Pending Fees </Text>
+        <Card
+          onPress={() => router.push("../payment")}
+          style={{ backgroundColor: "#fff" }}
+        >
+          <Text className="text-base font-semibold text-gray-800">
+            Total Pending Fees: ₱{pendingFees}
+          </Text>
+          <View className="mt-2">
+            {trips.map((trip) => (
+              <Text key={trip.id} className="text-sm text-gray-600">
+                🚲{" "}
+                {new Date(trip.startTime.seconds * 1000).toLocaleDateString()} -
+                ₱{trip.finalFee}
+              </Text>
+            ))}
           </View>
-        )}
-      </Card>
+          <Text className="text-sm mt-4" style={{ color: "#cccfcd" }}>
+            Check and pay late fees
+          </Text>
+        </Card>
 
-      {/* show total fees and list view most recent trips */}
-      {/* 'see more' -> clicking goes to a full page to view and pay */}
-      <Text style={globalStyles.title}> Pending Fees </Text>
-      <Card onPress={() => router.push("../payment")} style={{backgroundColor: "#fff"}}>
-        <Text className="text-base font-semibold text-gray-800">Total Pending Fees: ₱{pendingFees}</Text>
-        <View className="mt-2">
-          {trips.map((trip) => (
-            <Text key={trip.id} className="text-sm text-gray-600">
-              🚲 {new Date(trip.startTime.seconds * 1000).toLocaleDateString()} - ₱{trip.finalFee}
-            </Text>
-          ))}
-        </View>
-        <Text className="text-sm mt-4" style={{color: "#cccfcd"}}>Check and pay late fees</Text>
-      </Card>
+        <TouchableOpacity onPress={() => handleReset()}>
+          <Text>Reset Demo</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => handleReset()}>
-        <Text>Reset Demo</Text>
-      </TouchableOpacity>
-            
-      <LoadingModal showLoadingModal={showLoadingModal} />
-      <SuccessModal
-        title="Reset successful!"
-        description1="You're ready for a demo."
-        showSuccessModal={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          router.replace("/action"); // or use push/pop if needed
-        }}
-      />
-
-
+        <LoadingModal showLoadingModal={showLoadingModal} />
+        <SuccessModal
+          title="Reset successful!"
+          description1="You're ready for a demo."
+          showSuccessModal={showSuccessModal}
+          onClose={() => {
+            setShowSuccessModal(false);
+            router.replace("/action"); // or use push/pop if needed
+          }}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -205,11 +242,11 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   card: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 8,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });
