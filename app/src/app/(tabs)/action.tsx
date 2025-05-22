@@ -24,21 +24,10 @@ import { preRentCheck } from "@/src/service/tripService";
 import ErrorModal from "@/src/components/ErrorModal";
 import SuccessModal from "@/src/components/SuccessModal";
 import { formatDate } from "@/src/service/tripService";
-
-type BikeContextType = {
-  rackId: string;
-  showSuccessModal: boolean;
-  showErrorModal: boolean;
-  showReturnModal: boolean;
-  errorMessage: string;
-  setShowErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
-  showLoadingModal: boolean;
-};
-
-export const BikeContext = createContext<BikeContextType | null>(null);
+import { useBike } from "@/src/context/BikeContext";
 
 export default function ActionPage() {
+
   const router = useRouter();
   const [activeTrips, setActiveTrips] = useState<Trip[]>([]);
   const userId = "user123";
@@ -50,7 +39,6 @@ export default function ActionPage() {
 
   const handleButtonPress = async () => {
     try {
-      // handle prechecking before renting - TO MOVE TO RENT BUTTON PRESSING
       const result = await preRentCheck(userId);
       if (!result.allowed) {
         setErrorMessage(result.reason);

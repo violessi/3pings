@@ -29,7 +29,9 @@ export default function TripScreen() {
 
       const active = allTrips.filter((trip) => trip.status === "active");
 
-      const completed = allTrips.filter((trip) => trip.status === "completed");
+      const completed = allTrips.filter(trip =>
+        trip.status === "completed"
+      );
 
       setActiveTrips(active);
       setCompletedTrips(completed);
@@ -68,17 +70,9 @@ export default function TripScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={globalStyles.title}> Active </Text>
-        {activeTrips.length === 0 ? (
-          <Text
-            style={[
-              globalStyles.detail,
-              { fontSize: 18 },
-              { marginBottom: 30 },
-            ]}
-          >
-            No trips to show.
-          </Text>
-        ) : (
+        { activeTrips.length === 0 ? (
+          <Text style={[globalStyles.detail, { fontSize: 18 }, {marginBottom: 30}]}>No trips to show.</Text>
+        ) : (  
           activeTrips.map((trip, index) => (
             <TripCard
               key={index}

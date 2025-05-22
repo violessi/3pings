@@ -7,7 +7,6 @@ type ReserveFormProps = {
 };
 
 export default function ReserveForm({ onReserve }: ReserveFormProps) {
-
   return (
   <View style={styles.card}>
     <Text style={globalStyles.subtitle}>Reserve a Bike </Text>
@@ -48,12 +47,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 14,
-  },
-  placeholderPicker: {
-    backgroundColor: '#A9A9A9',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    alignItems: 'center',
   },
 });

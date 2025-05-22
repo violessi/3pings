@@ -130,7 +130,7 @@ export default function TripCard({
           { !paid && (remarks == "completed") && ( // penalty information
             <TouchableOpacity
               style={[globalStyles.statusBox, {backgroundColor: '#e2e3e5'}]}
-              onPress={() => router.push('/payment/pay')} // go to profile
+              onPress={() => router.push(`/payment/pay?tripId=${tripID}`)}
               activeOpacity={0.8}
               >
               <Text>Pay</Text>

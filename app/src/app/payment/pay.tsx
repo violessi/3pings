@@ -6,6 +6,7 @@ import {
   Alert,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { TextInput } from "react-native-paper";
@@ -20,6 +21,7 @@ import SuccessModal from "@/components/SuccessModal";
 import ErrorModal from "@/components/ErrorModal";
 import globalStyles from "@/src/assets/styles";
 import { formatDate } from "@/src/service/tripService";
+import { Card } from "@/src/components/Card";
 
 export default function Pay() {
   const { tripId } = useLocalSearchParams<{ tripId: string }>();
@@ -72,6 +74,7 @@ export default function Pay() {
     }
   };
 
+
   useEffect(() => {
     if (!tripId) return;
 
@@ -85,14 +88,13 @@ export default function Pay() {
         if (startSnap.exists()) {
           const startName = startSnap.data().rackName;
           const startTime = formatDate(
-            trip.startTime.toDate().toLocaleString()
-          );
+            trip.startTime.toDate());
           setStartString(`${startName}\n${startTime}\n`);
         }
         const endSnap = await getDoc(doc(db, "racks", trip.endRack));
         if (endSnap.exists()) {
           const endName = endSnap.data().rackName;
-          const endTime = formatDate(trip.endTime.toDate().toLocaleString());
+          const endTime = formatDate(trip.endTime.toDate());
           setEndString(`${endName}\n${endTime}`);
         }
 
@@ -106,9 +108,9 @@ export default function Pay() {
         setFeeString(feeString);
 
         if (trip.addtlCharge) {
-          setAddtlString(`LATE ₱${trip.addtlCharge}`);
+          setAddtlString(`Late fee: ₱${trip.addtlCharge}`);
         } else {
-          setAddtlString(`NO LATE FEES`);
+          setAddtlString(`No late fee`);
         }
       }
       // User balance
@@ -124,35 +126,50 @@ export default function Pay() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <Header title="Pay for a Trip" hasBack={true} prevCallback={handleBack} />
+      <ScrollView
+        contentContainerStyle={globalStyles.container}
+        showsVerticalScrollIndicator={false}
+      >
       {/* show trip details */}
-      <View className="px-4 py-2">
-        <Text className="text-lg font-semibold mb-1">Trip Summary:</Text>
-        <View className="px-4 py-2">
-          <Text>Start :</Text>
-          <Text>{startString}</Text>
+      <Card style={{backgroundColor: "#fff"}}>
+        <Text className="text-lg font-semibold text-gray-800 mb-3">🚴 Trip Summary</Text>
+        
+        <View className="flex-row mb-2">
+          <Text className="text-sm font-medium text-gray-800">Start Time:</Text>
+          <Text className="text-sm text-gray-600 ml-5">{startString}</Text>
         </View>
-        <View className="px-4 py-2">
-          <Text>End :</Text>
-          <Text>{endString}</Text>
+
+        <View className="flex-row">
+          <Text className="text-sm font-medium text-gray-800">End Time:</Text>
+          <Text className="text-sm text-gray-600 ml-7">{endString}</Text>
         </View>
-      </View>
+      </Card>
 
-      {/* way to pay for trip, use credits, etc */}
-      {/* set amount of credits to use, max allowable = total credits OR finalFee*/}
-      {/* i think need to set minusCredits and minusBalance on button press... but also go to payForTrip() with payload*/}
-      {/* set minusCredits = amount set by user; set minusBalance = diff of finalFee and minusCredits*/}
+      {/* payment breakdown */}
+      <Card style={{backgroundColor: "#fff"}}>
+        <Text className="text-lg font-semibold text-gray-800 mb-3">💰 Payment Breakdown</Text>
+        
+        <View className="mb-1">
+          <Text className="text-sm text-gray-600">{feeString}</Text>
+          <Text className="text-sm text-gray-600">{feeAddtlString}</Text>
+        </View>
 
-      <View className="px-4 mt-4">
-        <Text className="font-medium">Payment Breakdown:</Text>
-        <Text>{feeString}</Text>
-        <Text>{feeAddtlString}</Text>
-        <Text>Total Fee: ₱{finalFee}</Text>
-      </View>
+        <Text className="text-base font-bold text-gray-900 mt-2">Total Fee: ₱{finalFee}</Text>
+      </Card>
 
-      <View className="px-4 py-2">
-        <Text>Current Balance: {currentBalance}</Text>
-        <Text>New Balance: {newBalance}</Text>
-      </View>
+      {/* balance update */}
+      <Card style={{backgroundColor: "#fff"}}>
+        <Text className="text-lg font-semibold text-gray-800 mb-3">🧾 Wallet</Text>
+          <View className="flex-row justify-between mb-1">
+            <Text className="text-sm font-medium text-gray-800">Current Balance:</Text>
+            <Text className="text-sm text-gray-600">₱{currentBalance}</Text>
+          </View>
+
+          <View className="flex-row justify-between">
+            <Text className="text-sm font-medium text-gray-800">New Balance:</Text>
+            <Text className="text-sm text-gray-600">₱{newBalance}</Text>
+          </View>
+      </Card>
 
       <View className="px-4 mt-4">
         <TouchableOpacity onPress={handleButtonPress} style={styles.payButton}>
@@ -173,6 +190,7 @@ export default function Pay() {
         showErrorModal={showErrorModal}
         onClose={() => setShowErrorModal(false)}
       />
+    </ScrollView>
     </SafeAreaView>
   );
 }

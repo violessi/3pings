@@ -92,6 +92,7 @@ router.post("/preCheck", async (req, res) => {
     });
 
     const MAX_PENALTY = 50; // MAX PENALTY HARDCODED
+    console.log(totalPenalty);
     if (totalPenalty >= MAX_PENALTY) {
       return res
         .status(200)
