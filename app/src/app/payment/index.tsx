@@ -51,11 +51,32 @@ export default function Rent() {
         const tripsData: any[] = [];
         let totalFees = 0;
 
-        querySnapshot.forEach((doc) => {
-          const trip = doc.data();
-          tripsData.push({ id: doc.id, ...trip });
+        for (const docSnap of querySnapshot.docs) {
+          const trip = docSnap.data();
+          const tripId = docSnap.id;
+
+          // get rack name based on trip.startRack
+          let rackName = "";
+          if (trip.startRack) {
+            try {
+              const rackSnap = await getDoc(doc(db, "racks", trip.startRack));
+              if (rackSnap.exists()) {
+                const rackData = rackSnap.data();
+                rackName = rackData.rackName || "";
+              }
+            } catch (rackError) {
+              console.warn("Error fetching rack data:", rackError);
+            }
+          }
+
+          tripsData.push({
+            id: tripId,
+            ...trip,
+            startRackName: rackName,
+          });
+
           totalFees += trip.finalFee || 0; // handle undefined finalFare
-        });
+        }
         setPendingFees(totalFees);
         setTrips(tripsData);
 
@@ -90,7 +111,7 @@ export default function Rent() {
           <View key={trip.id} style={styles.tripRow}>
             <View style={styles.tripText}>
               <Text className="text-sm font-bold text-gray-700">
-                Trip {new Date(trip.startTime.seconds * 1000).toLocaleDateString()}
+                Trip {new Date(trip.startTime.seconds * 1000).toLocaleDateString()} from {trip.startRackName}
               </Text>
               <Text className="text-sm text-gray-500">₱{trip.finalFee}</Text>
             </View>

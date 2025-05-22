@@ -13,8 +13,6 @@ import Header from "@/src/components/Header";
 import Button from "@/src/components/Button";
 import { RackOption } from "@/src/components/RackOptions";
 
-import { hwToServer } from "@/src/service/tripService";
-
 export default function Index() {
   const router = useRouter();
 

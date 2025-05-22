@@ -30,9 +30,7 @@ router.post("/reset", async (req, res) => {
     });
     await bikeBatch.commit();
 
-    // clear/delete trips not demotrips
-    // CONSIDER: clear/delete completed trips EXCEPT trips named demotripX
-    // so we have hardcoded trips na for showing ui/cerifying rewards
+    // clear/delete trips that are not demotrips
     // everything else is for user testing
     const tripsSnapshot = await db.collection("trips").get();
     const tripBatch = db.batch();
@@ -48,6 +46,14 @@ router.post("/reset", async (req, res) => {
       }
     });
     await tripBatch.commit();
+
+    // update demotrips to unpaid
+    const demoSnap = await db.collection("trips").get();
+    const demoBatch = db.batch();
+    demoSnap.forEach((doc) => {
+      demoBatch.update(doc.ref, { paid: false });
+    });
+    await demoBatch.commit();
 
     // clear user.currentTrip
     // remove user rewards and rewardTrips EXCEPT demotrip1 and reward 1
